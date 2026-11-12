@@ -1,3 +1,7 @@
+## 4.3.0-beta2 - Crafting Intelligence 2.0: UI polish
+- Craft calculator: aligned the helper hint under the recipe input field.
+- Craft calculator: darkened the helper hint font slightly for better readability and lower glare.
+
 ## 4.3.0-beta1 - Crafting Intelligence 2.0: batch foundation
 - Added editable batch size (1-999 crafts) to the crafting calculator, saved across sessions.
 - Reagent quantities, market cost, additional cash expense and net auction revenue scale with the batch.

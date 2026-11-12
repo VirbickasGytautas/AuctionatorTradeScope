@@ -1515,7 +1515,8 @@ local function makeCraft(root)
   p.summary3=fs(p,"",22,-518,680)
   p.info=fs(p,"",22,-540,690)
   p.status=fs(p,l("Search saved recipes or open a profession and scan its recipes.",
-    "Найдите сохранённый рецепт или откройте профессию и просканируйте её рецепты."),20,-106,680)
+    "Найдите сохранённый рецепт или откройте профессию и просканируйте её рецепты."),26,-110,672)
+  p.status:SetTextColor(.72,.76,.80)
   local function displayName(id,provided,providedIcon)
     local name,icon=nil,nil
     if A.ResolveItemInfo then name,icon=A.ResolveItemInfo("item:"..tostring(id),provided) end
