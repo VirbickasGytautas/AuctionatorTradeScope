@@ -1,3 +1,9 @@
+## 4.3.0 - Stable Crafting Intelligence 2.0
+- Promoted the in-game-tested 4.3.0-beta5 source without changing addon calculations or SavedVariables.
+- Includes batch crafting (1-999), bag/bank reagent availability, missing purchases and grouped buy lists.
+- Includes graph cursor and supply-decline bar boundary fixes from beta5.
+- WoW Forever (Interface 16001); automated GitHub-to-CurseForge publishing with release tags.
+
 ## 4.3.0-beta5 - Chart cursor and distribution bar boundary fix
 - Keep supply-decline hover values and last observation time visible at the right-hand edge of the selected range.
 - Do not show a synthetic zero in a decline cursor when fewer than two quantity snapshots exist.
