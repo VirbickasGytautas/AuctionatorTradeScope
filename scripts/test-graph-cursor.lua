@@ -63,11 +63,11 @@ function A.ChartHours() return 24 end
 local observations = {}
 function A.AllSamples() return observations end
 
-assert(loadfile("Analytics.lua"))()
+assert(loadfile("Market/Analytics.lua"))()
 function A.MarketMetrics()
   return {observations = 2, currentQuantity = 8, estimatedDrops24 = 4}
 end
-assert(loadfile("Graph.lua"))()
+assert(loadfile("UI/Charts/Graph.lua"))()
 local graph = A.NewGraph(UIParent)
 graph.showItemHeader = false
 

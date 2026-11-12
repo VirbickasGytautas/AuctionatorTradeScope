@@ -1,3 +1,10 @@
+## 4.4.0-beta1 - Modular code layout (refactor only)
+- Reorganized addon Lua sources into Engine, Data, Market, Crafting, Finance, Localization and UI directories.
+- Split the former 2,724-line ProUI.lua into shared helpers, independent tool pages and a window controller.
+- Preserved the original TOC ordering, API surface, all graphical settings, inventory data, market calculations and SavedVariables.
+- Updated Lua regression harness paths and PowerShell release validation.
+- Development-only beta: no new Trading Journal 2.0 features; no CurseForge release tag or upload.
+
 ## 4.3.0 - Stable Crafting Intelligence 2.0
 - Promoted the in-game-tested 4.3.0-beta5 source without changing addon calculations or SavedVariables.
 - Includes batch crafting (1-999), bag/bank reagent availability, missing purchases and grouped buy lists.

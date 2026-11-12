@@ -1,4 +1,8 @@
-# Auctionator TradeScope 4.3.0 — WoW Forever
+# Auctionator TradeScope 4.4.0-beta1 — WoW Forever
+
+### 4.4.0-beta1 - Structural refactor (testing only)
+
+Moved Lua source into modular directories and divided the Pro workstation into independent pages. No new features or SavedVariables changes. This is a local beta and is not an implementation of Trading Journal 2.0.
 
 ### 4.3.0 - Stable release
 

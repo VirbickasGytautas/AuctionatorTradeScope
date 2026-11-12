@@ -1,9 +1,10 @@
-name: TradeScope Beta - Packaging Dry Run
+name: TradeScope - Build Only
 
 on:
   push:
     branches:
       - main
+      - beta/4.4.0-refactor
   workflow_dispatch:
 
 permissions:
@@ -12,47 +13,40 @@ permissions:
 jobs:
   package:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Check out main branch
+      - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Validate WoW Forever addon metadata
+      - name: Validate addon metadata
         shell: bash
         run: |
+          set -euo pipefail
           test -f AuctionatorTradeScope.toc
           test -f pkgmeta.yaml
           grep -Eq '^## Interface:[[:space:]]*16001[[:space:]]*$' AuctionatorTradeScope.toc
           grep -Eq '^package-as:[[:space:]]*AuctionatorTradeScope[[:space:]]*$' pkgmeta.yaml
-          echo 'WoW Forever TOC and packaging metadata verified.'
-
+          while IFS= read -r entry; do
+            entry="${entry//\\//}"
+            test -f "$entry" || { echo "::error::Missing TOC source: $entry"; exit 1; }
+          done < <(grep -E '^[^#[:space:]].*\.lua[[:space:]]*$' AuctionatorTradeScope.toc | tr -d '\r')
       - name: Package addon without publishing
         uses: BigWigsMods/packager@v2.6.1
         with:
           args: -d -p 1796279
-
-      - name: Inspect generated ZIP
+      - name: Verify package integrity
         shell: bash
         run: |
-          find .release -maxdepth 2 -type f -print
-          test -n "$(find .release -maxdepth 2 -type f -name '*.zip' -print -quit)"
-          while IFS= read -r -d '' zip; do
-            unzip -t "$zip"
-            unzip -l "$zip" | head -n 35
-          done < <(find .release -maxdepth 2 -type f -name '*.zip' -print0)
-
-      - name: Copy ZIP into visible artifact directory
-        shell: bash
-        run: |
+          set -euo pipefail
           mkdir -p package-artifacts
           cp .release/*.zip package-artifacts/
-
-      - name: Preserve test package
+          for zip in package-artifacts/*.zip; do
+            unzip -t "$zip"
+          done
+      - name: Preserve dry-run package
         uses: actions/upload-artifact@v4
         with:
-          name: tradescope-beta-zip
+          name: tradescope-refactor-build
           path: package-artifacts/*.zip
           if-no-files-found: error
           retention-days: 7

@@ -4,7 +4,7 @@ local A=ATS
 function A.Init() end
 function A.RealmKey() return "TestRealm" end
 function A.Valid(n) return type(n)=="number" and n>0 end
-assert(loadfile('MarketPro.lua'))()
+assert(loadfile('Market/MarketPro.lua'))()
 local prices={[1]=100,[2]=300,[99]=700}
 A.GetProAuctionPrice=function(id) return prices[tonumber(id)] end
 local stocks={[1]=5,[2]=1}

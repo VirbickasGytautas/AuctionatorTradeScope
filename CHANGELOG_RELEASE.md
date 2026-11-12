@@ -1,3 +1,8 @@
+## 4.4.0-beta1 - Code organization preview
+- Modularized source files and decomposed the Pro workstation interface into separate pages.
+- Retained prior stable 4.3.0 market and crafting behavior and saved data.
+- Test-only local beta; not published to CurseForge.
+
 ## 4.3.0 - Stable Release
 - Crafting Intelligence 2.0: batch crafting quantities, inventory-aware reagent requirements, and grouped material shopping lists.
 - Estimated batch costs, auction proceeds, profit and ROI, respecting unknown market prices and multi-output recipes.

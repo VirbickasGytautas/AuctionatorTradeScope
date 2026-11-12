@@ -1,9 +1,9 @@
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
 $tocPath = Join-Path $root 'AuctionatorTradeScope.toc'
-$corePath = Join-Path $root 'Core.lua'
+$corePath = Join-Path $root 'Engine/Core.lua'
 if (!(Test-Path $tocPath) -or !(Test-Path $corePath)) {
-    throw 'The TOC and Core.lua must be in the repository root.'
+    throw 'The TOC and Engine/Core.lua must exist.'
 }
 $toc = Get-Content $tocPath -Raw
 $core = Get-Content $corePath -Raw
