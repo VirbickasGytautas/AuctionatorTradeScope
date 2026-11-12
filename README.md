@@ -1,4 +1,8 @@
-# Auctionator TradeScope 4.4.0-beta5 — WoW Forever
+# Auctionator TradeScope 4.4.0-beta6 — WoW Forever
+
+### 4.4.0-beta6 - Terminal footer polish (local testing)
+
+The bottom footer is slightly taller and shaded. The Tools switch and hint are centered in it, and all watchlist rows, page arrows, and Pin/Unpin remain visible and aligned above the separator. No market or journal logic and no saved data changed. Not published to CurseForge.
 
 ### 4.4.0-beta5 - Watchlist restored and terminal alignment (local testing)
 

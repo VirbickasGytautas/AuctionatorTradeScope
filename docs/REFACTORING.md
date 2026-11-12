@@ -74,3 +74,7 @@ Journal filters use the shared `ProUIShared.dropdown` for direct item/type/perio
 The beta4 removal of the watchlist and its paging controls was reverted after in-game feedback. `UI/Dashboard.lua` again presents eight watch entries per page, prev/next pagination and the Pin/Unpin button. Layout uses a 25-unit row rhythm from y=-352, compact controls at y=-562 and an 8-unit lower Tools button at bottom-right. The watchlist data model and other UI modules are unchanged.
 
 `scripts/test-dashboard-ui.lua` checks preserved watchlist/search/zoom functions, button anchors and separation from the footer. The game client remains the final authority on scaling and text overlap.
+
+## Beta6: terminal footer polish
+
+A 56-unit footer strip now gives the Tools button and footnote generous top/bottom inset. Watchlist rows use 24-unit spacing starting at y=-348; page arrows and Pin are at y=-549. All controls stay above the divider at y=-582. No new data schema or behavior changes. See `scripts/test-dashboard-ui.lua` for conservative geometry checks.

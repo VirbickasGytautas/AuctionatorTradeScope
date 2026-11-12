@@ -1,3 +1,8 @@
+## 4.4.0-beta6 - Footer layout (local game test)
+- A taller, shaded footer separates terminal controls from the window border.
+- Tools button and caption are vertically centered; watchlist arrows and Pin fit above the footer.
+- Watchlist, journal, charts and saved data remain unchanged. Not published.
+
 ## 4.4.0-beta5 - Terminal Layout Correction (local test)
 - Restored watchlist, pagination arrows and Pin/Unpin controls.
 - Realigned the watchlist and its navigation to avoid footer overlap.

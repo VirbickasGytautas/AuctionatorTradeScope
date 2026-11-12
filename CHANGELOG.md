@@ -1,3 +1,10 @@
+## 4.4.0-beta6 - Footer spacing and button alignment
+- Enlarged the terminal bottom footer strip from 43 to 56 UI units and added a soft, inset background.
+- Centered the Tools button inside that strip and aligned the footer caption with it.
+- Moved watchlist entries and pagination slightly upward, retaining all eight rows, arrows and Pin/Unpin.
+- Preserved the Trading Journal dropdowns, charts, previous functionality and SavedVariables.
+- Game-test build only; no CurseForge publication or release tag.
+
 ## 4.4.0-beta5 - Restore watchlist and terminal alignment
 - Restored the Market Terminal watchlist with all eight entries per page, prev/next arrows and Pin/Unpin actions.
 - Moved watchlist rows into a compact grid and aligned navigation controls inside the left panel, above the footer separator.
