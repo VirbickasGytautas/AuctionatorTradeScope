@@ -1,3 +1,10 @@
+## 4.3.0 - Stable Release
+- Crafting Intelligence 2.0: batch crafting quantities, inventory-aware reagent requirements, and grouped material shopping lists.
+- Estimated batch costs, auction proceeds, profit and ROI, respecting unknown market prices and multi-output recipes.
+- Fixed supply-decline cursor and last-sample hover on the right chart boundary.
+- Improved chart bar clipping and kept crafting instructions in the right sidebar.
+- Tested in-game after 4.3.0-beta5; existing history, recipes, settings and SavedVariables are preserved.
+
 ## 4.3.0-beta5
 - Fixed the supply-decline graph cursor at the final time interval.
 - Prevented decline bars from overlapping the right-hand chart axis.
