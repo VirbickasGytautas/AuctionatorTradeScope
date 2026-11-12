@@ -1,6 +1,6 @@
 -- Auctionator TradeScope 4.1.0 -- WoW Forever / Lua 5.1
 -- A fresh standalone addon; no legacy history is imported.
-ATS = { version = "4.3.0-beta3", source = "none" }
+ATS = { version = "4.3.0-beta4", source = "none" }
 local A = ATS
 _G.AuctionatorTradeScope = A
 

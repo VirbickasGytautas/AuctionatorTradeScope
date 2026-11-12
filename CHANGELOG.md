@@ -1,3 +1,9 @@
+## 4.3.0-beta4 - Craft recipe help moved to sidebar
+- Removed the fixed helper line beneath the recipe search input.
+- Moved recipe scanning and selection instructions into the right HOW IT WORKS panel.
+- Scan progress, errors, and recipe selection feedback now appear in that panel, not below the input.
+- Craft calculations, recipe selection, and SavedVariables are unchanged.
+
 ## 4.3.0-beta3 - Crafting Intelligence 2.0: UI polish
 - Craft calculator: aligned the helper hint under the recipe input field.
 - Craft calculator: darkened the helper hint font slightly for better readability and lower glare.

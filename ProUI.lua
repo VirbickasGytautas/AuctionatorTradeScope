@@ -1514,9 +1514,9 @@ local function makeCraft(root)
   p.summary2=fs(p,"",22,-495,680)
   p.summary3=fs(p,"",22,-518,680)
   p.info=fs(p,"",22,-540,690)
-  p.status=fs(p,l("Search saved recipes or open a profession and scan its recipes.",
-    "Найдите сохранённый рецепт или откройте профессию и просканируйте её рецепты."),20,-108,680)
-  p.status:SetTextColor(.70,.74,.78)
+  -- The recipe instructions and scan/status messages belong to the side
+  -- HOW IT WORKS panel.  No help text is placed below the recipe input.
+  -- toolHelpPanel(p,"craft") creates p.status after this page is built.
   local function displayName(id,provided,providedIcon)
     local name,icon=nil,nil
     if A.ResolveItemInfo then name,icon=A.ResolveItemInfo("item:"..tostring(id),provided) end
@@ -2494,8 +2494,8 @@ local helpContent={
  candles={"OHLC candles summarize observed prices by time buckets. Empty time slots have no observations; candles are not recorded market trades.","Свечи OHLC объединяют наблюдаемые цены по времени. Пробелы означают отсутствие замеров, а не отсутствие сделок."},
  activity={"The activity index is an estimate based on changes in observed quotes and supply; it is not actual sales volume.","Индекс активности оценивает изменения наблюдаемых цен и предложения, а не реальный объём продаж."},
  journal={"Enter actual purchases and sales manually. Only matched buy and sell lots contribute to realized profit.","Вносите фактические покупки и продажи вручную. Реальная прибыль считается по сопоставленным сделкам."},
- craft={"Pick a recipe to view materials. Every material has a checkbox (included by default). Optional bag/bank tracking reduces additional purchases, but owned resources still have market value. Bank counts are saved from its last opening.",
-"Выберите рецепт и смотрите ресурсы. У каждого галочка (по умолчанию включена). Дополнительный учёт сумок/банка уменьшает расходы на докупку, но свои ресурсы имеют рыночную стоимость. Банк учитывается по последнему открытию."},
+ craft={"Open a profession and click Scan recipes. Then select a saved recipe by name or output item ID. Crafts sets the batch size. Bag/bank tracking reduces additional purchases, but owned materials still have market value. Bank counts are from its last opening.",
+"Откройте окно профессии и нажмите «Сканировать рецепты». Затем выберите сохранённый рецепт по названию или ID предмета. «Изготовлений» задаёт размер партии. Учёт сумок и банка уменьшает закупки, но свои ресурсы также имеют рыночную стоимость. Данные банка — с последнего открытия."},
  indicators={"Indicators use actual observed time buckets. Missing buckets are never filled. Short histories produce explicitly marked preliminary values, not reliable signals.","Индикаторы используют реальные интервалы наблюдений. Пустые часы не заполняются. При короткой истории значения предварительные, а не надёжные сигналы."},
  heatmap={"View observed average prices by day and hour. Blank cells mean no scans were captured in that time slot.","Средняя наблюдаемая цена по дням и часам. Пустые клетки означают отсутствие сканирований."},
  quality={"Assess data recency, coverage and gaps. A high score means better observed history, not higher chances of sale.","Оценка свежести, продолжительности и пропусков истории. Высокий балл — полнота данных, не шанс продажи."},
@@ -2512,6 +2512,15 @@ local function toolHelpPanel(page,key)
   local message=helpContent[key] or {"Local market data only.","Только локальные данные рынка."}
   local detail=fs(holder,l(message[1],message[2]),11,-55,174)
   if detail.SetWordWrap then detail:SetWordWrap(true) end
+  if key=="craft" then
+    -- Recipe search and scan feedback are shown only in the right column.
+    -- The craft page is built before this panel, so assign its status now.
+    page.status=fs(holder,"",11,-265,171)
+    page.status:SetTextColor(.72,.77,.82)
+    if page.status.SetWordWrap then page.status:SetWordWrap(true) end
+    page.helpPanel=holder
+    return
+  end
   if key=="indicators" then
     fs(holder,l("EMA: weighted average of recent quotes.",
       "EMA: средняя с большим весом свежих цен."),11,-147,174)
