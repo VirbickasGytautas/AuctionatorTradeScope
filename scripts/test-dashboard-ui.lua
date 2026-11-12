@@ -1,4 +1,4 @@
--- Dashboard layout contract for beta6: all watched-items controls stay intact.
+-- Dashboard layout contract for beta7: same footer geometry, no added shadow.
 local f=assert(io.open("UI/Dashboard.lua","rb"))
 local source=f:read("*a");f:close()
 local function has(x)assert(source:find(x,1,true),"Missing source feature: "..x)end
@@ -13,9 +13,11 @@ for _,x in ipairs({
   'f.pin:SetPoint("TOPLEFT",f,"TOPLEFT",106,-549)',
   'f.toolsToggle:SetPoint("BOTTOMRIGHT",f,"BOTTOMRIGHT",-26,17)',
   'f.footer:SetPoint("BOTTOMLEFT",f,"BOTTOMLEFT",267,26)',
-  'shade(f,15,-HEIGHT+56,WIDTH-30,56',
+  'shade(f,15,-HEIGHT+56,WIDTH-30,1',
 }) do has(x)end
 assert(not source:find("ПОИСК ПРЕДМЕТА",1,true),"Obsolete placeholder")
+assert(not source:find('shade(f,15,-HEIGHT+56,WIDTH-30,56',1,true),
+  "Additional footer background/shadow is not allowed")
 -- UI geometry in a WIDTH x HEIGHT = 944 x 638 terminal.
 local width,height=944,638
 local sidebarLeft,sidebarRight=23,234
@@ -32,4 +34,4 @@ assert(25+34+4<=25+34+4 and 25+34+4+34<=106,"Paging arrow overlaps pin")
 assert(106+128<=sidebarRight,"Pin button overflows watchlist column")
 assert(toolsBottomOffset>10 and toolsBottomOffset+toolsHeight<56-10,"Tools is too close to footer edge")
 assert(267+507 < width-26-131,"Footer caption overlaps Tools button")
-print("PASS beta6 footer: watchlist, arrows, Pin, Tools, 56px strip and no overlap")
+print("PASS beta7 footer: watchlist, arrows, Pin, Tools, divider only and no shadow")

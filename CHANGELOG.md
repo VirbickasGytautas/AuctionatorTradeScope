@@ -1,3 +1,9 @@
+## 4.4.0-beta7 - Remove footer shadow
+- Removed the extra dark semi-transparent footer texture introduced in beta6.
+- Retained the clean divider, 56-unit footer spacing, aligned Tools button and hint.
+- Watchlist, arrows, Pin/Unpin, graphs, Trading Journal and SavedVariables are unchanged.
+- Local-only testing patch; no CurseForge publication or tag.
+
 ## 4.4.0-beta6 - Footer spacing and button alignment
 - Enlarged the terminal bottom footer strip from 43 to 56 UI units and added a soft, inset background.
 - Centered the Tools button inside that strip and aligned the footer caption with it.

@@ -174,9 +174,9 @@ local function create()
   -- Match the Pro workstation: one continuous panel, fine gold separators.
   shade(f,15,-69,WIDTH-30,1,{.38,.29,.15,.62})
   shade(f,251,-69,1,HEIGHT-112,{.50,.37,.15,.62})
-  -- The footer is a quiet, taller 56px inset strip, with a soft backing.
-  -- This keeps the caption and Tools button away from the lower border.
-  shade(f,15,-HEIGHT+56,WIDTH-30,56,{.025,.045,.065,.36})
+  -- Keep only the separator: a second translucent surface made the lower
+  -- area visibly darker than the rest of the terminal.
+  -- The taller footer and aligned controls from beta6 are preserved.
   shade(f,15,-HEIGHT+56,WIDTH-30,1,{.43,.33,.16,.65})
   local logo=f:CreateTexture(nil,"ARTWORK")
   logo:SetTexture("Interface\\AddOns\\AuctionatorTradeScope\\Media\\Icon")

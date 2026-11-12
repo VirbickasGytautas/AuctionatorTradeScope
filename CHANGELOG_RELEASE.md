@@ -1,3 +1,7 @@
+## 4.4.0-beta7 - Footer shadow removal (local test)
+- Removed the extra dark footer panel; kept the bottom separator and controls in place.
+- No functional or saved-data changes; not published to CurseForge.
+
 ## 4.4.0-beta6 - Footer layout (local game test)
 - A taller, shaded footer separates terminal controls from the window border.
 - Tools button and caption are vertically centered; watchlist arrows and Pin fit above the footer.

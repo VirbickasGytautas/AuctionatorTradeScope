@@ -1,4 +1,8 @@
-# Auctionator TradeScope 4.4.0-beta6 — WoW Forever
+# Auctionator TradeScope 4.4.0-beta7 — WoW Forever
+
+### 4.4.0-beta7 - Remove footer background shadow (local testing)
+
+Removed only the extra translucent footer backing added in beta6. The footer separator, spacing, Tools button, watchlist, paging arrows and all behaviors remain as before. No SavedVariables changes or CurseForge upload.
 
 ### 4.4.0-beta6 - Terminal footer polish (local testing)
 

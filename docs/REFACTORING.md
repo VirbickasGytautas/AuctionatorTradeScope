@@ -78,3 +78,7 @@ The beta4 removal of the watchlist and its paging controls was reverted after in
 ## Beta6: terminal footer polish
 
 A 56-unit footer strip now gives the Tools button and footnote generous top/bottom inset. Watchlist rows use 24-unit spacing starting at y=-348; page arrows and Pin are at y=-549. All controls stay above the divider at y=-582. No new data schema or behavior changes. See `scripts/test-dashboard-ui.lua` for conservative geometry checks.
+
+## Beta7: footer shadow removal
+
+Only the secondary 56-unit translucent footer backing texture was removed. The single-pixel separator and all footer/watchlist coordinates from beta6 are unchanged. No data or API behavior changes.
