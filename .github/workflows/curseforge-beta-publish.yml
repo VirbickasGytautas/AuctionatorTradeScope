@@ -5,7 +5,7 @@ name: TradeScope Beta - Publish to CurseForge
 on:
   push:
     tags:
-      - 'v4.3.0-beta4'
+      - 'v*-beta*'
 
 permissions:
   contents: read
@@ -19,14 +19,23 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Require release commit on main
+        shell: bash
+        run: |
+          git fetch origin main --quiet
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
+            echo "::error::Release tags must point to commits already merged into main"
+            exit 1
+          fi
+
       - name: Validate release tag and WoW Forever metadata
         shell: bash
         run: |
           set -euo pipefail
           expected="${GITHUB_REF_NAME#v}"
           actual="$(sed -n 's/^## Version:[[:space:]]*//p' AuctionatorTradeScope.toc | tr -d '\r')"
-          if [[ "$expected" != "$actual" || "$expected" != '4.3.0-beta4' ]]; then
-            echo "::error::Tag and TOC version mismatch (expected 4.3.0-beta4)"
+          if [[ "$expected" != "$actual" || ! "$expected" =~ ^[0-9]+\.[0-9]+\.[0-9]+-beta[0-9]+$ ]]; then
+            echo "::error::Tag and TOC version mismatch, or invalid beta tag"
             exit 1
           fi
           test -f pkgmeta.yaml

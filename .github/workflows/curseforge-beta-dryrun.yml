@@ -3,7 +3,8 @@ name: TradeScope Beta - Packaging Dry Run
 on:
   push:
     branches:
-      - beta/curseforge-packaging-test
+      - main
+  workflow_dispatch:
 
 permissions:
   contents: read
