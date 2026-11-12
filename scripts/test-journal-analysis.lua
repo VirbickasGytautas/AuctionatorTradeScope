@@ -51,3 +51,47 @@ assert(A.JournalReport().spent==200)
 A.DeleteJournalTrade(1)
 assert(#A.ProJournal()==0)
 print("PASS: read-only journal breakdown, cost basis, time filters, fees, unmatched and legacy APIs")
+
+-- Beta3: precise filtered accounting, original indexes and pagination.
+local sellOnly=A.JournalAnalysis(sample,{kind="sell"})
+assert(#sellOnly.entries==4 and sellOnly.buys==0 and sellOnly.spent==0)
+assert(sellOnly.entries[1].index==3 and sellOnly.entries[4].index==7)
+assert(sellOnly.entries[1].costBasis==400 and sellOnly.entries[1].pnl==284)
+assert(math.abs(sellOnly.entries[1].roi-71)<0.00001)
+assert(sellOnly.entries[3].unmatched==1 and sellOnly.entries[4].unmatched==2)
+assert(math.abs(sellOnly.realized-r.realized)<0.00001)
+assert(sellOnly.positions["db:1"].qty==0 and sellOnly.positions["db:2"].qty==0)
+local itemOnly=A.JournalAnalysis(sample,{itemKey="db:2"})
+assert(#itemOnly.entries==2 and itemOnly.buys==2 and itemOnly.matched==2)
+assert(itemOnly.unmatched==1 and itemOnly.byItem["db:1"]==nil)
+assert(itemOnly.openUnits==0)
+local unmatchedOnly=A.JournalAnalysis({{key="db:77",kind="sell",qty=2,price=150,fee=5,t=2}})
+assert(unmatchedOnly.entries[1].pnl==nil and unmatchedOnly.entries[1].roi==nil)
+assert(unmatchedOnly.realized==0 and unmatchedOnly.unmatched==2)
+local zeroCost=A.JournalAnalysis({
+  {key="db:1",kind="buy",qty=1,price=0,t=1},
+  {key="db:1",kind="sell",qty=1,price=150,t=2,fee=0},
+})
+assert(zeroCost.realized==150 and zeroCost.roi==nil and zeroCost.entries[2].roi==nil)
+local badFee=A.JournalAnalysis({
+  {key="db:3",kind="buy",qty=1,price=100,t=1},
+  {key="db:3",kind="sell",qty=1,price=200,fee=200,t=2},
+})
+assert(badFee.entries[2].fees==200 and badFee.entries[2].pnl==-100)
+local paging={}
+for i=1,22 do paging[i]={index=i} end
+local first,page,pages=A.JournalPage(paging,1,8)
+assert(page==1 and pages==3 and #first==8 and first[1].index==22 and first[8].index==15)
+local last,lastPage,lastPages=A.JournalPage(paging,30,8)
+assert(lastPage==3 and lastPages==3 and #last==6 and last[1].index==6 and last[6].index==1)
+local none,emptyPage,emptyPages=A.JournalPage({},1,8)
+assert(#none==0 and emptyPage==1 and emptyPages==1)
+-- Legacy report must not decorate stored trades with transient _pnl fields.
+A.AddJournalTrade("db:8","buy",2,100,0)
+A.AddJournalTrade("db:8","sell",1,250,5)
+local rows=A.ProJournal()
+assert(rows[2]._pnl==nil)
+local legacy=A.JournalReport()
+assert(legacy.realized==137.5 and legacy.unmatched==0)
+assert(rows[2]._pnl==nil and rows[1]._pnl==nil)
+print("PASS beta3 journal filters, realized P&L, zero basis, paging and saved-row immutability")

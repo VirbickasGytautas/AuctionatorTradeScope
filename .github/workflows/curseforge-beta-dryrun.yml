@@ -30,6 +30,19 @@ jobs:
             entry="${entry//\\//}"
             test -f "$entry" || { echo "::error::Missing TOC source: $entry"; exit 1; }
           done < <(grep -E '^[^#[:space:]].*\.lua[[:space:]]*$' AuctionatorTradeScope.toc | tr -d '\r')
+      - name: Install Lua 5.1 for regression tests
+        shell: bash
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq lua5.1
+      - name: Run Lua regression suite
+        shell: bash
+        run: |
+          set -euo pipefail
+          for test in test-toc test-ui-modules test-craft-batch test-craft-report test-graph-cursor test-journal-analysis test-journal-ui; do
+            echo "Checking $test"
+            lua5.1 "scripts/$test.lua"
+          done
       - name: Package addon without publishing
         uses: BigWigsMods/packager@v2.6.1
         with:
