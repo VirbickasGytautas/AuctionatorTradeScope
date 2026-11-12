@@ -64,3 +64,7 @@ texlua scripts/test-journal-ui.lua
 ```
 
 Only the main testable branch is packaged by GitHub Actions in build-only mode (`-d`). Do not push release tags for this beta. Run WoW Forever in-game regression tests before any promotion.
+
+## Beta4: journal UI and terminal cleanup
+
+Journal filters use the shared `ProUIShared.dropdown` for direct item/type/period selection. Filter choices are local UI state. The legacy watchlist UI and paging arrows were removed from the terminal, but `ATS.AddWatch`, `ATS.RemoveWatch` and persisted watchlist data remain. Search suggestions and graph zoom remain; bag item selection no longer writes a hidden watch entry.

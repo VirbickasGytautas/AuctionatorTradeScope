@@ -19,6 +19,7 @@ local function w(text)
   function o:Show()self.shown=true end
   function o:Hide()self.shown=false end
   function o:GetFontString()return self end
+  function o:SetEnabled(v)self.enabled=v end
   return o
 end
 local function button(p,label,x,y,width,fn)
@@ -28,15 +29,48 @@ local function button(p,label,x,y,width,fn)
   return o
 end
 local function fs(p,label)return w(label)end
+local function tex()return w("")end
 local function edit(p,_,x,y,width,value)return w(value)end
 local function marketInput(p)return w("")end
 local function newPage(root)return {buttons={}} end
+local function dropdown(p,caption,x,y,width,options,selected,onSelect)
+  local trigger=button(p,"",x,y,width)
+  local popup=w("");popup:Hide();popup.rows={}
+  for _,opt in ipairs(options) do
+    local row=w(opt.text)
+    row.value=opt.value
+    row:SetScript("OnClick",function()
+      onSelect(opt.value)
+      popup:Hide()
+    end)
+    popup.rows[#popup.rows+1]=row
+  end
+  trigger.popup=popup
+  trigger:SetScript("OnClick",function()
+    if popup.shown then popup:Hide() else popup:Show()end
+  end)
+  p.proDropdowns=p.proDropdowns or {}
+  p.proDropdowns[#p.proDropdowns+1]=popup
+  return trigger
+end
+local function selectOption(control,value)
+  control.scripts.OnClick()
+  assert(control.popup.shown,"dropdown did not open")
+  for _,row in ipairs(control.popup.rows) do
+    if row.value==value then
+      row.scripts.OnClick()
+      assert(not control.popup.shown,"dropdown remains open after selecting")
+      return
+    end
+  end
+  error("Option was not found in dropdown")
+end
 local function lineList(p,n)
   local rows={}
   for i=1,n do rows[i]=button(p,"") end
   return rows
 end
-A.ProUIShared={l=function(en) return en end,fs=fs,button=button,edit=edit,
+A.ProUIShared={l=function(en) return en end,fs=fs,tex=tex,button=button,dropdown=dropdown,edit=edit,
   marketInput=marketInput,anyItem=function(p)return p.selection.itemKey end,
   fillMarketEdit=function(e,v)e.itemKey=v.key;e:SetText(v.text)end,
   shareMarketChoice=function()end,
@@ -58,26 +92,31 @@ A.db.pro.journal[key]=data
 local p=A.ProUIBuilders.journal({})
 assert(p.total.text:find("Realized P&L",1,true))
 assert(p.pageText.text=="Page 1 / 3")
+assert(not p.emptyTitle.shown and not p.emptyHint.shown)
+assert(p.prev.enabled==false and p.next.enabled==true)
 assert(p.rows[1].text:find("db:2",1,true))
 assert(p.rows[8].shown)
 p.next.scripts.OnClick()
 assert(p.pageIndex==2 and p.pageText.text=="Page 2 / 3")
-p.kindFilter.scripts.OnClick()
+selectOption(p.kindFilter,"buy")
 assert(p.filter.kind=="buy" and p.pageIndex==1)
 assert(p.filterSummary.text:find("Records: 15",1,true))
-p.kindFilter.scripts.OnClick()
+selectOption(p.kindFilter,"sell")
 assert(p.filter.kind=="sell" and p.filterSummary.text:find("Records: 7",1,true))
-p.itemFilter.scripts.OnClick()
+selectOption(p.itemFilter,"selected")
 assert(p.filter.onlyItem and p.filterSummary.text:find("Records: 0",1,true))
+assert(p.emptyTitle.shown and p.emptyHint.shown)
+assert(p.prev.enabled==false and p.next.enabled==false)
 p.selection.itemKey="db:1"
 p.update()
 assert(p.filterSummary.text:find("Records: 4",1,true))
-p.timeFilter.scripts.OnClick()
+selectOption(p.timeFilter,2)
 assert(p.filter.periodIndex==2)
 assert(p.filterSummary.text:find("Records: 2",1,true))
 p.clearFilter.scripts.OnClick()
 assert(not p.filter.onlyItem and p.filter.kind=="all" and p.filter.periodIndex==1)
 assert(p.filterSummary.text:find("Records: 22",1,true))
+assert(not p.emptyTitle.shown)
 assert(p.pageIndex==1)
 local before=#data
 -- Creating a trade changes only the journal itself, not filter state keys.
@@ -90,3 +129,14 @@ buy.scripts.OnClick()
 assert(#data==before+1 and data[#data].key=="db:5" and data[#data].price==10203)
 assert(A.db.pro.filter==nil and A.db.pro.journalFilter==nil)
 print("PASS journal UI filters, pagination, buy/sell workflow, and unsaved UI state")
+
+-- Selecting the dropdown header only opens a menu, it must not change the active filter.
+local oldKind=p.filter.kind
+p.kindFilter.scripts.OnClick()
+assert(p.kindFilter.popup.shown and p.filter.kind==oldKind)
+p.kindFilter.scripts.OnClick()
+assert(not p.kindFilter.popup.shown and p.filter.kind==oldKind)
+-- Selecting a later period directly must not require cycling.
+selectOption(p.timeFilter,4)
+assert(p.filter.periodIndex==4)
+assert(#data==before+1)

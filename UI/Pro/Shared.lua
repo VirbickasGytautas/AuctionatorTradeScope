@@ -32,6 +32,102 @@ local function button(p,title,x,y,w,fn,h)
   if A.StyleButton then A.StyleButton(b) end
   return b
 end
+-- Compact selection popup matching the Scanner dropdown, with single-click choice.
+-- MouseDown commits early for older WoW clients whose popup loses focus on click.
+-- Values live only in the owner page; there is no SavedVariables side effect.
+local function dropdown(p,title,x,y,width,options,getSelected,onSelect)
+  local popup
+  local trigger=button(p,"",x,y,width,function()
+    if popup:IsShown() then popup:Hide();return end
+    for _,other in ipairs(p.proDropdowns or {}) do
+      if other~=popup then other:Hide() end
+    end
+    if GameTooltip then GameTooltip:Hide() end
+    popup:Show()
+  end)
+  if A.StyleButton then A.StyleButton(trigger,"secondary") end
+  local arrow=trigger:CreateFontString(nil,"ARTWORK","GameFontNormalSmall")
+  arrow:SetPoint("RIGHT",trigger,"RIGHT",-8,0)
+  arrow:SetText("v")
+  arrow:SetTextColor(.96,.79,.39)
+  local menuWidth=math.max(width,175)
+  local menuHeight=40+#options*27
+  popup=CreateFrame("Frame",nil,p)
+  popup:SetSize(menuWidth,menuHeight)
+  popup:SetPoint("TOPLEFT",trigger,"BOTTOMLEFT",0,-3)
+  popup:SetFrameStrata("FULLSCREEN_DIALOG")
+  popup:SetFrameLevel(math.max(p:GetFrameLevel()+20,trigger:GetFrameLevel()+12))
+  popup:EnableMouse(true)
+  tex(popup,0,0,menuWidth,menuHeight,.025,.036,.048,1)
+  if popup.SetBackdrop then
+    popup:SetBackdrop({edgeFile="Interface\\Tooltips\\UI-Tooltip-Border",edgeSize=12,
+      insets={left=3,right=3,top=3,bottom=3}})
+    if popup.SetBackdropBorderColor then popup:SetBackdropBorderColor(.70,.55,.25,1) end
+  end
+  local header=fs(popup,title,10,-7,menuWidth-20)
+  header:SetTextColor(1,.78,.32)
+  tex(popup,8,-27,menuWidth-16,1,.53,.40,.19,.8)
+  local rows={}
+  local function refresh()
+    for _,row in ipairs(rows) do
+      local active=getSelected()==row.value
+      if active then row.mark:Show() else row.mark:Hide() end
+      row.label:SetTextColor(active and 1 or .92,active and .87 or .93,active and .56 or .92)
+      row.fill:SetVertexColor(active and .23 or .075,active and .17 or .105,
+        active and .075 or .13,.94)
+    end
+  end
+  for i,option in ipairs(options) do
+    local row=CreateFrame("Button",nil,popup)
+    row:SetSize(menuWidth-16,26)
+    row:SetPoint("TOPLEFT",popup,"TOPLEFT",8,-31-(i-1)*27)
+    local fill=tex(row,0,0,menuWidth-16,26,.075,.105,.13,.94)
+    local mark=row:CreateTexture(nil,"ARTWORK")
+    mark:SetTexture("Interface\\Buttons\\UI-CheckBox-Check")
+    mark:SetSize(17,17)
+    mark:SetPoint("LEFT",row,"LEFT",4,0)
+    local label=row:CreateFontString(nil,"ARTWORK","GameFontHighlightSmall")
+    label:SetPoint("LEFT",row,"LEFT",25,0)
+    label:SetWidth(menuWidth-50)
+    label:SetJustifyH("LEFT")
+    label:SetText(option.text)
+    row.fill=fill;row.mark=mark;row.label=label;row.value=option.value
+    row:SetScript("OnEnter",function(self)
+      self.fill:SetVertexColor(.24,.22,.12,.98)
+    end)
+    row:SetScript("OnLeave",function(self)
+      local active=self.value==getSelected()
+      self.fill:SetVertexColor(active and .23 or .075,active and .17 or .105,
+        active and .075 or .13,.94)
+    end)
+    local function selectOption(self)
+      if not popup:IsShown() then return end
+      popup:Hide()
+      onSelect(self.value)
+    end
+    row:SetScript("OnMouseDown",selectOption)
+    row:SetScript("OnClick",selectOption)
+    rows[i]=row
+  end
+  popup.rows=rows
+  popup.RefreshSelection=refresh
+  popup:SetScript("OnKeyDown",function(self,key)
+    if key=="ESCAPE" then self:Hide() end
+  end)
+  popup:SetScript("OnShow",function(self)
+    self:RefreshSelection()
+    if self.EnableKeyboard then self:EnableKeyboard(true) end
+  end)
+  popup:SetScript("OnHide",function(self)
+    if self.EnableKeyboard then self:EnableKeyboard(false) end
+  end)
+  popup:Hide()
+  p.proDropdowns=p.proDropdowns or {}
+  p.proDropdowns[#p.proDropdowns+1]=popup
+  p:HookScript("OnHide",function() popup:Hide() end)
+  trigger.popup=popup
+  return trigger
+end
 -- All money/quantity fields retain their numeric behavior; item fields share
 -- the same name/ID search used by the original TradeScope market terminal.
 local function helpText(caption)
@@ -571,6 +667,7 @@ A.ProUIShared = {
   tex=tex,
   fs=fs,
   button=button,
+  dropdown=dropdown,
   helpText=helpText,
   showHelp=showHelp,
   attachHelp=attachHelp,

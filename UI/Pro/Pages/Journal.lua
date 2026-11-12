@@ -6,6 +6,8 @@ local B=assert(A.ProUIBuilders)
 local l=C.l
 local fs=C.fs
 local button=C.button
+local dropdown=C.dropdown
+local tex=C.tex
 local edit=C.edit
 local marketInput=C.marketInput
 local anyItem=C.anyItem
@@ -19,7 +21,6 @@ local currency=C.currency
 local DAY=24*60*60
 local PAGE_SIZE=8
 local periods={0,7,30,90}
-local kinds={"all","buy","sell"}
 local function feeText(entry)
   if entry.kind=="buy" then return "" end
   if entry.matched==0 then return l("Unmatched","Без закупки") end
@@ -54,14 +55,12 @@ end
 function B.journal(root)
   local p=newPage(root)
   heading(p,l("Trading Journal: weighted-cost P&L","Журнал сделок: прибыль с учётом себестоимости"),-12)
-  p.selection=marketInput(p,20,-60,188)
-  p.qty=edit(p,l("Quantity","Количество"),223,-60,87,"1",true)
-  p.gold=edit(p,l("Gold","Золото"),326,-60,75,"0",true)
-  p.silver=edit(p,l("Silver","Серебро"),411,-60,75,"0",true)
-  p.copper=edit(p,l("Copper","Медь"),496,-60,75,"0",true)
-  p.total=fs(p,"",20,-154,705,true)
-  p.summary=fs(p,"",20,-175,705)
-  p.filterSummary=fs(p,"",20,-231,690)
+  -- Inputs use a shared baseline. Actions and summaries have independent rows.
+  p.selection=marketInput(p,20,-55,200)
+  p.qty=edit(p,l("Quantity","Количество"),236,-55,92,"1",true)
+  p.gold=edit(p,l("Gold","Золото"),344,-55,82,"0",true)
+  p.silver=edit(p,l("Silver","Серебро"),442,-55,80,"0",true)
+  p.copper=edit(p,l("Copper","Медь"),538,-55,78,"0",true)
   p.filter={onlyItem=false,kind="all",periodIndex=1}
   p.pageIndex=1
 
@@ -79,39 +78,65 @@ function B.journal(root)
     end
     resetPage()
   end
-  button(p,l("Record BUY","Записать ПОКУПКУ"),20,-127,170,function()record("buy")end)
-  button(p,l("Record SELL","Записать ПРОДАЖУ"),204,-127,170,function()record("sell")end)
-
-  p.itemFilter=button(p,"",20,-201,173,function()
-    p.filter.onlyItem=not p.filter.onlyItem
-    resetPage()
-  end)
-  p.kindFilter=button(p,"",202,-201,155,function()
-    local index=1
-    for i=1,#kinds do if kinds[i]==p.filter.kind then index=i;break end end
-    p.filter.kind=kinds[index%#kinds+1]
-    resetPage()
-  end)
-  p.timeFilter=button(p,"",366,-201,153,function()
-    p.filter.periodIndex=p.filter.periodIndex%#periods+1
-    resetPage()
-  end)
-  p.clearFilter=button(p,l("Clear filters","Сброс фильтров"),528,-201,180,function()
-    p.filter.onlyItem=false;p.filter.kind="all";p.filter.periodIndex=1
-    resetPage()
-  end)
-  p.rows=lineList(p,PAGE_SIZE,-255,31)
-  p.prev=button(p,l("< Prev","< Назад"),20,-507,115,function()
-    if p.pageIndex>1 then p.pageIndex=p.pageIndex-1;p.update() end
-  end)
-  p.pageText=fs(p,"",147,-513,265)
-  p.next=button(p,l("Next >","Вперёд >"),400,-507,122,function()
-    p.pageIndex=p.pageIndex+1;p.update()
-  end)
-  button(p,l("Undo last trade","Отменить последнюю"),520,-529,190,function()
+  button(p,l("Record BUY","Записать ПОКУПКУ"),20,-125,180,function()record("buy")end)
+  button(p,l("Record SELL","Записать ПРОДАЖУ"),211,-125,180,function()record("sell")end)
+  p.undo=button(p,l("Undo last trade","Отменить последнюю"),529,-125,180,function()
     local ledger=A.ProJournal()
     if #ledger>0 then A.DeleteJournalTrade(#ledger) end
     resetPage()
+  end)
+
+  -- Same quiet gold-toned summary as the market scanner, without overlapping buttons.
+  tex(p,18,-159,698,50,.055,.075,.095,.73)
+  tex(p,18,-159,698,1,.49,.36,.15,.65)
+  p.total=fs(p,"",25,-165,686,true)
+  p.summary=fs(p,"",25,-187,686)
+  fs(p,l("FILTER TRANSACTIONS","ФИЛЬТРЫ СДЕЛОК"),20,-213,690)
+
+  -- Dropdowns choose an option directly; no repeated-click cycling.
+  p.itemFilter=dropdown(p,l("ITEM FILTER","ФИЛЬТР ПРЕДМЕТА"),20,-235,198,{
+    {value="all",text=l("All items","Все предметы")},
+    {value="selected",text=l("Selected item","Выбранный предмет")},
+  },function()return p.filter.onlyItem and "selected" or "all" end,function(value)
+    p.filter.onlyItem=value=="selected"
+    resetPage()
+  end)
+  p.kindFilter=dropdown(p,l("TRANSACTION TYPE","ТИП СДЕЛКИ"),229,-235,182,{
+    {value="all",text=l("All transactions","Все сделки")},
+    {value="buy",text=l("BUY only","Только ПОКУПКИ")},
+    {value="sell",text=l("SELL only","Только ПРОДАЖИ")},
+  },function()return p.filter.kind end,function(value)
+    p.filter.kind=value
+    resetPage()
+  end)
+  p.timeFilter=dropdown(p,l("TIME PERIOD","ПЕРИОД"),422,-235,179,{
+    {value=1,text=l("All time","Всё время")},
+    {value=2,text=l("Last 7 days","За 7 дней")},
+    {value=3,text=l("Last 30 days","За 30 дней")},
+    {value=4,text=l("Last 90 days","За 90 дней")},
+  },function()return p.filter.periodIndex end,function(value)
+    p.filter.periodIndex=value
+    resetPage()
+  end)
+  p.clearFilter=button(p,l("Reset","Сброс"),613,-235,96,function()
+    p.filter.onlyItem=false;p.filter.kind="all";p.filter.periodIndex=1
+    for _,menu in ipairs(p.proDropdowns or {}) do menu:Hide() end
+    resetPage()
+  end)
+  p.filterSummary=fs(p,"",20,-266,696)
+  tex(p,20,-284,696,1,.43,.34,.17,.60)
+
+  -- Compact row rhythm fits eight trades and navigation inside the 557px page.
+  p.rows=lineList(p,PAGE_SIZE,-298,25)
+  p.emptyTitle=fs(p,l("No trades to show","Нет сделок для отображения"),34,-340,660,true)
+  p.emptyHint=fs(p,l("Record a purchase or sale above, or change the filters.",
+    "Добавьте покупку или продажу выше либо измените фильтры."),34,-364,660)
+  p.prev=button(p,l("< Prev","< Назад"),20,-520,120,function()
+    if p.pageIndex>1 then p.pageIndex=p.pageIndex-1;p.update() end
+  end)
+  p.pageText=fs(p,"",156,-527,285)
+  p.next=button(p,l("Next >","Вперёд >"),591,-520,117,function()
+    p.pageIndex=p.pageIndex+1;p.update()
   end)
 
   p.update=function()
@@ -128,7 +153,7 @@ function B.journal(root)
     local pageRows,page,pages=A.JournalPage(report.entries,p.pageIndex,PAGE_SIZE)
     p.pageIndex=page
     p.itemFilter:SetText(p.filter.onlyItem and l("Item: selected","Предмет: выбран") or l("Item: all","Предмет: все"))
-    local kindNames={all={"Side: all","Тип: все"},buy={"Side: BUY","Тип: ПОКУПКА"},sell={"Side: SELL","Тип: ПРОДАЖА"}}
+    local kindNames={all={"Type: all","Тип: все"},buy={"Type: BUY","Тип: ПОКУПКА"},sell={"Type: SELL","Тип: ПРОДАЖА"}}
     local text=kindNames[p.filter.kind]
     p.kindFilter:SetText(l(text[1],text[2]))
     p.timeFilter:SetText(days==0 and l("Period: all","Период: весь") or
@@ -142,6 +167,14 @@ function B.journal(root)
       "    "..l("All open units: ","Общий остаток: ")..report.openUnits..
       (p.filter.onlyItem and not key and l("   Select an item first.","   Сначала выберите предмет.") or ""))
     p.pageText:SetText(l("Page ","Страница ")..page.." / "..pages)
+    local empty=#report.entries==0
+    if empty then
+      p.emptyTitle:Show();p.emptyHint:Show()
+    else
+      p.emptyTitle:Hide();p.emptyHint:Hide()
+    end
+    if p.prev.SetEnabled then p.prev:SetEnabled(page>1) end
+    if p.next.SetEnabled then p.next:SetEnabled(page<pages) end
     for i=1,#p.rows do
       local entry=pageRows[i]
       local row=p.rows[i]

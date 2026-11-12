@@ -1,4 +1,8 @@
-# Auctionator TradeScope 4.4.0-beta3 — WoW Forever
+# Auctionator TradeScope 4.4.0-beta4 — WoW Forever
+
+### 4.4.0-beta4 - Journal UI and terminal cleanup (testing only)
+
+Aligned the Trading Journal form, actions, summary, filters and pagination. Item/type/period filters now have compact direct-selection dropdowns like the Scanner. The Market Terminal no longer shows the old watchlist panel or displaced paging arrows; name/ID search, bag item selection and charts remain. Legacy saved watch data are preserved. No changes to journal accounting or SavedVariables. Not published to CurseForge.
 
 ### 4.4.0-beta3 - Journal filters and Craft UI modules (testing only)
 

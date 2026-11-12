@@ -1,3 +1,10 @@
+## 4.4.0-beta4 - Journal and Terminal UI Patch (local testing)
+- Aligned the journal entry form, summaries, filter row and navigation.
+- Direct selection dropdowns for item, transaction type and period.
+- Improved empty state, page arrows and Undo button placement.
+- Removed the old terminal watchlist panel and displaced pagination arrows.
+- No changes to saved data or trading calculations; not published.
+
 ## 4.4.0-beta3 - Local Testing Build
 - Trading journal: filter by item, transaction type, and time range; browse older entries with pagination.
 - Sale details: per-trade average cost, matching status, commission, realized P&L and ROI.

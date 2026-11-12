@@ -1,3 +1,12 @@
+## 4.4.0-beta4 - Trading Journal UI alignment and dropdown patch
+- Reworked the journal entry form, action buttons, summary surface, filter row and pagination.
+- Added scanner-style popup selectors for item scope, BUY/SELL and 7/30/90-day periods.
+- Menus select an option directly without repeated button cycling.
+- Moved Undo last trade alongside BUY/SELL, added empty state and disabled invalid page navigation.
+- Removed the visible legacy watchlist and misplaced paging arrows from Market Terminal.
+- Watchlist SavedVariables and /ats add API remain intact; dropping a bag item no longer silently adds a hidden watch entry.
+- No journal accounting or SavedVariables schema changes. Build-only beta, no CurseForge upload.
+
 ## 4.4.0-beta3 - Trading Journal 2.0 filtering and Crafting UI decomposition
 - Added journal filters for selected item, BUY/SELL, and rolling 7/30/90-day periods, with eight-row pagination.
 - Added per-transaction matched cost, fees, realized profit and ROI in sale hover details; partial/unmatched sales remain explicitly marked.
