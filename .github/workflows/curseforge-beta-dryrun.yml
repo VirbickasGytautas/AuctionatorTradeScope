@@ -42,10 +42,16 @@ jobs:
             unzip -l "$zip" | head -n 35
           done < <(find .release -maxdepth 2 -type f -name '*.zip' -print0)
 
+      - name: Copy ZIP into visible artifact directory
+        shell: bash
+        run: |
+          mkdir -p package-artifacts
+          cp .release/*.zip package-artifacts/
+
       - name: Preserve test package
         uses: actions/upload-artifact@v4
         with:
           name: tradescope-beta-zip
-          path: .release/*.zip
+          path: package-artifacts/*.zip
           if-no-files-found: error
           retention-days: 7
