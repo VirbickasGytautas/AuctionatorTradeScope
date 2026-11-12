@@ -1,3 +1,6 @@
+## 4.2.1.7-beta1
+- Test automatic CurseForge packaging.
+
 ## 4.2.1.6 - Unified Terminal & Pro Layout
 - Unified Market Terminal and TradeScope Pro backgrounds, gold separators and frame borders.
 - Removed stacking transparent backdrop layers; only one surface responds to each window transparency setting.
