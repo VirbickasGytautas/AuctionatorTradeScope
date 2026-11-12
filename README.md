@@ -1,4 +1,8 @@
-# Auctionator TradeScope 4.2.1.6 — WoW Forever
+# Auctionator TradeScope 4.3.0-beta1 — WoW Forever
+
+### 4.3.0-beta1 - Batch crafting preview
+
+Under TradeScope Pro > Crafting Calculator, select a saved recipe and enter **Crafts in batch** (1–999). The reagent table shows total materials needed, stock in bags/bank (when enabled), and missing purchase quantities. Hover or click **Buy list** for a combined ingredient shopping list, including repeated reagents. The summary shows the complete batch's market cost, estimated purchases, auction net revenue, market profit, cash-basis profit and market ROI. A recipe producing two items per craft correctly produces twice the selected crafting count. Missing prices remain unknown instead of being treated as free resources. Existing recipes, inventory snapshots and history remain intact. This is a beta pending game-client verification.
 
 ### Version 4.2.1.6 - Scanner sorting and window backgrounds
 

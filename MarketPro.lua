@@ -721,49 +721,86 @@ function A.SetRecipeIngredientIncluded(recipe,index,include)
   if include then flags[index]=nil else flags[index]=true end
 end
 
-function A.EvaluateRecipeWithInventory(recipe)
+-- Cost a complete production batch against observed auction quotes and optional
+-- bag/bank stock. Uses the same ingredient exclusion flags as the single craft
+-- calculator; for one craft, all existing report fields remain compatible.
+function A.EvaluateCraftBatch(recipe,craftCount)
   if not recipe then return nil end
   local settings=cfg()
+  local crafts=max(1,min(999,floor(tonumber(craftCount) or 1)))
   local flags=A.RecipeExclusions(recipe)
   local inventoryEnabled=settings.craftInventoryEnabled==true
   local marketCost,cashCost,missingMarket,missingCash,excluded=0,0,{}, {},0
-  local rows,used={},{}
+  local rows,used,stocks,shoppingByID={}, {}, {}, {}
   for index=1,#(recipe.materials or {}) do
     local mat=recipe.materials[index]
     local id=tonumber(mat.id)
-    local qty=max(1,floor(tonumber(mat.qty) or 1))
+    local qty=max(1,floor(tonumber(mat.qty) or 1))*crafts
     local include=flags[index]~=true
     local unit=A.GetProAuctionPrice(id or mat.id)
-    local bag,bank,bankTime,ownedTotal
-    if inventoryEnabled then bag,bank,bankTime,ownedTotal=A.CraftOwnedCount(id) end
-    local stock=inventoryEnabled and (ownedTotal or ((bag or 0)+(bank or 0))) or 0
-    local already=used[id] or 0
+    local bag,bank,bankTime,stock
+    if inventoryEnabled and id then
+      -- Snapshot each ingredient ID only once. Different recipe rows sharing
+      -- an ID must not each receive the entire owned stock.
+      local saved=stocks[id]
+      if not saved then
+        local ownedTotal
+        bag,bank,bankTime,ownedTotal=A.CraftOwnedCount(id)
+        saved={bag,bank,bankTime,max(0,tonumber(ownedTotal) or
+          ((tonumber(bag) or 0)+(tonumber(bank) or 0)))}
+        stocks[id]=saved
+      end
+      bag,bank,bankTime,stock=saved[1],saved[2],saved[3],saved[4]
+    end
+    stock=stock or 0
+    local already=id and (used[id] or 0) or 0
     local own=include and min(qty,max(0,stock-already)) or 0
     if include and inventoryEnabled and id then used[id]=already+own end
+    local buy=include and (qty-own) or 0
     if include then
-      local purchase=qty-own
       if type(unit)=="number" and unit>0 then
         marketCost=marketCost+unit*qty
-        cashCost=cashCost+unit*purchase
+        cashCost=cashCost+unit*buy
       else
         missingMarket[#missingMarket+1]=id or tostring(mat.id)
-        if purchase>0 then missingCash[#missingCash+1]=id or tostring(mat.id) end
+        if buy>0 then missingCash[#missingCash+1]=id or tostring(mat.id) end
+      end
+      -- Combine repeated ingredient IDs into one shopping-list entry.
+      if buy>0 then
+        local key=tostring(id or mat.id)
+        local entry=shoppingByID[key]
+        if not entry then
+          entry={id=id or mat.id,name=mat.name,qty=0,unit=unit}
+          shoppingByID[key]=entry
+        end
+        entry.qty=entry.qty+buy
+        if type(unit)~="number" or unit<=0 then entry.unit=nil end
       end
     else
       excluded=excluded+1
     end
     rows[#rows+1]={id=id,qty=qty,unit=unit,include=include,
-      bag=bag,bank=bank,stock=stock,bankTime=bankTime,
-      own=own,buy=include and (qty-own) or 0,
+      bag=bag,bank=bank,stock=inventoryEnabled and stock or nil,bankTime=bankTime,
+      own=own,buy=buy,
       cost=include and unit and unit*qty or nil,
-      cash=include and unit and unit*(qty-own) or nil}
+      cash=include and unit and unit*buy or nil}
   end
-  local made=max(1,tonumber(recipe.made) or 1)
+  local made=max(1,floor(tonumber(recipe.made) or 1))*crafts
   local quote=A.GetProAuctionPrice(recipe.product)
   local fee=max(0,min(15,tonumber(settings.journalFee) or 5))
   local net=quote and quote*made*(1-fee/100) or nil
   local completeMarket=#missingMarket==0
   local completeCash=#missingCash==0
+  local shoppingList={}
+  for _,entry in pairs(shoppingByID) do
+    entry.cost=entry.unit and entry.qty*entry.unit or nil
+    shoppingList[#shoppingList+1]=entry
+  end
+  table.sort(shoppingList,function(a,b)
+    return tostring(a.name or a.id)<tostring(b.name or b.id)
+  end)
+  local roi=completeMarket and marketCost>0 and net and
+    100*(net-marketCost)/marketCost or nil
   return {rows=rows,net=net,outputQuote=quote,
     marketCost=completeMarket and marketCost or nil,
     cashCost=completeCash and cashCost or nil,
@@ -771,7 +808,13 @@ function A.EvaluateRecipeWithInventory(recipe)
     marketProfit=completeMarket and net and net-marketCost or nil,
     cashProfit=completeCash and net and net-cashCost or nil,
     missingMarket=missingMarket,missingCash=missingCash,
-    excluded=excluded,inventoryEnabled=inventoryEnabled,quantity=made}
+    excluded=excluded,inventoryEnabled=inventoryEnabled,quantity=made,
+    craftCount=crafts,outputPerCraft=max(1,floor(tonumber(recipe.made) or 1)),
+    roi=roi,shoppingList=shoppingList}
+end
+
+function A.EvaluateRecipeWithInventory(recipe)
+  return A.EvaluateCraftBatch(recipe,1)
 end
 
 -- All imported recipes are listed, even losses and those missing Auctionator

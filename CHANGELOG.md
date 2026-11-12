@@ -1,3 +1,12 @@
+## 4.3.0-beta1 - Crafting Intelligence 2.0: batch foundation
+- Added editable batch size (1-999 crafts) to the crafting calculator, saved across sessions.
+- Reagent quantities, market cost, additional cash expense and net auction revenue scale with the batch.
+- Recipe output-per-craft is respected; market profit and ROI are calculated separately from cash-basis profit.
+- Added a Buy column with needed purchasing quantities and a grouped Buy List for repeated reagents.
+- Available bag/bank stock is allocated only once across repeated ingredient IDs; missing prices remain unknown.
+- Single-recipe results remain backward-compatible when batch size is 1.
+- This is a feature beta, not a verified in-game release.
+
 ## 4.2.1.7-beta1
 - Test automatic CurseForge packaging.
 

@@ -1370,8 +1370,8 @@ local function makeCraft(root)
   productIcon:SetPoint("TOPLEFT",p,"TOPLEFT",20,-125)
   productIcon:SetTexture("Interface\\Icons\\INV_Misc_QuestionMark")
   p.productName=fs(p,l("Choose a recipe to see its ingredients and costs.",
-    "Выберите рецепт, чтобы увидеть ресурсы и их стоимость."),66,-124,630,true)
-  p.productMade=fs(p,"",66,-147,630)
+    "Выберите рецепт, чтобы увидеть ресурсы и их стоимость."),66,-124,448,true)
+  p.productMade=fs(p,"",66,-147,324)
   -- Both the result icon and its name are one interactive hover target.
   local productHotspot=CreateFrame("Frame",nil,p)
   productHotspot:SetSize(340,43)
@@ -1383,11 +1383,12 @@ local function makeCraft(root)
 
   tex(p,20,-180,688,1,.40,.33,.16,.8)
   local columns={
-    {l("MATERIAL","МАТЕРИАЛ"),84,205},
-    {l("QTY","КОЛ-ВО"),299,58},
-    {l("IN STOCK","В НАЛИЧИИ"),350,96},
-    {l("EACH","ЗА ШТ."),445,110},
-    {l("TOTAL","СТОИМОСТЬ"),559,148},
+    {l("MATERIAL","МАТЕРИАЛ"),84,184},
+    {l("NEED","НУЖНО"),274,54},
+    {l("OWNED","ЕСТЬ"),338,58},
+    {l("BUY","ДОКУПИТЬ"),397,68},
+    {l("EACH","ЗА ШТ."),473,98},
+    {l("TOTAL","СТОИМОСТЬ"),579,129},
   }
   for i=1,#columns do
     local c=columns[i]
@@ -1398,6 +1399,38 @@ local function makeCraft(root)
   local PAGE_SIZE=6
   local active, page = nil,1
   local drawReport -- row click handlers need this forward declaration
+  fs(p,l("Crafts in batch","Изготовлений"),524,-125,111)
+  p.batchCount=CreateFrame("EditBox",nil,p,"InputBoxTemplate")
+  p.batchCount:SetSize(58,24)
+  p.batchCount:SetPoint("TOPLEFT",p,"TOPLEFT",644,-121)
+  p.batchCount:SetAutoFocus(false)
+  p.batchCount:SetMaxLetters(3)
+  if p.batchCount.SetNumeric then p.batchCount:SetNumeric(true) end
+  local batchCount=math.max(1,math.min(999,math.floor(
+    tonumber(A.db.pro.craftBatchCount) or 1)))
+  p.batchCount:SetText(tostring(batchCount))
+  attachHelp(p.batchCount,l("Batch size (crafts)","Размер партии (изготовлений)"),l(
+    "Number of crafting actions, 1 to 999. A recipe may produce multiple items per action. Changes are saved automatically.",
+    "Число изготовлений от 1 до 999. Один крафт может давать несколько готовых предметов. Значение сохраняется автоматически."))
+  p.batchCount:SetScript("OnTextChanged",function(self)
+    local value=tonumber(self:GetText() or "")
+    if not value or value<1 then return end
+    value=math.min(999,math.floor(value))
+    if value~=batchCount then
+      batchCount=value
+      A.db.pro.craftBatchCount=value
+      if active and drawReport then drawReport() end
+    end
+  end)
+  p.batchCount:SetScript("OnEditFocusLost",function(self)
+    self:SetText(tostring(batchCount))
+  end)
+  p.batchCount:SetScript("OnEnterPressed",function(self)
+    self:ClearFocus()
+  end)
+  p.batchCount:SetScript("OnEscapePressed",function(self)
+    self:ClearFocus()
+  end)
   p.stockToggle=CreateFrame("CheckButton",nil,p,"UICheckButtonTemplate")
   p.stockToggle:SetSize(24,24)
   p.stockToggle:SetPoint("TOPLEFT",p,"TOPLEFT",395,-150)
@@ -1419,11 +1452,12 @@ local function makeCraft(root)
     local icon=p:CreateTexture(nil,"ARTWORK")
     icon:SetSize(25,25)
     icon:SetPoint("TOPLEFT",p,"TOPLEFT",49,y-4)
-    local title=fs(p,"",84,y-7,202)
-    local qty=fs(p,"",301,y-7,55)
-    local owned=fs(p,"",360,y-7,76)
-    local unit=fs(p,"",445,y-7,108)
-    local total=fs(p,"",560,y-7,142)
+    local title=fs(p,"",84,y-7,184)
+    local qty=fs(p,"",276,y-7,53)
+    local owned=fs(p,"",338,y-7,54)
+    local buy=fs(p,"",400,y-7,65)
+    local unit=fs(p,"",473,y-7,97)
+    local total=fs(p,"",581,y-7,125)
     local hotspot=CreateFrame("Frame",nil,p)
     hotspot:SetSize(659,33)
     hotspot:SetPoint("TOPLEFT",p,"TOPLEFT",49,y)
@@ -1462,7 +1496,7 @@ local function makeCraft(root)
         GameTooltip:Hide()
       end
     end)
-    local row={background=bgrow,icon=icon,title=title,qty=qty,owned=owned,unit=unit,
+    local row={background=bgrow,icon=icon,title=title,qty=qty,owned=owned,buy=buy,unit=unit,
       total=total,hotspot=hotspot,include=include,sourceIndex=nil}
     include:SetScript("OnClick",function(self)
       if active and row.sourceIndex then
@@ -1475,7 +1509,7 @@ local function makeCraft(root)
       "Снимите галочку, чтобы исключить этот ингредиент из себестоимости и расчёта прибыли. При исключении расчёт уже не отражает полную экономическую стоимость."))
     p.materialRows[i]=row
   end
-  p.pageLabel=fs(p,"",295,-442,190)
+  p.pageLabel=fs(p,"",266,-442,134)
   p.summary1=fs(p,"",22,-472,680,true)
   p.summary2=fs(p,"",22,-495,680)
   p.summary3=fs(p,"",22,-518,680)
@@ -1528,7 +1562,7 @@ local function makeCraft(root)
     for i=1,#p.materialRows do
       local row=p.materialRows[i]
       row.background:Hide();row.icon:Hide();row.title:Hide();row.qty:Hide()
-      row.owned:Hide();row.unit:Hide();row.total:Hide();row.hotspot:Hide();row.include:Hide()
+      row.owned:Hide();row.buy:Hide();row.unit:Hide();row.total:Hide();row.hotspot:Hide();row.include:Hide()
       row.sourceIndex=nil
     end
     if not active then
@@ -1548,14 +1582,13 @@ local function makeCraft(root)
     p.productName:SetText(productName)
     productHotspot:Show()
     local made=math.max(1,math.floor(tonumber(active.made) or 1))
-    p.productMade:SetText(l("Produced: ","Результат: ")..made.." "..
-      l("unit(s) per craft","шт. за изготовление"))
+    p.productMade:SetText(l("Per craft: ","За крафт: ")..made..
+      l("   Batch output: ","   В партии: ")..(made*batchCount))
     local list=active.materials or {}
     local pages=math.max(1,math.ceil(#list/PAGE_SIZE))
     page=math.max(1,math.min(page,pages))
-    p.pageLabel:SetText(l("Materials ","Материалы ")..#list.."   "..
-      l("Page ","Страница ")..page.."/"..pages)
-    local report=A.EvaluateRecipeWithInventory and A.EvaluateRecipeWithInventory(active)
+    p.pageLabel:SetText(l("Items: ","Рес.: ")..#list.."  "..page.."/"..pages)
+    local report=A.EvaluateCraftBatch and A.EvaluateCraftBatch(active,batchCount)
     local rows=report and report.rows or {}
     for index=1,#list do
       local mat=list[index]
@@ -1564,15 +1597,20 @@ local function makeCraft(root)
         local result=rows[index]
         local itemName,itemTexture=displayName(mat.id,mat.name,mat.icon)
         row.icon:SetTexture(itemTexture or mat.icon or "Interface\\Icons\\INV_Misc_QuestionMark")
-        row.title:SetText(A.FitItemName and A.FitItemName(itemName,row.title,200) or itemName)
-        row.qty:SetText(tostring(mat.qty or 1))
+        row.title:SetText(A.FitItemName and A.FitItemName(itemName,row.title,179) or itemName)
+        row.qty:SetText(tostring(result and result.qty or (tonumber(mat.qty) or 1)*batchCount))
         if report and report.inventoryEnabled then
           local total=result and result.stock or 0
           row.owned:SetText(tostring(total))
           row.owned:SetTextColor(.48,.86,.62)
+          row.buy:SetText(result and result.include and tostring(result.buy or 0) or "-")
+          row.buy:SetTextColor((result and result.buy or 0)>0 and 1 or .48,
+            (result and result.buy or 0)>0 and .77 or .86,.42)
         else
           row.owned:SetText("-")
           row.owned:SetTextColor(.54,.59,.64)
+          row.buy:SetText("-")
+          row.buy:SetTextColor(.54,.59,.64)
         end
         row.unit:SetText(formatValue(result and result.unit))
         row.total:SetText(result and result.include and formatValue(result.cost)
@@ -1590,7 +1628,7 @@ local function makeCraft(root)
           stock=result and result.stock,bankTime=result and result.bankTime,
           buy=result and result.buy}
         row.background:Show();row.icon:Show();row.title:Show();row.qty:Show()
-        row.owned:Show();row.unit:Show();row.total:Show();row.hotspot:Show();row.include:Show()
+        row.owned:Show();row.buy:Show();row.unit:Show();row.total:Show();row.hotspot:Show();row.include:Show()
       end
     end
     local market=report and report.marketCost
@@ -1605,9 +1643,11 @@ local function makeCraft(root)
       l("Net revenue: ","Выручка после комиссии: ")..formatValue(net))
     local baseline=report and report.marketProfit
     local cashProfit=report and report.cashProfit
-    p.summary3:SetText(l("Market-basis profit: ","Прибыль по рыночной стоимости: ")..
-      formatValue(baseline)..(report and report.inventoryEnabled and
-      ("   "..l("Profit with owned stock: ","Прибыль с собственными: ")..formatValue(cashProfit)) or ""))
+    p.summary3:SetText(l("Market profit: ","Рыночная прибыль: ")..
+      formatValue(baseline).."   ROI: "..
+      (report and type(report.roi)=="number" and string.format("%.1f%%",report.roi)
+        or l("No data","Нет данных"))..(report and report.inventoryEnabled and
+      ("   "..l("Cash-basis: ","Денежная: ")..formatValue(cashProfit)) or ""))
     p.summary3:SetTextColor(type(baseline)=="number" and
       (baseline>=0 and .42 or 1) or 1,
       type(baseline)=="number" and (baseline>=0 and 1 or .55) or .73,.39)
@@ -1844,6 +1884,45 @@ local function makeCraft(root)
   button(p,l("Next >","Вперёд >"),143,-434,120,function()
     if not active then return end
     page=page+1;drawReport()
+  end)
+  local shoppingButton=button(p,l("Buy list","Закупки"),408,-434,126,function(self)
+    -- Also permit a click to display the same list as the hover tooltip.
+    if self:GetScript("OnEnter") then self:GetScript("OnEnter")(self) end
+  end)
+  shoppingButton:SetScript("OnEnter",function(self)
+    if not GameTooltip then return end
+    GameTooltip:SetOwner(self,"ANCHOR_RIGHT")
+    GameTooltip:SetText(l("Materials to purchase","Список закупок"))
+    if not active then
+      GameTooltip:AddLine(l("Select a saved recipe.","Выберите сохранённый рецепт."),1,1,1,true)
+    else
+      local report=A.EvaluateCraftBatch(active,batchCount)
+      local list=report and report.shoppingList or {}
+      if #list==0 then
+        GameTooltip:AddLine(l("No additional materials needed.","Дополнительные материалы не нужны."),.46,1,.55,true)
+      else
+        for i=1,math.min(#list,20) do
+          local item=list[i]
+          local name=displayName(item.id,item.name)
+          GameTooltip:AddDoubleLine(tostring(name).." x"..item.qty,
+            formatValue(item.cost),1,.85,.35,.86,.93,1)
+        end
+        if #list>20 then
+          GameTooltip:AddLine(l("Additional ingredients not shown.",
+            "Остальные ингредиенты не показаны."),.75,.78,.83,true)
+        end
+        GameTooltip:AddLine(l("Additional purchases: ","Нужно докупить на: ")..
+          formatValue(report.cashCost),.5,1,.7,true)
+      end
+      if not report.inventoryEnabled then
+        GameTooltip:AddLine(l("Own stock tracking is OFF: full quantities shown.",
+          "Учёт запасов выключен: показана полная потребность."),1,.7,.44,true)
+      end
+    end
+    GameTooltip:Show()
+  end)
+  shoppingButton:SetScript("OnLeave",function()
+    if GameTooltip then GameTooltip:Hide() end
   end)
   button(p,l("Refresh data","Обновить данные"),550,-434,158,function()
     if A.RefreshCraftStock then A.RefreshCraftStock() end

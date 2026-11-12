@@ -1,6 +1,6 @@
 -- Auctionator TradeScope 4.1.0 -- WoW Forever / Lua 5.1
 -- A fresh standalone addon; no legacy history is imported.
-ATS = { version = "4.2.1.7-beta1", source = "none" }
+ATS = { version = "4.3.0-beta1", source = "none" }
 local A = ATS
 _G.AuctionatorTradeScope = A
 
@@ -175,6 +175,8 @@ function A.Init()
   default("craftScannerSort","profit")
   default("craftScannerOnlyProfitable",false)
   default("craftInventoryEnabled",false)
+  p.craftBatchCount = math.max(1,math.min(999,math.floor(
+    tonumber(p.craftBatchCount) or 1)))
   p.craftExcluded = type(p.craftExcluded)=="table" and p.craftExcluded or {}
   p.craftStock = type(p.craftStock)=="table" and p.craftStock or {}
   -- 4.2.0: quality-aware opportunity scoring. Old scan results are preserved,

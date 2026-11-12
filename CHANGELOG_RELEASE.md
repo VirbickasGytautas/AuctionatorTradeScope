@@ -1,5 +1,6 @@
-## 4.2.1.6 - Unified Terminal & Pro Layout
-- Unified Market Terminal and TradeScope Pro styling.
-- Standardized graph viewport sizes in the terminal.
-- Improved transparency handling without fading chart lines and text.
-- Existing SavedVariables and price history remain compatible.
+## 4.3.0-beta1 - Crafting Intelligence 2.0 (Batch Preview)
+- Added batch crafting quantities (1-999) with live recalculation.
+- New buy quantities and grouped shopping list for missing ingredients.
+- Full-batch market cost, additional purchase cost, output revenue, profit and ROI.
+- Respects multiple outputs per recipe, shared reagent stock and missing quotes.
+- Existing saved data remains compatible; game-client verification pending.
