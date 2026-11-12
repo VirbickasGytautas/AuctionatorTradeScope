@@ -396,8 +396,11 @@ local function cursorDot(c,name,x,value,axis)
 end
 
 local function salesBucketAt(c,t)
-  if not c.hoverBuckets or not c.hoverBucketSeconds then return nil end
+  if not c.hoverBuckets or not c.hoverBucketSeconds or not c.hoverBucketCount then return nil end
+  -- At the rightmost pixel t == now. SalesSeries assigns that observation
+  -- to the *last* bucket, not to an additional bucket beyond the chart.
   local index=math.floor((t-c.hoverStart)/c.hoverBucketSeconds)+1
+  index=math.max(1,math.min(c.hoverBucketCount,index))
   return c.hoverBuckets[index]
 end
 
@@ -551,6 +554,9 @@ local function drawBars(c, samples, hours, now, axisMax, combined)
   for i=1,#bars do
     local point=bars[i]
     local x=LEFT+(point.t-startTime)/span*(RIGHT-LEFT)
+    -- Partial final buckets can be centred on now. Keep the bar fully
+    -- inside the plotting area instead of covering the right-axis labels.
+    x=math.max(LEFT+width/2,math.min(RIGHT-width/2,x))
     local height
     if combined then
       -- Composite bars are scaled independently to 32px for readability.
@@ -668,23 +674,30 @@ local function drawOne(c,samples,hours,now)
   c.hoverSpan=math.max(3600,hours*3600)
   c.hoverPriceAxis=kind=="market" and {qm0,qm1} or {pm0,pm1}
   c.hoverQuantityAxis={qm0,qm1}
-  c.hoverBuckets=nil;c.hoverBucketSeconds=nil
+  c.hoverBuckets=nil;c.hoverBucketSeconds=nil;c.hoverBucketCount=nil
   if kind=="sales" or (kind=="combined" and A.db.combinedSalesBars) then
-    local buckets,seconds=A.SalesSeries(samples,hours,now)
-    c.hoverBucketSeconds=seconds
-    c.hoverBuckets={}
-    for i=1,#buckets do
-      local b=buckets[i]
-      local index=math.floor((b.t-startTime)/seconds)+1
-      -- Bucket data are observations, not values carried across empty intervals.
-      c.hoverBuckets[index]=b
-    end
-    for i=1,#samples do
-      local sample=samples[i]
-      if type(sample.quantity)=="number" and sample.t>=startTime and sample.t<=now then
-        local index=math.floor((sample.t-startTime)/seconds)+1
-        local bucket=c.hoverBuckets[index]
-        if bucket then bucket.lastAt=sample.t end
+    local buckets,seconds,observed=A.SalesSeries(samples,hours,now)
+    -- Fewer than two quantity observations cannot establish a decline.
+    -- Match the empty graph rather than reporting an invented zero.
+    if observed>=2 and type(seconds)=="number" and seconds>0 then
+      c.hoverBucketSeconds=seconds
+      c.hoverBucketCount=math.ceil(c.hoverSpan/seconds)
+      c.hoverBuckets={}
+      local function bucketIndex(t)
+        return math.max(1,math.min(c.hoverBucketCount,
+          math.floor((t-startTime)/seconds)+1))
+      end
+      for i=1,#buckets do
+        local b=buckets[i]
+        -- Bucket data are observations, not values carried across empty intervals.
+        c.hoverBuckets[bucketIndex(b.t)]=b
+      end
+      for i=1,#samples do
+        local sample=samples[i]
+        if type(sample.quantity)=="number" and sample.t>=startTime and sample.t<=now then
+          local bucket=c.hoverBuckets[bucketIndex(sample.t)]
+          if bucket then bucket.lastAt=sample.t end
+        end
       end
     end
   end

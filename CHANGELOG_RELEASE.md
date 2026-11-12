@@ -1,3 +1,8 @@
+## 4.3.0-beta5
+- Fixed the supply-decline graph cursor at the final time interval.
+- Prevented decline bars from overlapping the right-hand chart axis.
+- Kept the crafting help in its sidebar; no history or settings were reset.
+
 ## 4.3.0-beta4 - Craft recipe help in right panel
 - Removed the misplaced helper line below the recipe search field.
 - Recipe usage instructions now appear under HOW IT WORKS.

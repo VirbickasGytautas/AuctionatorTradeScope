@@ -1,0 +1,77 @@
+name: TradeScope Beta - Publish to CurseForge
+
+# Publication is opt-in: only pushing a v*-beta* tag starts uploading.
+# Pushes to branches never publish to CurseForge.
+on:
+  push:
+    tags:
+      - 'v*-beta*'
+
+permissions:
+  contents: read
+
+jobs:
+  curseforge-beta:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out tagged revision
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Require release commit on main
+        shell: bash
+        run: |
+          git fetch origin main --quiet
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
+            echo "::error::Release tags must point to commits already merged into main"
+            exit 1
+          fi
+
+      - name: Validate release tag and WoW Forever metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          expected="${GITHUB_REF_NAME#v}"
+          actual="$(sed -n 's/^## Version:[[:space:]]*//p' AuctionatorTradeScope.toc | tr -d '\r')"
+          if [[ "$expected" != "$actual" || ! "$expected" =~ ^[0-9]+\.[0-9]+\.[0-9]+-beta[0-9]+$ ]]; then
+            echo "::error::Tag and TOC version mismatch, or invalid beta tag"
+            exit 1
+          fi
+          test -f pkgmeta.yaml
+          grep -Eq '^## Interface:[[:space:]]*16001[[:space:]]*$' AuctionatorTradeScope.toc
+          grep -Eq '^package-as:[[:space:]]*AuctionatorTradeScope[[:space:]]*$' pkgmeta.yaml
+          echo 'Release tag and WoW Forever metadata verified.'
+
+      - name: Verify CurseForge credential is configured
+        shell: bash
+        env:
+          CF_API_TOKEN: ${{ secrets.CF_API_KEY }}
+        run: |
+          if [[ -z "$CF_API_TOKEN" ]]; then
+            echo '::error::GitHub secret CF_API_KEY is missing'
+            exit 1
+          fi
+
+      - name: Package and upload Beta to CurseForge
+        uses: BigWigsMods/packager@v2.6.1
+        env:
+          CF_API_TOKEN: ${{ secrets.CF_API_KEY }}
+        with:
+          args: -p 1796279
+
+      - name: Preserve generated ZIP for troubleshooting
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p package-artifacts
+          find .release -maxdepth 1 -name '*.zip' -type f -exec cp {} package-artifacts/ \; 2>/dev/null || true
+
+      - name: Save ZIP as an Actions artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tradescope-curseforge-beta-package
+          path: package-artifacts/*.zip
+          if-no-files-found: warn
+          retention-days: 7

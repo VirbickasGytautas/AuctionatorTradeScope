@@ -1,3 +1,10 @@
+## 4.3.0-beta5 - Chart cursor and distribution bar boundary fix
+- Keep supply-decline hover values and last observation time visible at the right-hand edge of the selected range.
+- Do not show a synthetic zero in a decline cursor when fewer than two quantity snapshots exist.
+- Keep decline bars inside the plot area, including partial final time buckets.
+- Preserved crafting sidebar helper text and the removal of the obsolete hint below recipe search.
+- No changes to historical data, scanning, alert rules, or SavedVariables.
+
 ## 4.3.0-beta4 - Craft recipe help moved to sidebar
 - Removed the fixed helper line beneath the recipe search input.
 - Moved recipe scanning and selection instructions into the right HOW IT WORKS panel.
