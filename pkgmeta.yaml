@@ -1,0 +1,12 @@
+package-as: AuctionatorTradeScope
+enable-nolib-creation: no
+manual-changelog:
+  filename: CHANGELOG_RELEASE.md
+  markup-type: markdown
+license-output: LICENSE
+ignore:
+  - README.md
+  - README_RU.md
+  - CHANGELOG.md
+  - CHANGELOG_RELEASE.md
+  - scripts

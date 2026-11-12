@@ -1,0 +1,34 @@
+## Interface: 16001
+## Title: Auctionator TradeScope
+## Notes: Auctionator market terminal: price/supply history, dual-axis charts and market indicators
+## Notes-ruRU: Рыночный терминал Auctionator: история цены и предложения, совмещённые графики и показатели
+## Version: 4.2.1.6
+## Author: Gytautas Virbickas
+## X-Category: Auction/Economy
+## X-Localizations: enUS, ruRU
+## X-License: MIT
+## OptionalDeps: Auctionator
+## SavedVariables: AuctionatorTradeScopeDB
+## IconTexture: Interface\AddOns\AuctionatorTradeScope\Media\Icon
+## X-Icon: Interface\AddOns\AuctionatorTradeScope\Media\Icon
+
+Core.lua
+UITheme.lua
+Locales.lua
+Balance.lua
+Data.lua
+ItemInfo.lua
+Analytics.lua
+Trading.lua
+MarketPro.lua
+SmartAlerts.lua
+CraftInventory.lua
+Scan.lua
+Graph.lua
+Dashboard.lua
+TradeUI.lua
+Options.lua
+Hover.lua
+ProUI.lua
+ProOptions.lua
+Minimap.lua

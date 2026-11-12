@@ -1,0 +1,15 @@
+# Local build artifacts and user data
+*.zip
+*.luac
+*.log
+*.bak
+*.tmp
+*.code-workspace
+WTF/
+SavedVariables/
+.idea/
+.vscode/settings.json
+.vscode/launch.json
+__pycache__/
+.DS_Store
+Thumbs.db
