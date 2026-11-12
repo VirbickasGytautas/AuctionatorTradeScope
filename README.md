@@ -1,4 +1,8 @@
-# Auctionator TradeScope 4.4.0-beta1 — WoW Forever
+# Auctionator TradeScope 4.4.0-beta2 — WoW Forever
+
+### 4.4.0-beta2 - Structural refactor: chart extraction and Journal 2.0 groundwork
+
+Separated graph placement and crafting previews, extracted journal storage and added read-only weighted-cost analytics. A compact manual journal summary is available. No automatic trading event capture, migrations or release publication. The original Trading Journal 2.0 roadmap is not complete.
 
 ### 4.4.0-beta1 - Structural refactor (testing only)
 

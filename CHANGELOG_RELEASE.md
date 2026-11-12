@@ -1,3 +1,9 @@
+## 4.4.0-beta2 - Internal test build
+- Split graph tooltip placement and crafting preview into separate Lua modules.
+- Extracted manual journal persistence and added read-only per-item analytics.
+- Added a small journal summary and automated regression checks.
+- No data migration, automatic trade capture, or CurseForge publication.
+
 ## 4.4.0-beta1 - Code organization preview
 - Modularized source files and decomposed the Pro workstation interface into separate pages.
 - Retained prior stable 4.3.0 market and crafting behavior and saved data.

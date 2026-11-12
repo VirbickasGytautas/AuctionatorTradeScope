@@ -50,6 +50,7 @@ function B.journal(root)
   p.silver=edit(p,l("Silver","Серебро"),411,-60,75,"0",true)
   p.copper=edit(p,l("Copper","Медь"),496,-60,75,"0",true)
   p.total=fs(p,"",20,-154,690,true)
+  p.summary=fs(p,"",20,-176,690,true)
   local function record(kind)
     local key=anyItem(p)
     local price=(tonumber(p.gold:GetText()) or 0)*10000+
@@ -67,6 +68,10 @@ function B.journal(root)
   end)
   p.update=function()
     local report=A.JournalReport()
+    local summary=A.JournalAnalysis()
+    p.summary:SetText(l("Open units: ","Остаток: ")..summary.openUnits..
+      "    "..l("Matched units: ","Учтённые продажи: ")..summary.matched..
+      "    "..l("Fees: ","Комиссии: ")..currency(summary.fees))
     p.total:SetText(l("Realized P&L: ","Реализованная прибыль: ")..currency(report.realized)..
       "    "..l("Unmatched sold units: ","Продажи без закупки: ")..report.unmatched)
     for i=1,#p.rows do

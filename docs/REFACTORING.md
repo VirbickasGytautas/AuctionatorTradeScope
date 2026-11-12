@@ -1,4 +1,4 @@
-# TradeScope 4.4.0-beta1: structural refactor
+# TradeScope 4.4.0-beta2: structural refactor
 
 This beta reorganizes source paths and splits ProUI. It is **not** the roadmap's Trading Journal 2.0 feature implementation. The stable 4.3.0 behavior remains the baseline.
 
@@ -29,3 +29,15 @@ powershell -File scripts/verify-release.ps1
 ```
 
 Always test the interface in WoW Forever before releasing. Never add a release tag for this branch while the user is testing. Preserve SavedVariables by keeping this refactor purely structural.
+
+## Beta2 extract (no code logic redesign)
+
+- `UI/Charts/Graph.lua`: rendering, scales, cursor and zoom
+- `UI/Charts/Placement.lua`: positioning away from native item tooltips (`ATS.GraphPlacement`)
+- `UI/Charts/Preview.lua`: crafting hover preview and regular floating graph lifecycle
+- `Finance/Journal/Ledger.lua`: existing manual journal CRUD and P&L report API
+- `Finance/Journal/Analysis.lua`: read-only weighted-cost analytics, filtering, per-item metrics
+
+The journal analysis computes cost basis on **all** transactions before applying output filters. It deliberately excludes unmatched sale units from realized P&L. It does not infer confirmed real-money trades or auction activity. The existing `JournalReport` entrypoints continue to work.
+
+New tests: `texlua scripts/test-journal-analysis.lua`; `texlua scripts/test-toc.lua`. No tag should be created for this branch.

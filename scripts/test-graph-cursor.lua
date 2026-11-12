@@ -68,6 +68,8 @@ function A.MarketMetrics()
   return {observations = 2, currentQuantity = 8, estimatedDrops24 = 4}
 end
 assert(loadfile("UI/Charts/Graph.lua"))()
+assert(loadfile("UI/Charts/Placement.lua"))()
+assert(loadfile("UI/Charts/Preview.lua"))()
 local graph = A.NewGraph(UIParent)
 graph.showItemHeader = false
 

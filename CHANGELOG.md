@@ -1,3 +1,11 @@
+## 4.4.0-beta2 - Chart separation and Journal 2.0 foundations
+- Separated graph layout/axes from tooltip collision placement and deferred crafting preview.
+- Moved the manual journal ledger and its existing entrypoints into Finance/Journal/Ledger.lua.
+- Added read-only JournalAnalysis for weighted-average P&L, transaction counts, fees, unmatched sales and per-item positions.
+- Added a compact journal summary without modifying saved transactions, history or SavedVariables schema.
+- Added journal regression coverage; no automatic auction transaction capture yet.
+- Build-only beta branch; no CurseForge publication or release tag.
+
 ## 4.4.0-beta1 - Modular code layout (refactor only)
 - Reorganized addon Lua sources into Engine, Data, Market, Crafting, Finance, Localization and UI directories.
 - Split the former 2,724-line ProUI.lua into shared helpers, independent tool pages and a window controller.
