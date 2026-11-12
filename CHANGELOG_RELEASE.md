@@ -1,4 +1,4 @@
-## 4.3.0-beta2 - Crafting Intelligence 2.0 (UI polish)
+## 4.3.0-beta3 - Crafting Intelligence 2.0 (UI polish)
 - Craft calculator: aligned the helper text below the recipe search field.
 - Craft calculator: reduced the brightness of the helper text for a cleaner look.
 

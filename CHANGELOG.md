@@ -1,4 +1,4 @@
-## 4.3.0-beta2 - Crafting Intelligence 2.0: UI polish
+## 4.3.0-beta3 - Crafting Intelligence 2.0: UI polish
 - Craft calculator: aligned the helper hint under the recipe input field.
 - Craft calculator: darkened the helper hint font slightly for better readability and lower glare.
 
