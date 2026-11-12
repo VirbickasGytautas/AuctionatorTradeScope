@@ -1,7 +1,7 @@
 name: TradeScope Beta - Publish to CurseForge
 
-# Publication is opt-in: only pushing this exact beta tag runs this workflow.
-# The existing branch dry-run remains unchanged.
+# Publication is opt-in: only pushing a v*-beta* tag starts uploading.
+# Pushes to branches never publish to CurseForge.
 on:
   push:
     tags:
