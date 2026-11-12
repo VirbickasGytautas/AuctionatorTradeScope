@@ -1,6 +1,7 @@
 -- TradeScope 3.0 - Blizzard-styled market terminal and direct bag item selection.
 local A=ATS
 local WIDTH,HEIGHT=944,638
+local PER_PAGE=8
 
 local function fs(parent,w,font)
   local f=parent:CreateFontString(nil,"OVERLAY",font or "GameFontHighlightSmall")
@@ -53,6 +54,18 @@ function A.RemoveWatch(key)
   local watches=watchTable(false)
   if watches then watches[key]=nil end
   if A.dashboard and A.dashboard:IsShown() then A.RefreshDashboard() end
+end
+local function watchList()
+  local list={}
+  for key,entry in pairs(watchTable(false) or {}) do
+    if type(entry)=="table" then
+      entry.key=entry.key or key
+      if entry.name or entry.icon then A.RememberItem(entry.link or entry.key,entry.name,entry.icon) end
+      list[#list+1]=entry
+    end
+  end
+  table.sort(list,function(a,b) return string.lower(a.name or "")<string.lower(b.name or "") end)
+  return list
 end
 local function parseItem(raw)
   if type(raw) ~= "string" then return nil end
@@ -176,11 +189,9 @@ local function create()
     f.showTools=not f.showTools
     A.RefreshDashboard()
   end)
-  -- The chart/trader-tools switch belongs to the bottom content action area,
-  -- not the persistent top navigation.  The tools pane ends 42 px above the
-  -- window bottom, so this 22-px control stays clear of both the graph and it.
+  -- Keep the tools control 8px lower, fully below the footer separator.
   f.toolsToggle:SetSize(131,22)
-  f.toolsToggle:SetPoint("BOTTOMRIGHT",f,"BOTTOMRIGHT",-26,19)
+  f.toolsToggle:SetPoint("BOTTOMRIGHT",f,"BOTTOMRIGHT",-26,11)
   f.proButton=button(f,"TradeScope Pro",118,24,function()
     if A.OpenProTool then A.OpenProTool("scanner") end
   end)
@@ -323,7 +334,8 @@ local function create()
   local function dropAction()
     local link=cursorItem()
     if link and A.SelectItem(link) then
-      -- Select a bag item without adding an invisible watch entry.
+      -- Adding from the bag also restores the original watchlist workflow.
+      A.AddWatch(f.key,f.legacy,f.link)
       f.dropCaption:SetText(A.L.DROP_ITEM)
       if type(ClearCursor)=="function" then ClearCursor() end
     end
@@ -346,20 +358,42 @@ local function create()
   f.pickHelp=fs(f,206)
   f.pickHelp:SetPoint("TOPLEFT",f,"TOPLEFT",25,-283)
   f.pickHelp:SetText(A.L.PICK_HINT)
-  -- The old watchlist and its paging arrows are no longer visible. Keep the
-  -- saved watch data and /ats add API for backwards compatibility.
-  shade(f,23,-325,211,151,{.055,.075,.095,.68})
-  shade(f,23,-325,211,1,{.47,.36,.18,.68})
-  local guideTitle=fs(f,202,"GameFontNormal")
-  guideTitle:SetPoint("TOPLEFT",f,"TOPLEFT",30,-335)
-  guideTitle:SetText(A.locale=="ruRU" and "ПОИСК ПРЕДМЕТА" or "ITEM SEARCH")
-  guideTitle:SetTextColor(.98,.82,.42)
-  local guide=fs(f,192,"GameFontHighlightSmall")
-  guide:SetPoint("TOPLEFT",f,"TOPLEFT",30,-365)
-  guide:SetText(A.locale=="ruRU" and
-    "Введите название или ID выше.\n\nВыберите подсказку из списка либо перетащите предмет из сумки.\n\nДля прокрутки результатов используйте колесо мыши." or
-    "Search by name or item ID above.\n\nChoose a result from suggestions or drop an item from your bags.\n\nUse the mouse wheel to scroll search results.")
-  guide:SetTextColor(.77,.82,.83)
+  -- Watchlist layout fits 8 rows and a control strip above the footer.
+  shade(f,23,-315,211,1,{.43,.33,.16,.64})
+  local wl=fs(f,210,"GameFontNormal")
+  wl:SetPoint("TOPLEFT",f,"TOPLEFT",25,-327);wl:SetText(A.L.WATCHLIST)
+  f.watchButtons={}
+  for i=1,PER_PAGE do
+    local index=i
+    local b=CreateFrame("Button",nil,f)
+    b:SetSize(211,24)
+    b:SetPoint("TOPLEFT",f,"TOPLEFT",23,-352-(i-1)*25)
+    b:EnableMouse(true)
+    local bg=shade(b,0,0,211,23,{0.14,0.16,0.17,0.76})
+    local ic=b:CreateTexture(nil,"ARTWORK");ic:SetSize(22,22);ic:SetPoint("LEFT",b,"LEFT",3,0)
+    local t=fs(b,175,"GameFontHighlightSmall");t:SetPoint("LEFT",b,"LEFT",29,0)
+    b.icon=ic;b.label=t;b.background=bg
+    b:SetScript("OnClick",function()
+      local entry=f.entries and f.entries[index]
+      if entry then A.SelectItem(entry.link or entry.key) end
+    end)
+    b:SetScript("OnEnter",function(self) self.background:SetVertexColor(.29,.24,.12,.92) end)
+    b:SetScript("OnLeave",function(self) self.background:SetVertexColor(.14,.16,.17,.76) end)
+    f.watchButtons[i]=b
+  end
+  f.watchPage=1
+  f.prev=button(f,"<",34,22,function() f.watchPage=math.max(1,f.watchPage-1);A.RefreshDashboard() end)
+  f.prev:SetPoint("TOPLEFT",f,"TOPLEFT",25,-562)
+  f.next=button(f,">",34,22,function() f.watchPage=f.watchPage+1;A.RefreshDashboard() end)
+  f.next:SetPoint("LEFT",f.prev,"RIGHT",4,0)
+  f.pin=button(f,A.L.PIN,128,22,function()
+    if not f.key then return end
+    local watches=watchTable(false)
+    if watches and watches[f.key] then A.RemoveWatch(f.key)
+    else A.AddWatch(f.key,f.legacy,f.link) end
+    A.RefreshDashboard()
+  end)
+  f.pin:SetPoint("TOPLEFT",f,"TOPLEFT",106,-562)
   f.selectedIcon=f:CreateTexture(nil,"ARTWORK")
   f.selectedIcon:SetSize(40,40);f.selectedIcon:SetPoint("TOPLEFT",f,"TOPLEFT",267,-83)
   f.selectedIcon:SetTexture("Interface\\Icons\\INV_Misc_QuestionMark")
@@ -419,6 +453,25 @@ local function create()
 end
 function A.RefreshDashboard()
   local f=create()
+  local list=watchList()
+  local total=math.max(1,math.ceil(#list/PER_PAGE))
+  local page=math.min(math.max(1,f.watchPage),total)
+  f.watchPage=page;f.entries={}
+  for i=1,PER_PAGE do
+    local entry=list[(page-1)*PER_PAGE+i]
+    local b=f.watchButtons[i]
+    if entry then
+      f.entries[i]=entry;b:Show()
+      local name, icon = A.ResolveItemInfo(entry.link or entry.key, entry.name)
+      if name ~= entry.name then entry.name = name end
+      if icon ~= entry.icon then entry.icon = icon end
+      b.icon:SetTexture(icon)
+      b.label:SetText(A.FitItemName(name,b.label,168))
+    else b:Hide() end
+  end
+  if f.prev.SetEnabled then f.prev:SetEnabled(page>1);f.next:SetEnabled(page<total) end
+  local watches=watchTable(false)
+  f.pin:SetText(watches and f.key and watches[f.key] and A.L.UNPIN or A.L.PIN)
   for i=1,#f.graphTabs do
     local chosen=f.selectedGraph==({"combined","price","market","sales"})[i]
     if A.StyleButton then A.StyleButton(f.graphTabs[i],chosen and "activeTab" or "tab") end
@@ -517,6 +570,18 @@ function A.RefreshItemWidgets()
     f.itemLabel:SetText(A.FitItemName(displayName(name),f.itemLabel,545))
     f.selectedIcon:SetTexture(icon)
     f.dropCaption:SetText(A.L.DROP_ITEM)
+  end
+  local entries = f.entries or {}
+  for i=1,#f.watchButtons do
+    local entry = entries[i]
+    local button = f.watchButtons[i]
+    if entry and button then
+      local name, icon = A.ResolveItemInfo(entry.link or entry.key, entry.name)
+      entry.name, entry.icon = name, icon
+      A.RememberItem(entry.link or entry.key,name,icon)
+      button.label:SetText(A.FitItemName(name,button.label,168))
+      button.icon:SetTexture(icon)
+    end
   end
 end
 local itemInfoListener = CreateFrame("Frame")

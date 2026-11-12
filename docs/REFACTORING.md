@@ -68,3 +68,9 @@ Only the main testable branch is packaged by GitHub Actions in build-only mode (
 ## Beta4: journal UI and terminal cleanup
 
 Journal filters use the shared `ProUIShared.dropdown` for direct item/type/period selection. Filter choices are local UI state. The legacy watchlist UI and paging arrows were removed from the terminal, but `ATS.AddWatch`, `ATS.RemoveWatch` and persisted watchlist data remain. Search suggestions and graph zoom remain; bag item selection no longer writes a hidden watch entry.
+
+## Beta5: restored terminal watchlist
+
+The beta4 removal of the watchlist and its paging controls was reverted after in-game feedback. `UI/Dashboard.lua` again presents eight watch entries per page, prev/next pagination and the Pin/Unpin button. Layout uses a 25-unit row rhythm from y=-352, compact controls at y=-562 and an 8-unit lower Tools button at bottom-right. The watchlist data model and other UI modules are unchanged.
+
+`scripts/test-dashboard-ui.lua` checks preserved watchlist/search/zoom functions, button anchors and separation from the footer. The game client remains the final authority on scaling and text overlap.

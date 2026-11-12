@@ -1,4 +1,8 @@
-# Auctionator TradeScope 4.4.0-beta4 — WoW Forever
+# Auctionator TradeScope 4.4.0-beta5 — WoW Forever
+
+### 4.4.0-beta5 - Watchlist restored and terminal alignment (local testing)
+
+Restores the eight-row Market Terminal watchlist, previous/next arrows, and Pin/Unpin button. Watch rows and navigation now fit inside the left column above the footer, and the bottom-right Tools button sits eight UI pixels lower. Bag drag-and-drop can add the selected item to the watchlist again. The beta4 Trading Journal dropdowns and existing SavedVariables are unchanged. No release tag or CurseForge publication.
 
 ### 4.4.0-beta4 - Journal UI and terminal cleanup (testing only)
 

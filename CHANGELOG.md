@@ -1,3 +1,11 @@
+## 4.4.0-beta5 - Restore watchlist and terminal alignment
+- Restored the Market Terminal watchlist with all eight entries per page, prev/next arrows and Pin/Unpin actions.
+- Moved watchlist rows into a compact grid and aligned navigation controls inside the left panel, above the footer separator.
+- Lowered the bottom-right Tools / Back to chart button by eight UI pixels without changing its behavior.
+- Restored the original bag-drop action that adds the selected item to watchlist.
+- Retained the working 4.4.0-beta4 journal dropdowns, history controls and SavedVariables schema.
+- Local-only build; no CurseForge upload or release tag.
+
 ## 4.4.0-beta4 - Trading Journal UI alignment and dropdown patch
 - Reworked the journal entry form, action buttons, summary surface, filter row and pagination.
 - Added scanner-style popup selectors for item scope, BUY/SELL and 7/30/90-day periods.

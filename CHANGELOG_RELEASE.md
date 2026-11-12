@@ -1,3 +1,9 @@
+## 4.4.0-beta5 - Terminal Layout Correction (local test)
+- Restored watchlist, pagination arrows and Pin/Unpin controls.
+- Realigned the watchlist and its navigation to avoid footer overlap.
+- Lowered the Tools button slightly.
+- Trading Journal dropdowns and saved data are unchanged. Not published.
+
 ## 4.4.0-beta4 - Journal and Terminal UI Patch (local testing)
 - Aligned the journal entry form, summaries, filter row and navigation.
 - Direct selection dropdowns for item, transaction type and period.
