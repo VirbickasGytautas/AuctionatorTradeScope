@@ -1,0 +1,51 @@
+name: TradeScope Beta - Packaging Dry Run
+
+on:
+  push:
+    branches:
+      - beta/curseforge-packaging-test
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out beta branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate WoW Forever addon metadata
+        shell: bash
+        run: |
+          test -f AuctionatorTradeScope.toc
+          test -f pkgmeta.yaml
+          grep -Eq '^## Interface:[[:space:]]*16001[[:space:]]*$' AuctionatorTradeScope.toc
+          grep -Eq '^package-as:[[:space:]]*AuctionatorTradeScope[[:space:]]*$' pkgmeta.yaml
+          echo 'WoW Forever TOC and packaging metadata verified.'
+
+      - name: Package addon without publishing
+        uses: BigWigsMods/packager@v2.6.1
+        with:
+          args: -d -p 1796279
+
+      - name: Inspect generated ZIP
+        shell: bash
+        run: |
+          find .release -maxdepth 2 -type f -print
+          test -n "$(find .release -maxdepth 2 -type f -name '*.zip' -print -quit)"
+          while IFS= read -r -d '' zip; do
+            unzip -t "$zip"
+            unzip -l "$zip" | head -n 35
+          done < <(find .release -maxdepth 2 -type f -name '*.zip' -print0)
+
+      - name: Preserve test package
+        uses: actions/upload-artifact@v4
+        with:
+          name: tradescope-beta-zip
+          path: .release/**/*.zip
+          if-no-files-found: error
+          retention-days: 7
