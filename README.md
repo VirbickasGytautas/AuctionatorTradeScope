@@ -1,4 +1,8 @@
-# Auctionator TradeScope 4.4.0-beta2 — WoW Forever
+# Auctionator TradeScope 4.4.0-beta3 — WoW Forever
+
+### 4.4.0-beta3 - Journal filters and Craft UI modules (testing only)
+
+The manual Trading Journal now filters transactions by the selected market item, BUY/SELL and rolling 7/30/90-day windows, with eight rows per page. Hover a sale to see matched units, missing purchase units, weighted-average cost basis, fees, realized profit and ROI. Filters never change the cost-basis history and are not persisted to SavedVariables. Legacy report reads no longer attach temporary `_pnl` values to saved trades. The Crafting Calculator's recipe selector and results renderer are independent modules with unchanged behavior, and recipe usage instructions remain in the right HOW IT WORKS sidebar. Automatic trade capture is **not** included. This beta is for local testing and is not uploaded to CurseForge.
 
 ### 4.4.0-beta2 - Structural refactor: chart extraction and Journal 2.0 groundwork
 

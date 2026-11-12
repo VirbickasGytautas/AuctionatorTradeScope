@@ -2,7 +2,7 @@
 ## Title: Auctionator TradeScope
 ## Notes: Auctionator market terminal: price/supply history, dual-axis charts and market indicators
 ## Notes-ruRU: Рыночный терминал Auctionator: история цены и предложения, совмещённые графики и показатели
-## Version: 4.4.0-beta2
+## Version: 4.4.0-beta3
 ## Author: Gytautas Virbickas
 ## X-Category: Auction/Economy
 ## X-Localizations: enUS, ruRU
@@ -34,6 +34,8 @@ UI\TradeUI.lua
 UI\Options.lua
 UI\Hover.lua
 UI\Pro\Shared.lua
+UI\Pro\Craft\Report.lua
+UI\Pro\Craft\RecipePicker.lua
 UI\Pro\Pages\Scanner.lua
 UI\Pro\Pages\Alerts.lua
 UI\Pro\Pages\Candles.lua

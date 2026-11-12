@@ -41,8 +41,7 @@ function A.JournalReport()
         realized=realized+pnl
         position.cost=max(0,position.cost-unitCost*matched)
         position.qty=position.qty-matched
-        row._pnl=pnl
-      else row._pnl=nil end
+      end
       unmatched=unmatched+(row.qty-matched)
     end
     inventory[row.key]=position

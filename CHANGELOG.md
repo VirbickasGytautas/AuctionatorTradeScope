@@ -1,3 +1,12 @@
+## 4.4.0-beta3 - Trading Journal 2.0 filtering and Crafting UI decomposition
+- Added journal filters for selected item, BUY/SELL, and rolling 7/30/90-day periods, with eight-row pagination.
+- Added per-transaction matched cost, fees, realized profit and ROI in sale hover details; partial/unmatched sales remain explicitly marked.
+- Exposed deterministic journal paging and retained weighted-average cost basis from the full transaction history, regardless of display filters.
+- Stopped JournalReport from writing transient _pnl fields into SavedVariables when viewing reports.
+- Extracted the crafting material/summary renderer and recipe picker into UI/Pro/Craft modules, preserving the existing sidebar recipe instructions.
+- New unit and UI-mock regression tests cover journal filters, paging, trade entry, unsaved filter state and crafting report drawing.
+- Manual journal only: auction events are not automatically imported. Build-only beta; no GitHub release tag or CurseForge upload.
+
 ## 4.4.0-beta2 - Chart separation and Journal 2.0 foundations
 - Separated graph layout/axes from tooltip collision placement and deferred crafting preview.
 - Moved the manual journal ledger and its existing entrypoints into Finance/Journal/Ledger.lua.

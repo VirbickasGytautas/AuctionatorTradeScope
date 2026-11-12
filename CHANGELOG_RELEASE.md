@@ -1,3 +1,10 @@
+## 4.4.0-beta3 - Local Testing Build
+- Trading journal: filter by item, transaction type, and time range; browse older entries with pagination.
+- Sale details: per-trade average cost, matching status, commission, realized P&L and ROI.
+- Refactored crafting calculator: independent recipe picker and material report renderer.
+- Opening journal reports no longer changes saved trade rows.
+- No automatic trade collection or SavedVariables schema migration. Test only, not published.
+
 ## 4.4.0-beta2 - Internal test build
 - Split graph tooltip placement and crafting preview into separate Lua modules.
 - Extracted manual journal persistence and added read-only per-item analytics.

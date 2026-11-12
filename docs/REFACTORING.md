@@ -41,3 +41,26 @@ Always test the interface in WoW Forever before releasing. Never add a release t
 The journal analysis computes cost basis on **all** transactions before applying output filters. It deliberately excludes unmatched sale units from realized P&L. It does not infer confirmed real-money trades or auction activity. The existing `JournalReport` entrypoints continue to work.
 
 New tests: `texlua scripts/test-journal-analysis.lua`; `texlua scripts/test-toc.lua`. No tag should be created for this branch.
+
+## Beta3: Journal filters and Crafting UI components
+
+- `Finance/Journal/Analysis.lua`: read-only matched-cost P&L, item/kind/time filters, item positions, deterministic `JournalPage` pagination; returns `entry.index` for future actions without modifying saved entries.
+- `Finance/Journal/Ledger.lua`: legacy `JournalReport` no longer writes `_pnl` into saved trade records. Existing journal schema and APIs remain unchanged.
+- `UI/Pro/Pages/Journal.lua`: user-visible filter controls and sale-detail tooltip; paging/filter preferences are in-memory only.
+- `UI/Pro/Craft/RecipePicker.lua`: saved-recipe search, keyboard selection, profession import and popup events.
+- `UI/Pro/Craft/Report.lua`: material rows, ingredient exclusions and batch economics, with page state injected by the calculator.
+- `UI/Pro/Pages/Craft.lua`: composition and screen events; no new tooltip beneath the recipe search input.
+
+Tests from the source root:
+
+```sh
+texlua scripts/test-toc.lua
+texlua scripts/test-ui-modules.lua
+texlua scripts/test-craft-batch.lua
+texlua scripts/test-craft-report.lua
+texlua scripts/test-graph-cursor.lua
+texlua scripts/test-journal-analysis.lua
+texlua scripts/test-journal-ui.lua
+```
+
+Only the main testable branch is packaged by GitHub Actions in build-only mode (`-d`). Do not push release tags for this beta. Run WoW Forever in-game regression tests before any promotion.
