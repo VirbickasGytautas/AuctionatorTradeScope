@@ -82,3 +82,7 @@ A 56-unit footer strip now gives the Tools button and footnote generous top/bott
 ## Beta7: footer shadow removal
 
 Only the secondary 56-unit translucent footer backing texture was removed. The single-pixel separator and all footer/watchlist coordinates from beta6 are unchanged. No data or API behavior changes.
+
+## 4.4.0 stable promotion
+
+Stable 4.4.0 is based on the game-tested 4.4.0-beta7 revision. Version metadata and release documentation changed; the gameplay Lua modules (beyond the Core version string) are identical to beta7. Current Trading Journal improvements apply to **manual** transactions; there is no automatic auction transaction detection. Existing SavedVariables are not migrated or rewritten by the release process.

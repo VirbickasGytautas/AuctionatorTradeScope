@@ -1,4 +1,8 @@
-# Auctionator TradeScope 4.4.0-beta7 — WoW Forever
+# Auctionator TradeScope 4.4.0 — WoW Forever
+
+### 4.4.0 - Stable release
+
+Promoted after in-game testing of 4.4.0-beta7. Modular Lua architecture, stable graph and crafting behavior, an improved manual Trading Journal with item/type/date filters, per-trade weighted-average cost basis and realized P&L, and final terminal layout fixes. Existing market history, watchlist, recipes and SavedVariables remain compatible. The journal records purchases/sales manually: automatic auction transaction capture is **not** implemented. The stable promotion changes only version metadata, documentation and release notes.
 
 ### 4.4.0-beta7 - Remove footer background shadow (local testing)
 

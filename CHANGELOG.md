@@ -1,3 +1,14 @@
+## 4.4.0 - Stable modular architecture and Trading Journal improvements
+- Promoted the in-game-tested 4.4.0-beta7 sources without gameplay or trading calculation changes.
+- Reorganized Lua modules and split the former ProUI workstation into shared controls, independent pages and a window controller.
+- Separated chart placement and crafting preview from the graph renderer; separated journal storage and read-only analytics from market calculations.
+- Added manual Trading Journal filters by item, BUY/SELL and last 7/30/90 days, pagination, weighted-average matched cost basis, fees, realized P&L and ROI.
+- Improved manual journal detail tooltips and stopped read-only reporting from adding temporary fields to saved transactions.
+- Refined the Market Terminal footer, watchlist and navigation; retained existing watch items and Pin/Unpin behavior.
+- Preserved the SavedVariables schema, market history, saved recipes and existing crafting calculations.
+- Automatic auction transaction capture is not included. No migration is required.
+- Official WoW Forever interface 16001; 4.4.0-beta7 was user-tested in-game.
+
 ## 4.4.0-beta7 - Remove footer shadow
 - Removed the extra dark semi-transparent footer texture introduced in beta6.
 - Retained the clean divider, 56-unit footer spacing, aligned Tools button and hint.

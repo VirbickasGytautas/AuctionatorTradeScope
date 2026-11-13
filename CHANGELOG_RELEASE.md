@@ -1,3 +1,11 @@
+## 4.4.0 - Stable Release
+- Modular source layout and independently maintained Pro workstation pages, chart placement and crafting preview.
+- Trading Journal: manual BUY/SELL entries, filter by selected item/type/date, eight-row history pagination, per-sale cost basis, auction fees, realized profit and ROI.
+- Partial and unmatched sales are labeled; unmatched units are excluded from realized P&L.
+- Market Terminal: corrected watchlist/paging button alignment, restored watchlist and Pin/Unpin, improved footer spacing without an extra shadow.
+- All existing saved prices, trades, recipes and settings remain compatible; no SavedVariables migration.
+- Built from tested 4.4.0-beta7; no automatic import of auction transactions.
+
 ## 4.4.0-beta7 - Footer shadow removal (local test)
 - Removed the extra dark footer panel; kept the bottom separator and controls in place.
 - No functional or saved-data changes; not published to CurseForge.
