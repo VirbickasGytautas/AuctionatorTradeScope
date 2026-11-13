@@ -1,4 +1,36 @@
-# Auctionator TradeScope 4.3.0 — WoW Forever
+# Auctionator TradeScope 4.4.0 — WoW Forever
+
+### 4.4.0 - Stable release
+
+Promoted after in-game testing of 4.4.0-beta7. Modular Lua architecture, stable graph and crafting behavior, an improved manual Trading Journal with item/type/date filters, per-trade weighted-average cost basis and realized P&L, and final terminal layout fixes. Existing market history, watchlist, recipes and SavedVariables remain compatible. The journal records purchases/sales manually: automatic auction transaction capture is **not** implemented. The stable promotion changes only version metadata, documentation and release notes.
+
+### 4.4.0-beta7 - Remove footer background shadow (local testing)
+
+Removed only the extra translucent footer backing added in beta6. The footer separator, spacing, Tools button, watchlist, paging arrows and all behaviors remain as before. No SavedVariables changes or CurseForge upload.
+
+### 4.4.0-beta6 - Terminal footer polish (local testing)
+
+The bottom footer is slightly taller and shaded. The Tools switch and hint are centered in it, and all watchlist rows, page arrows, and Pin/Unpin remain visible and aligned above the separator. No market or journal logic and no saved data changed. Not published to CurseForge.
+
+### 4.4.0-beta5 - Watchlist restored and terminal alignment (local testing)
+
+Restores the eight-row Market Terminal watchlist, previous/next arrows, and Pin/Unpin button. Watch rows and navigation now fit inside the left column above the footer, and the bottom-right Tools button sits eight UI pixels lower. Bag drag-and-drop can add the selected item to the watchlist again. The beta4 Trading Journal dropdowns and existing SavedVariables are unchanged. No release tag or CurseForge publication.
+
+### 4.4.0-beta4 - Journal UI and terminal cleanup (testing only)
+
+Aligned the Trading Journal form, actions, summary, filters and pagination. Item/type/period filters now have compact direct-selection dropdowns like the Scanner. The Market Terminal no longer shows the old watchlist panel or displaced paging arrows; name/ID search, bag item selection and charts remain. Legacy saved watch data are preserved. No changes to journal accounting or SavedVariables. Not published to CurseForge.
+
+### 4.4.0-beta3 - Journal filters and Craft UI modules (testing only)
+
+The manual Trading Journal now filters transactions by the selected market item, BUY/SELL and rolling 7/30/90-day windows, with eight rows per page. Hover a sale to see matched units, missing purchase units, weighted-average cost basis, fees, realized profit and ROI. Filters never change the cost-basis history and are not persisted to SavedVariables. Legacy report reads no longer attach temporary `_pnl` values to saved trades. The Crafting Calculator's recipe selector and results renderer are independent modules with unchanged behavior, and recipe usage instructions remain in the right HOW IT WORKS sidebar. Automatic trade capture is **not** included. This beta is for local testing and is not uploaded to CurseForge.
+
+### 4.4.0-beta2 - Structural refactor: chart extraction and Journal 2.0 groundwork
+
+Separated graph placement and crafting previews, extracted journal storage and added read-only weighted-cost analytics. A compact manual journal summary is available. No automatic trading event capture, migrations or release publication. The original Trading Journal 2.0 roadmap is not complete.
+
+### 4.4.0-beta1 - Structural refactor (testing only)
+
+Moved Lua source into modular directories and divided the Pro workstation into independent pages. No new features or SavedVariables changes. This is a local beta and is not an implementation of Trading Journal 2.0.
 
 ### 4.3.0 - Stable release
 

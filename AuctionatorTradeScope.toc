@@ -2,7 +2,7 @@
 ## Title: Auctionator TradeScope
 ## Notes: Auctionator market terminal: price/supply history, dual-axis charts and market indicators
 ## Notes-ruRU: Рыночный терминал Auctionator: история цены и предложения, совмещённые графики и показатели
-## Version: 4.3.0
+## Version: 4.4.0
 ## Author: Gytautas Virbickas
 ## X-Category: Auction/Economy
 ## X-Localizations: enUS, ruRU
@@ -12,23 +12,40 @@
 ## IconTexture: Interface\AddOns\AuctionatorTradeScope\Media\Icon
 ## X-Icon: Interface\AddOns\AuctionatorTradeScope\Media\Icon
 
-Core.lua
-UITheme.lua
-Locales.lua
-Balance.lua
-Data.lua
-ItemInfo.lua
-Analytics.lua
-Trading.lua
-MarketPro.lua
-SmartAlerts.lua
-CraftInventory.lua
-Scan.lua
-Graph.lua
-Dashboard.lua
-TradeUI.lua
-Options.lua
-Hover.lua
-ProUI.lua
-ProOptions.lua
-Minimap.lua
+Engine\Core.lua
+UI\Shared\Theme.lua
+Localization\Locales.lua
+Finance\Balance.lua
+Data\History.lua
+Data\ItemInfo.lua
+Market\Analytics.lua
+Finance\Trading.lua
+Market\MarketPro.lua
+Finance\Journal\Ledger.lua
+Finance\Journal\Analysis.lua
+Market\SmartAlerts.lua
+Crafting\Inventory.lua
+Market\Scan.lua
+UI\Charts\Graph.lua
+UI\Charts\Placement.lua
+UI\Charts\Preview.lua
+UI\Dashboard.lua
+UI\TradeUI.lua
+UI\Options.lua
+UI\Hover.lua
+UI\Pro\Shared.lua
+UI\Pro\Craft\Report.lua
+UI\Pro\Craft\RecipePicker.lua
+UI\Pro\Pages\Scanner.lua
+UI\Pro\Pages\Alerts.lua
+UI\Pro\Pages\Candles.lua
+UI\Pro\Pages\Activity.lua
+UI\Pro\Pages\Journal.lua
+UI\Pro\Pages\Craft.lua
+UI\Pro\Pages\Indicators.lua
+UI\Pro\Pages\Heatmap.lua
+UI\Pro\Pages\Quality.lua
+UI\Pro\Pages\CraftCatalog.lua
+UI\Pro\Window.lua
+UI\Pro\Options.lua
+UI\Minimap.lua

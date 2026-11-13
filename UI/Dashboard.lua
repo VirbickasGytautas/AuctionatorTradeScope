@@ -174,7 +174,10 @@ local function create()
   -- Match the Pro workstation: one continuous panel, fine gold separators.
   shade(f,15,-69,WIDTH-30,1,{.38,.29,.15,.62})
   shade(f,251,-69,1,HEIGHT-112,{.50,.37,.15,.62})
-  shade(f,15,-HEIGHT+43,WIDTH-30,1,{.43,.33,.16,.65})
+  -- Keep only the separator: a second translucent surface made the lower
+  -- area visibly darker than the rest of the terminal.
+  -- The taller footer and aligned controls from beta6 are preserved.
+  shade(f,15,-HEIGHT+56,WIDTH-30,1,{.43,.33,.16,.65})
   local logo=f:CreateTexture(nil,"ARTWORK")
   logo:SetTexture("Interface\\AddOns\\AuctionatorTradeScope\\Media\\Icon")
   logo:SetSize(31,31);logo:SetPoint("TOPLEFT",f,"TOPLEFT",22,-20)
@@ -189,11 +192,9 @@ local function create()
     f.showTools=not f.showTools
     A.RefreshDashboard()
   end)
-  -- The chart/trader-tools switch belongs to the bottom content action area,
-  -- not the persistent top navigation.  The tools pane ends 42 px above the
-  -- window bottom, so this 22-px control stays clear of both the graph and it.
+  -- Keep the tools control 8px lower, fully below the footer separator.
   f.toolsToggle:SetSize(131,22)
-  f.toolsToggle:SetPoint("BOTTOMRIGHT",f,"BOTTOMRIGHT",-26,19)
+  f.toolsToggle:SetPoint("BOTTOMRIGHT",f,"BOTTOMRIGHT",-26,17)
   f.proButton=button(f,"TradeScope Pro",118,24,function()
     if A.OpenProTool then A.OpenProTool("scanner") end
   end)
@@ -336,6 +337,7 @@ local function create()
   local function dropAction()
     local link=cursorItem()
     if link and A.SelectItem(link) then
+      -- Adding from the bag also restores the original watchlist workflow.
       A.AddWatch(f.key,f.legacy,f.link)
       f.dropCaption:SetText(A.L.DROP_ITEM)
       if type(ClearCursor)=="function" then ClearCursor() end
@@ -359,16 +361,18 @@ local function create()
   f.pickHelp=fs(f,206)
   f.pickHelp:SetPoint("TOPLEFT",f,"TOPLEFT",25,-283)
   f.pickHelp:SetText(A.L.PICK_HINT)
+  -- Watchlist layout fits 8 rows and a control strip above the footer.
+  shade(f,23,-315,211,1,{.43,.33,.16,.64})
   local wl=fs(f,210,"GameFontNormal")
   wl:SetPoint("TOPLEFT",f,"TOPLEFT",25,-327);wl:SetText(A.L.WATCHLIST)
   f.watchButtons={}
   for i=1,PER_PAGE do
     local index=i
     local b=CreateFrame("Button",nil,f)
-    b:SetSize(211,28)
-    b:SetPoint("TOPLEFT",f,"TOPLEFT",23,-353-(i-1)*28)
+    b:SetSize(211,23)
+    b:SetPoint("TOPLEFT",f,"TOPLEFT",23,-348-(i-1)*24)
     b:EnableMouse(true)
-    local bg=shade(b,0,0,211,26,{0.14,0.16,0.17,0.76})
+    local bg=shade(b,0,0,211,23,{0.14,0.16,0.17,0.76})
     local ic=b:CreateTexture(nil,"ARTWORK");ic:SetSize(22,22);ic:SetPoint("LEFT",b,"LEFT",3,0)
     local t=fs(b,175,"GameFontHighlightSmall");t:SetPoint("LEFT",b,"LEFT",29,0)
     b.icon=ic;b.label=t;b.background=bg
@@ -381,18 +385,18 @@ local function create()
     f.watchButtons[i]=b
   end
   f.watchPage=1
-  f.prev=button(f,"<",32,23,function() f.watchPage=math.max(1,f.watchPage-1);A.RefreshDashboard() end)
-  f.prev:SetPoint("BOTTOMLEFT",f,"BOTTOMLEFT",25,30)
-  f.next=button(f,">",32,23,function() f.watchPage=f.watchPage+1;A.RefreshDashboard() end)
+  f.prev=button(f,"<",34,22,function() f.watchPage=math.max(1,f.watchPage-1);A.RefreshDashboard() end)
+  f.prev:SetPoint("TOPLEFT",f,"TOPLEFT",25,-549)
+  f.next=button(f,">",34,22,function() f.watchPage=f.watchPage+1;A.RefreshDashboard() end)
   f.next:SetPoint("LEFT",f.prev,"RIGHT",4,0)
-  f.pin=button(f,A.L.PIN,130,23,function()
+  f.pin=button(f,A.L.PIN,128,22,function()
     if not f.key then return end
     local watches=watchTable(false)
     if watches and watches[f.key] then A.RemoveWatch(f.key)
     else A.AddWatch(f.key,f.legacy,f.link) end
     A.RefreshDashboard()
   end)
-  f.pin:SetPoint("BOTTOMLEFT",f,"BOTTOMLEFT",104,30)
+  f.pin:SetPoint("TOPLEFT",f,"TOPLEFT",106,-549)
   f.selectedIcon=f:CreateTexture(nil,"ARTWORK")
   f.selectedIcon:SetSize(40,40);f.selectedIcon:SetPoint("TOPLEFT",f,"TOPLEFT",267,-83)
   f.selectedIcon:SetTexture("Interface\\Icons\\INV_Misc_QuestionMark")
@@ -439,7 +443,7 @@ local function create()
   -- Reserve the right side of the bottom strip for the mode switch.
   -- Keep the footnote on its own, non-overlapping side of that strip.
   f.footer=fs(f,507)
-  f.footer:SetPoint("BOTTOMLEFT",f,"BOTTOMLEFT",267,23)
+  f.footer:SetPoint("BOTTOMLEFT",f,"BOTTOMLEFT",267,26)
   f.footer:SetText(A.L.FOOTNOTE)
   f.footer:SetTextColor(.78,.71,.50)
   local drag=CreateFrame("Frame",nil,f)

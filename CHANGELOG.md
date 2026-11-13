@@ -1,3 +1,68 @@
+## 4.4.0 - Stable modular architecture and Trading Journal improvements
+- Promoted the in-game-tested 4.4.0-beta7 sources without gameplay or trading calculation changes.
+- Reorganized Lua modules and split the former ProUI workstation into shared controls, independent pages and a window controller.
+- Separated chart placement and crafting preview from the graph renderer; separated journal storage and read-only analytics from market calculations.
+- Added manual Trading Journal filters by item, BUY/SELL and last 7/30/90 days, pagination, weighted-average matched cost basis, fees, realized P&L and ROI.
+- Improved manual journal detail tooltips and stopped read-only reporting from adding temporary fields to saved transactions.
+- Refined the Market Terminal footer, watchlist and navigation; retained existing watch items and Pin/Unpin behavior.
+- Preserved the SavedVariables schema, market history, saved recipes and existing crafting calculations.
+- Automatic auction transaction capture is not included. No migration is required.
+- Official WoW Forever interface 16001; 4.4.0-beta7 was user-tested in-game.
+
+## 4.4.0-beta7 - Remove footer shadow
+- Removed the extra dark semi-transparent footer texture introduced in beta6.
+- Retained the clean divider, 56-unit footer spacing, aligned Tools button and hint.
+- Watchlist, arrows, Pin/Unpin, graphs, Trading Journal and SavedVariables are unchanged.
+- Local-only testing patch; no CurseForge publication or tag.
+
+## 4.4.0-beta6 - Footer spacing and button alignment
+- Enlarged the terminal bottom footer strip from 43 to 56 UI units and added a soft, inset background.
+- Centered the Tools button inside that strip and aligned the footer caption with it.
+- Moved watchlist entries and pagination slightly upward, retaining all eight rows, arrows and Pin/Unpin.
+- Preserved the Trading Journal dropdowns, charts, previous functionality and SavedVariables.
+- Game-test build only; no CurseForge publication or release tag.
+
+## 4.4.0-beta5 - Restore watchlist and terminal alignment
+- Restored the Market Terminal watchlist with all eight entries per page, prev/next arrows and Pin/Unpin actions.
+- Moved watchlist rows into a compact grid and aligned navigation controls inside the left panel, above the footer separator.
+- Lowered the bottom-right Tools / Back to chart button by eight UI pixels without changing its behavior.
+- Restored the original bag-drop action that adds the selected item to watchlist.
+- Retained the working 4.4.0-beta4 journal dropdowns, history controls and SavedVariables schema.
+- Local-only build; no CurseForge upload or release tag.
+
+## 4.4.0-beta4 - Trading Journal UI alignment and dropdown patch
+- Reworked the journal entry form, action buttons, summary surface, filter row and pagination.
+- Added scanner-style popup selectors for item scope, BUY/SELL and 7/30/90-day periods.
+- Menus select an option directly without repeated button cycling.
+- Moved Undo last trade alongside BUY/SELL, added empty state and disabled invalid page navigation.
+- Removed the visible legacy watchlist and misplaced paging arrows from Market Terminal.
+- Watchlist SavedVariables and /ats add API remain intact; dropping a bag item no longer silently adds a hidden watch entry.
+- No journal accounting or SavedVariables schema changes. Build-only beta, no CurseForge upload.
+
+## 4.4.0-beta3 - Trading Journal 2.0 filtering and Crafting UI decomposition
+- Added journal filters for selected item, BUY/SELL, and rolling 7/30/90-day periods, with eight-row pagination.
+- Added per-transaction matched cost, fees, realized profit and ROI in sale hover details; partial/unmatched sales remain explicitly marked.
+- Exposed deterministic journal paging and retained weighted-average cost basis from the full transaction history, regardless of display filters.
+- Stopped JournalReport from writing transient _pnl fields into SavedVariables when viewing reports.
+- Extracted the crafting material/summary renderer and recipe picker into UI/Pro/Craft modules, preserving the existing sidebar recipe instructions.
+- New unit and UI-mock regression tests cover journal filters, paging, trade entry, unsaved filter state and crafting report drawing.
+- Manual journal only: auction events are not automatically imported. Build-only beta; no GitHub release tag or CurseForge upload.
+
+## 4.4.0-beta2 - Chart separation and Journal 2.0 foundations
+- Separated graph layout/axes from tooltip collision placement and deferred crafting preview.
+- Moved the manual journal ledger and its existing entrypoints into Finance/Journal/Ledger.lua.
+- Added read-only JournalAnalysis for weighted-average P&L, transaction counts, fees, unmatched sales and per-item positions.
+- Added a compact journal summary without modifying saved transactions, history or SavedVariables schema.
+- Added journal regression coverage; no automatic auction transaction capture yet.
+- Build-only beta branch; no CurseForge publication or release tag.
+
+## 4.4.0-beta1 - Modular code layout (refactor only)
+- Reorganized addon Lua sources into Engine, Data, Market, Crafting, Finance, Localization and UI directories.
+- Split the former 2,724-line ProUI.lua into shared helpers, independent tool pages and a window controller.
+- Preserved the original TOC ordering, API surface, all graphical settings, inventory data, market calculations and SavedVariables.
+- Updated Lua regression harness paths and PowerShell release validation.
+- Development-only beta: no new Trading Journal 2.0 features; no CurseForge release tag or upload.
+
 ## 4.3.0 - Stable Crafting Intelligence 2.0
 - Promoted the in-game-tested 4.3.0-beta5 source without changing addon calculations or SavedVariables.
 - Includes batch crafting (1-999), bag/bank reagent availability, missing purchases and grouped buy lists.
