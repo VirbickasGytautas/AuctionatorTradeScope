@@ -1,3 +1,11 @@
+## 4.5.0-beta1 - Manual Trading Portfolio foundations
+- Added read-only portfolio accounting from the current character's manual Trading Journal purchases and matched sales.
+- Exposed open quantity, weighted-average cost, invested amount and separate realized/unrealized estimates.
+- Mark-to-market uses real Auctionator history quotes, with a 7-day freshness limit; missing/stale prices are identified and excluded from valuation totals.
+- Added the Portfolio page to the Trading Workstation header and a direct button in the Trading Journal; existing ten tabs remain on two rows.
+- The 4.4.0 SavedVariables schema and calculation semantics are unchanged; no automatic trade capture or inventory assumptions.
+- Local test beta; no CurseForge upload or version tag.
+
 ## 4.4.0 - Stable modular architecture and Trading Journal improvements
 - Promoted the in-game-tested 4.4.0-beta7 sources without gameplay or trading calculation changes.
 - Reorganized Lua modules and split the former ProUI workstation into shared controls, independent pages and a window controller.
