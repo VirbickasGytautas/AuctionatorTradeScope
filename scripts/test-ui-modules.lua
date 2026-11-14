@@ -5,14 +5,15 @@ assert(loadfile("UI/Pro/Craft/Report.lua"))()
 assert(loadfile("UI/Pro/Craft/RecipePicker.lua"))()
 assert(type(ATS.CreateCraftReportRenderer)=="function")
 assert(type(ATS.AttachCraftRecipePicker)=="function")
-local pages={"Scanner","Alerts","Candles","Activity","Journal","Craft","Indicators","Heatmap","Quality","CraftCatalog"}
+local pages={"Scanner","Alerts","Candles","Activity","Journal","Portfolio","Craft","Indicators","Heatmap","Quality","CraftCatalog"}
 for _,name in ipairs(pages) do
   assert(loadfile("UI/Pro/Pages/"..name..".lua"))()
 end
 assert(loadfile("UI/Pro/Window.lua"))()
-for _,name in ipairs({"scanner","alerts","candles","activity","journal","craft","indicators","heatmap","quality","craftscan"}) do
+for _,name in ipairs({"scanner","alerts","candles","activity","journal","portfolio","craft","indicators","heatmap","quality","craftscan"}) do
   assert(type(ATS.ProUIBuilders[name])=="function", "missing Pro page "..name)
 end
+assert(type(ATS.OpenPortfolio)=="function")
 assert(type(ATS.OpenProTool)=="function")
 assert(type(ATS.ShowProTab)=="function")
 assert(type(ATS.OpenProAlertForItem)=="function")
