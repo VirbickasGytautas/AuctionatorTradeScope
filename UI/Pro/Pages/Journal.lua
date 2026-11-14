@@ -80,6 +80,10 @@ function B.journal(root)
   end
   button(p,l("Record BUY","Записать ПОКУПКУ"),20,-125,180,function()record("buy")end)
   button(p,l("Record SELL","Записать ПРОДАЖУ"),211,-125,180,function()record("sell")end)
+  -- First portfolio beta: explicit route from the existing manual journal.
+  button(p,l("Portfolio","Портфель"),402,-125,115,function()
+    A.ShowProTab("portfolio")
+  end)
   p.undo=button(p,l("Undo last trade","Отменить последнюю"),529,-125,180,function()
     local ledger=A.ProJournal()
     if #ledger>0 then A.DeleteJournalTrade(#ledger) end
