@@ -1,3 +1,9 @@
+## 4.5.0-beta1 - Trading Portfolio (local test)
+- Portfolio for open manually recorded positions, with weighted-average purchase cost.
+- Unrealized estimates after fees, separate realized result, missing/stale price flags and per-item details.
+- Accessible via Portfolio in the Workstation header or Trading Journal.
+- No auto-imported trades, no SavedVariables migration, and no CurseForge publication.
+
 ## 4.4.0 - Stable Release
 - Modular source layout and independently maintained Pro workstation pages, chart placement and crafting preview.
 - Trading Journal: manual BUY/SELL entries, filter by selected item/type/date, eight-row history pagination, per-sale cost basis, auction fees, realized profit and ROI.
