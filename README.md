@@ -1,4 +1,8 @@
-# Auctionator TradeScope 4.4.0 — WoW Forever
+# Auctionator TradeScope 4.5.0-beta1 — WoW Forever
+
+### 4.5.0-beta1 - Trading Portfolio preview (local test)
+
+A separate Portfolio view tracks positions created by current-character manual Journal buys and matched sells. It displays quantities, weighted-average purchase cost, invested cost, latest observed Auctionator price, and unrealized estimates net of the configured auction fee. Missing/stale quotes are excluded (7-day maximum age), and partial portfolio estimates are identified. Open it with the Portfolio button in the Trading Workstation header or Trading Journal. **There is no automatic auction transaction import.** This preview does not change SavedVariables and is not published on CurseForge.
 
 ### 4.4.0 - Stable release
 
