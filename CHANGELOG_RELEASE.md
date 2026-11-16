@@ -1,3 +1,10 @@
+## 4.5.0-beta3 - Live Stock & Verified Revenue (local test)
+- Automatically reads bag contents; last-known bank contents from bank visits.
+- Portfolio tabs: Stock, Sales (confirmed mail receipts), Cost basis (Journal positions).
+- Shows gross/net auction receipts and fees when cost basis is unknown; profit remains unknown.
+- Market valuations exclude missing/stale observations; existing history and data are preserved.
+- No automatic assumption of how inventory was acquired. No CurseForge publication.
+
 ## 4.5.0-beta2 - Auction mail import preview (local testing)
 - Optional capture of confirmed Auction House BUY/SELL invoices when opening the mailbox.
 - Imports only when item, quantity, actual price and seller fees can be verified.

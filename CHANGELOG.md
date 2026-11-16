@@ -1,3 +1,13 @@
+## 4.5.0-beta3 - Automatic stock and confirmed auction revenue
+- Added bag inventory snapshots independent of crafting tracking and a per-character bank snapshot updated on bank visits.
+- Separate Portfolio modes for physical Stock, confirmed auction Sales and Journal Cost Basis.
+- Confirmed invoice sales report gross receipts, fees and net revenue even without a corresponding purchased lot; unmatched profit remains unknown.
+- Current bag and last-known bank quantities display separately; stale or missing Auctionator quotes do not contribute to valuations.
+- Preserved matched-only weighted average journal profit, manual trades, old records and watched items.
+- Fixed the unreadable 'Mail: 0 / ?0' UI status to show new imports and pending items clearly.
+- SavedVariables compatibility: added only a namespaced per-character portfolio stock snapshot; no forced migration or loss of old data.
+- Game-test beta only; no release tag and no CurseForge upload.
+
 ## 4.5.0-beta2 - Opt-in confirmed auction-mail import
 - Added invoice-based auction-mail reading on MAIL_SHOW / MAIL_INBOX_UPDATE in WoW Forever.
 - Auto-imports only fully validated BUY/SELL invoices with unambiguous item ID, count and price; completed sales require positive payout and matching bid/buyout, deposit and commission.

@@ -1,4 +1,8 @@
-# Auctionator TradeScope 4.5.0-beta2 — WoW Forever
+# Auctionator TradeScope 4.5.0-beta3 — WoW Forever
+
+### 4.5.0-beta3 - Physical inventory and confirmed sale revenue (local test)
+
+The Portfolio page now has three distinct views: **Stock** (automatic current bags plus last-known bank snapshots), **Sales** (confirmed Auction House mail receipts, gross and net of fees), and **Cost basis** (the original matched manual/auto Journal lots). A sale without a recorded purchase is counted as revenue, **not** as known profit. Bag holdings are not assumed to be purchased stock: their origin and cost basis remain unknown. Only actual recent Auctionator quotes enter market valuations. The bank is read when opened; bank counts thereafter remain labelled as last observed. No reset of previous data. Build-only beta, not published on CurseForge.
 
 ### 4.5.0-beta2 - Optional auction-mail import (local test)
 
