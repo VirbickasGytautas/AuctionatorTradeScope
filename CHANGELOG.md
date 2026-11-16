@@ -1,3 +1,11 @@
+## 4.5.0-beta2 - Opt-in confirmed auction-mail import
+- Added invoice-based auction-mail reading on MAIL_SHOW / MAIL_INBOX_UPDATE in WoW Forever.
+- Auto-imports only fully validated BUY/SELL invoices with unambiguous item ID, count and price; completed sales require positive payout and matching bid/buyout, deposit and commission.
+- An opt-in toggle in the Trading Journal (or /ats mail on/off/scan/status) controls import. No auto-collection of items, money or opening mail text.
+- Mail fingerprints prevent repeated imports; indistinguishable simultaneous mails, pending payouts, uncertain prices and unresolved items are held for diagnostic review.
+- Imported entries are marked as mail-sourced and feed the existing manual-journal portfolio without modifying previous trades.
+- Added mail-specific regression tests. Game-testing beta only; no CurseForge publishing.
+
 ## 4.5.0-beta1 - Manual Trading Portfolio foundations
 - Added read-only portfolio accounting from the current character's manual Trading Journal purchases and matched sales.
 - Exposed open quantity, weighted-average cost, invested amount and separate realized/unrealized estimates.

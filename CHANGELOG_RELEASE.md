@@ -1,3 +1,11 @@
+## 4.5.0-beta2 - Auction mail import preview (local testing)
+- Optional capture of confirmed Auction House BUY/SELL invoices when opening the mailbox.
+- Imports only when item, quantity, actual price and seller fees can be verified.
+- Persistent duplicate protection, no automatic item/gold collection, and diagnostics for skipped mail.
+- Use the Trading Journal Auto-mail toggle or /ats mail on. Disabled by default.
+- No automatic import of past deleted mail, pending sales or auction price/supply changes.
+- Not published to CurseForge.
+
 ## 4.5.0-beta1 - Trading Portfolio (local test)
 - Portfolio for open manually recorded positions, with weighted-average purchase cost.
 - Unrealized estimates after fees, separate realized result, missing/stale price flags and per-item details.

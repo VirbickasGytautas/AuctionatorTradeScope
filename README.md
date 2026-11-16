@@ -1,4 +1,8 @@
-# Auctionator TradeScope 4.5.0-beta1 — WoW Forever
+# Auctionator TradeScope 4.5.0-beta2 — WoW Forever
+
+### 4.5.0-beta2 - Optional auction-mail import (local test)
+
+The Trading Journal now has an Auto-mail: OFF/ON toggle. Turn it on, open an in-game mailbox, and the addon checks the game's actual Auction House invoices for confirmed BUY/SELL transactions. The scanner does not take items or money and never edits the mail body. Only transactions with a unique item ID, count, paid/received price and valid fee information are saved; duplicate or ambiguous mails are rejected instead of producing fictional P&L. Use /ats mail scan in the mailbox to display pending reasons, /ats mail status to inspect status and /ats mail off to disable. Old mail that has already been deleted cannot be recovered. Imported rows appear with [MAIL] in the journal and enter Portfolio positions. Default OFF for this testing beta. No CurseForge publication.
 
 ### 4.5.0-beta1 - Trading Portfolio preview (local test)
 
