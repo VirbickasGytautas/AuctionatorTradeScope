@@ -55,6 +55,24 @@ end
 function B.journal(root)
   local p=newPage(root)
   heading(p,l("Trading Journal: weighted-cost P&L","Журнал сделок: прибыль с учётом себестоимости"),-12)
+  -- Explicit opt-in: no mail is imported until the user enables it.
+  p.mailToggle=button(p,"",528,-13,178,function()
+    if type(A.MailImportState)=="function" then
+      A.SetMailImportEnabled(not A.MailImportState().enabled)
+      if p.update then p.update() end
+    end
+  end)
+  if p.mailToggle.SetScript then
+    p.mailToggle:SetScript("OnEnter",function(self)
+      if not GameTooltip then return end
+      GameTooltip:SetOwner(self,"ANCHOR_RIGHT")
+      GameTooltip:SetText(l("Auction-mail import","Импорт аукционной почты"))
+      GameTooltip:AddLine(l("Opt in, then open a mailbox. Only validated invoices are recorded. Unresolved mail is skipped.",
+        "Включите и откройте почту. Только подтверждённые счета записываются, спорные письма пропускаются."),1,1,1,true)
+      GameTooltip:Show()
+    end)
+    p.mailToggle:SetScript("OnLeave",function()if GameTooltip then GameTooltip:Hide()end end)
+  end
   -- Inputs use a shared baseline. Actions and summaries have independent rows.
   p.selection=marketInput(p,20,-55,200)
   p.qty=edit(p,l("Quantity","Количество"),236,-55,92,"1",true)
@@ -170,6 +188,15 @@ function B.journal(root)
     p.filterSummary:SetText(l("Records: ","Записей: ")..#report.entries..
       "    "..l("All open units: ","Общий остаток: ")..report.openUnits..
       (p.filter.onlyItem and not key and l("   Select an item first.","   Сначала выберите предмет.") or ""))
+    if type(A.MailImportState)=="function" then
+      local enabled=A.MailImportState().enabled
+      p.mailToggle:SetText(enabled and l("Auto-mail: ON","Почта: ВКЛ") or
+        l("Auto-mail: OFF","Почта: ВЫКЛ"))
+      local status=A.MailImportLastStatus and A.MailImportLastStatus() or {}
+      p.filterSummary:SetText(p.filterSummary:GetText()..
+        l("   Mail: ","   Почта: ")..tostring(status.imported or 0).." / ?"..
+        tostring(status.pending or 0))
+    end
     p.pageText:SetText(l("Page ","Страница ")..page.." / "..pages)
     local empty=#report.entries==0
     if empty then
@@ -187,7 +214,8 @@ function B.journal(root)
         if A.FitItemName then name=A.FitItemName(name,row:GetFontString(),218) or name end
         local side=entry.kind=="buy" and l("BUY","ПОКУПКА") or l("SELL","ПРОДАЖА")
         local tail=entry.kind=="sell" and ("   P&L "..feeText(entry)) or ""
-        row:SetText(date("%d.%m %H:%M",entry.t).."  "..side.." x"..entry.qty..
+        local fromMail=entry.source=="auction_mail" and l("[MAIL] ","[ПОЧТА] ") or ""
+        row:SetText(fromMail..date("%d.%m %H:%M",entry.t).."  "..side.." x"..entry.qty..
           "  "..name.."  "..currency(entry.price)..tail)
         row:SetScript("OnClick",function()
           fillMarketEdit(p.selection,{key=entry.key,text=A.ProItemName(entry.key)})

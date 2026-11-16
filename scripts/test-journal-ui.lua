@@ -76,6 +76,10 @@ A.ProUIShared={l=function(en) return en end,fs=fs,tex=tex,button=button,dropdown
   shareMarketChoice=function()end,
   newPage=newPage,heading=function()end,lineList=lineList,
   currency=function(value)return value and tostring(value) or "-" end}
+local mailImportEnabled=false
+A.MailImportState=function()return {enabled=mailImportEnabled}end
+A.MailImportLastStatus=function()return {imported=0,pending=1}end
+A.SetMailImportEnabled=function(v)mailImportEnabled=v;return v end
 A.ProUIBuilders={}
 assert(loadfile("Finance/Journal/Ledger.lua"))()
 assert(loadfile("Finance/Journal/Analysis.lua"))()
@@ -90,6 +94,11 @@ for i=1,22 do
 end
 A.db.pro.journal[key]=data
 local p=A.ProUIBuilders.journal({})
+assert(p.mailToggle.text=="Auto-mail: OFF")
+p.mailToggle.scripts.OnClick()
+assert(mailImportEnabled and p.mailToggle.text=="Auto-mail: ON")
+p.mailToggle.scripts.OnClick()
+assert(not mailImportEnabled and p.mailToggle.text=="Auto-mail: OFF")
 assert(p.total.text:find("Realized P&L",1,true))
 assert(p.pageText.text=="Page 1 / 3")
 assert(not p.emptyTitle.shown and not p.emptyHint.shown)

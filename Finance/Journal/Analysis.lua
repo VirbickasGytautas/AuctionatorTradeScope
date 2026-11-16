@@ -67,6 +67,7 @@ function A.JournalAnalysis(rows,opts)
       if selected then
         local entry={index=i,key=key,kind=kind,qty=qty,price=price,
           t=timestamp,fee=fee*100,matched=matched,unmatched=unmatched,
+          source=row.source,mailRef=row.mailRef,
           pnl=pnl,net=net,fees=fees,costBasis=costBasis,
           roi=costBasis>0 and pnl/costBasis*100 or nil}
         result.entries[#result.entries+1]=entry
