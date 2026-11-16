@@ -194,8 +194,8 @@ function B.journal(root)
         l("Auto-mail: OFF","Почта: ВЫКЛ"))
       local status=A.MailImportLastStatus and A.MailImportLastStatus() or {}
       p.filterSummary:SetText(p.filterSummary:GetText()..
-        l("   Mail: ","   Почта: ")..tostring(status.imported or 0).." / ?"..
-        tostring(status.pending or 0))
+        l("   Mail new: ","   Почта новых: ")..tostring(status.imported or 0)..
+        l("   Pending: ","   Пропущено: ")..tostring(status.pending or 0))
     end
     p.pageText:SetText(l("Page ","Страница ")..page.." / "..pages)
     local empty=#report.entries==0

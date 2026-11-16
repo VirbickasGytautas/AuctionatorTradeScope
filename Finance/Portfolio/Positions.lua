@@ -31,6 +31,8 @@ local function latestQuote(key, now)
   return result
 end
 
+A.PortfolioLatestQuote=latestQuote
+
 -- rows: optional test/manual journal rows (nil = current character's manual journal).
 -- quotes: optional price map for deterministic tests; missing map entries mean
 -- no quote, not an invitation to use an arbitrary current Auction House listing.

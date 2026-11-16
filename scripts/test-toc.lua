@@ -14,7 +14,7 @@ for line in toc:lines() do
   end
 end
 toc:close()
-assert(#loaded==40,"Expected 40 source files, found "..#loaded)
+assert(#loaded==43,"Expected 43 source files, found "..#loaded)
 assert(loaded[1]=="Engine/Core.lua")
 assert(loaded[#loaded]=="UI/Minimap.lua")
 print("PASS TOC: "..#loaded.." Lua sources exist in load order and parse")
