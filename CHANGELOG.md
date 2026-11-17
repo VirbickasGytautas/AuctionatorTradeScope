@@ -1,3 +1,11 @@
+## 4.5.0-beta5 - Portfolio icons and readable allocation bars
+- Added 21px localized item icons to all four Portfolio views: Stock, Sales, Cost Basis and Allocation, using the same metadata source as Market Scanner.
+- Replaced the tiny right-aligned 120x3 allocation line with a high-contrast 640x7 distribution track beneath each item name and value; kept explicit numeric percentages.
+- Split Portfolio rows into a fixed item-name column and a separate right-aligned metrics column to reduce collisions with long localized names.
+- Restored question-mark fallback when item metadata is not yet cached and cleared icons/bars when rows are hidden or modes/pages change.
+- All Portfolio accounting, mail import, existing SavedVariables and published stable release are unchanged.
+- Local-only beta for UI regression tests; no CurseForge publishing.
+
 ## 4.5.0-beta4 — Portfolio allocation and source concentration
 - New Portfolio Allocation page with an explicit dropdown: priced bags, last-known bank, open Journal cost or confirmed AH net revenue.
 - Ranked per-item shares, lightweight row bars, top-one and top-three coverage metrics, and hover source details.

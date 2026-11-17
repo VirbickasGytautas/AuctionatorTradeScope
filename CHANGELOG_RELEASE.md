@@ -1,3 +1,9 @@
+## 4.5.0-beta5 - Portfolio UI polish (local test)
+- Item icons appear in Stock, Sales, Cost Basis, and Allocation, matching the scanner.
+- Allocation now displays wide, thicker distribution bars and explicit percentages, with clearer row alignment.
+- Fallback icons and page transitions are regression-tested. No accounting or saved-data changes.
+- Testing build only; not published to CurseForge.
+
 ## 4.5.0-beta4 — Allocation & Concentration (local beta)
 - Portfolio now shows how observed value or verified receipts are distributed across items.
 - Choose bags, bank snapshot, Journal cost or confirmed sales from a dropdown, without double counting.

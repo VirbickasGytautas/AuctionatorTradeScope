@@ -1,4 +1,8 @@
-# Auctionator TradeScope 4.5.0-beta4 — WoW Forever
+# Auctionator TradeScope 4.5.0-beta5 — WoW Forever
+
+### 4.5.0-beta5 - Portfolio item icons and distribution bars (local test)
+
+All Portfolio pages now show 21px item icons using the same icon metadata lookup as Market Scanner. The Allocation screen has a wide 640x7 distribution bar beneath the item and its explicit value/percentage, instead of a hard-to-see 120x3 marker on the far right. Item names and metrics use separate columns for better localization and pagination. No changes to journal calculations, confirmed sales, bank snapshots, SavedVariables or CurseForge publishing.
 
 ### 4.5.0-beta4 — Portfolio allocation and concentration (testing only)
 
