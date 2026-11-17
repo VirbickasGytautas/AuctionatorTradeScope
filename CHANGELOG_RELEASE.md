@@ -1,3 +1,9 @@
+## 4.5.0-beta6 - Item icons (local test)
+- Trading Journal now shows an icon next to every recorded item, consistent with the Portfolio and Market Scanner.
+- Portfolio and Journal retry missing icon textures even when item names are already cached.
+- A visible question mark remains until client item metadata becomes available; late-loaded icons update on screen.
+- No data/accounting schema changes and no CurseForge publication.
+
 ## 4.5.0-beta5 - Portfolio UI polish (local test)
 - Item icons appear in Stock, Sales, Cost Basis, and Allocation, matching the scanner.
 - Allocation now displays wide, thicker distribution bars and explicit percentages, with clearer row alignment.

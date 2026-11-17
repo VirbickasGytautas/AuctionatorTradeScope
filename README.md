@@ -1,4 +1,8 @@
-# Auctionator TradeScope 4.5.0-beta5 — WoW Forever
+# Auctionator TradeScope 4.5.0-beta6 — WoW Forever
+
+### 4.5.0-beta6 - Missing item icons and Journal row icons (local test)
+
+Fixed the item-info cache edge case where a localized name was already known but its icon had not yet loaded. Visible entries in all **Portfolio** modes and the **Trading Journal** now use one 21px icon renderer and bounded asynchronous retries, including late WoW Forever item metadata. Unavailable textures display a visible question-mark placeholder rather than a nearly blank mark. UI pagination preserves the correct icon and clears hidden rows. This beta makes no accounting, auto-mail import, or SavedVariables changes. Not published to CurseForge.
 
 ### 4.5.0-beta5 - Portfolio item icons and distribution bars (local test)
 

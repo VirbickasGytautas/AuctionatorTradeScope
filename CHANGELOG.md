@@ -1,3 +1,11 @@
+## 4.5.0-beta6 - Resolve missing icons and add Journal item images
+- Fixed name-only item cache entries: texture data continues to load and retry even after the name is available.
+- Shared 21px overlay icon renderer for all Portfolio modes and Trading Journal, matching the Market Scanner item layout.
+- Added a visible '?' placeholder until the real icon arrives, avoiding the thin empty mark seen on some WoW Forever items.
+- Bounded refresh of visible list rows, including pagination/mode switching and clearing hidden entries, without spamming the entire item database.
+- Preserved the existing trade accounting, mail importer, market calculations, saved data and 640px allocation bars.
+- Local beta only: no CurseForge release or tag.
+
 ## 4.5.0-beta5 - Portfolio icons and readable allocation bars
 - Added 21px localized item icons to all four Portfolio views: Stock, Sales, Cost Basis and Allocation, using the same metadata source as Market Scanner.
 - Replaced the tiny right-aligned 120x3 allocation line with a high-contrast 640x7 distribution track beneath each item name and value; kept explicit numeric percentages.
