@@ -1,4 +1,4 @@
--- Beta3 portfolio screen: source-separated inventory, sales, journal positions.
+-- Beta4 portfolio screen: four modes and direct allocation-source dropdown.
 ATS={db={pro={journalFee=5}}}
 local A=ATS
 local function widget(text)
@@ -17,10 +17,21 @@ local function button(p,text,x,y,width,fn)
  local w=widget(text);w:SetScript("OnClick",fn);buttons[#buttons+1]=w;return w
 end
 local function fs(_,text)return widget(text)end
+local function dropdown(_,_,_,_,_,options,selected,onSelect)
+ local result=widget('');result.popup=widget('');result.popup:Hide()
+ result.options=options;result.getSelected=selected
+ function result:Choose(value)
+   local found=false
+   for _,opt in ipairs(self.options) do if opt.value==value then found=true end end
+   assert(found,'missing allocation basis: '..tostring(value))
+   onSelect(value)
+ end
+ return result
+end
 local function lineList(_,count)
  local list={};for i=1,count do list[i]=widget() end;return list
 end
-A.ProUIShared={l=function(en)return en end,fs=fs,button=button,
+A.ProUIShared={l=function(en)return en end,fs=fs,button=button,dropdown=dropdown,
  newPage=function()return {}end,heading=function()end,lineList=lineList,
  tex=function()end,currency=function(n)return tostring(n)end}
 A.ProUIBuilders={}
@@ -39,15 +50,16 @@ A.RefreshPortfolioStock=function()A.refreshed=(A.refreshed or 0)+1 end
 local sales={sales={},count=2,units=21,gross=30000,fees=1500,net=28500,
   realized=0,matched=0,unmatched=21}
 for i=1,2 do sales.sales[i]={key="db:"..i,qty=i,net=1000*i,
-  unmatched=i,matched=0,gross=i*1500,fees=i*75,t=i}end
+  unmatched=i,matched=0,gross=i*1500,fees=i*75,t=i,source="auction_mail"}end
 A.PortfolioSalesReport=function()return sales end
 local ledger={positions={{key="db:100",qty=2,cost=500,avgCost=250,
    pnl=100,status="priced",netValue=600,price=300,roi=20}},
  openCount=1}
 A.PortfolioSnapshot=function()return ledger end
+assert(loadfile("Finance/Portfolio/Allocation.lua"))()
 assert(loadfile("UI/Pro/Pages/Portfolio.lua"))()
 local p=A.ProUIBuilders.portfolio({})
-assert(p.mode=="stock" and p.sales.text:find("Confirmed AH sales: 2",1,true))
+assert(p.mode=="stock" and not p.allocationSource.visible and p.sales.text:find("Confirmed AH sales: 2",1,true))
 assert(p.revenue.text:find("NET REVENUE: 28500",1,true))
 assert(p.profit.text:find("unknown",1,true) and p.profit.text:find("21",1,true))
 assert(p.stock.text:find("Bags: 90",1,true))
@@ -65,8 +77,24 @@ assert(p.rows[2].visible==false)
 assert(p.realized==nil and p.profit.text:find("unknown",1,true))
 p.stockMode.scripts.OnClick()
 assert(p.mode=="stock")
+p.allocationMode.scripts.OnClick()
+assert(p.mode=="allocation" and p.allocationSource.visible)
+assert(p.allocationBasis=="bags" and p.section.text:find("DISTRIBUTION",1,true))
+assert(p.rows[1].text:find("%",1,true))
+assert(p.subtitle.text:find("Valued:",1,true))
+p.allocationSource:Choose("sales")
+assert(p.allocationBasis=="sales" and p.pageIndex==1)
+assert(p.rows[1].text:find("Value",1,true))
+assert(p.note.text:find("Basis total:",1,true))
+p.allocationSource:Choose("cost")
+assert(p.allocationBasis=="cost" and p.rows[1].text:find("db:100",1,true))
+p.allocationSource:Choose("bank")
+assert(p.allocationBasis=="bank" and p.empty.visible)
+assert(p.note.text:find("not been scanned",1,true))
+p.stockMode.scripts.OnClick()
+assert(p.mode=="stock" and not p.allocationSource.visible)
 for _,b in ipairs(buttons) do if b.text=="Refresh" then b.scripts.OnClick() end end
 assert(A.refreshed>=2)
 stock.items={};stock.count=0;stock.bagKnown=false;stock.bagUnits=0
 p.update();assert(p.empty.visible and p.empty.text:find("unavailable",1,true))
-print("PASS portfolio UI: sales revenue, unknown profit, three modes and pagination")
+print("PASS portfolio UI: confirmed revenue, four modes, allocation dropdown and paging")
