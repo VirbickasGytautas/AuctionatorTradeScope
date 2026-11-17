@@ -150,6 +150,18 @@ function B.journal(root)
 
   -- Compact row rhythm fits eight trades and navigation inside the 557px page.
   p.rows=lineList(p,PAGE_SIZE,-298,25)
+  -- Match the Market Scanner/Portfolio layout: icon at left, text inset 35px.
+  for _,row in ipairs(p.rows) do
+    assert(C.attachProRowIcon)(row,7,21)
+    local label=row:GetFontString()
+    if label then
+      label:ClearAllPoints()
+      label:SetPoint("LEFT",row,"LEFT",36,0)
+      label:SetWidth(652)
+      label:SetJustifyH("LEFT")
+      if label.SetWordWrap then label:SetWordWrap(false) end
+    end
+  end
   p.emptyTitle=fs(p,l("No trades to show","Нет сделок для отображения"),34,-340,660,true)
   p.emptyHint=fs(p,l("Record a purchase or sale above, or change the filters.",
     "Добавьте покупку или продажу выше либо измените фильтры."),34,-364,660)
@@ -210,8 +222,8 @@ function B.journal(root)
       local entry=pageRows[i]
       local row=p.rows[i]
       if entry then
-        local name=A.ProItemName(entry.key)
-        if A.FitItemName then name=A.FitItemName(name,row:GetFontString(),218) or name end
+        local name=assert(C.renderProRowItem)(row,entry.key) or A.ProItemName(entry.key)
+        if A.FitItemName then name=A.FitItemName(name,row:GetFontString(),185) or name end
         local side=entry.kind=="buy" and l("BUY","ПОКУПКА") or l("SELL","ПРОДАЖА")
         local tail=entry.kind=="sell" and ("   P&L "..feeText(entry)) or ""
         local fromMail=entry.source=="auction_mail" and l("[MAIL] ","[ПОЧТА] ") or ""
@@ -227,11 +239,13 @@ function B.journal(root)
         row:Show()
       else
         row:Hide()
+        C.renderProRowItem(row,nil)
         row:SetScript("OnClick",nil)
         row:SetScript("OnEnter",nil)
       end
     end
   end
   p.update()
+  if C.watchProRowIcons then C.watchProRowIcons(p,p.rows) end
   return p
 end

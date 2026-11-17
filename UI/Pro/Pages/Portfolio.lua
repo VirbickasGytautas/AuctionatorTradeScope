@@ -169,11 +169,7 @@ function B.portfolio(root)
   local UNKNOWN_ICON="Interface\\Icons\\INV_Misc_QuestionMark"
   p.allocationBars={}
   for i,row in ipairs(p.rows) do
-    local icon=row:CreateTexture(nil,"ARTWORK")
-    icon:SetSize(ICON_SIZE,ICON_SIZE)
-    icon:SetPoint("TOPLEFT",row,"TOPLEFT",7,-2)
-    icon:SetTexture(UNKNOWN_ICON)
-    row.itemIcon=icon
+    assert(C.attachProRowIcon)(row,7,ICON_SIZE)
 
     local title=row:GetFontString()
     if title then
@@ -301,13 +297,9 @@ function B.portfolio(root)
       if entry then
         -- ProItemMeta uses the same localized icon resolver as the scanner.
         -- Fall back to a question-mark icon if the item is not cached yet.
-        local name,texture
-        if A.ProItemMeta then name,texture=A.ProItemMeta(entry.key) end
-        name=name or A.ProItemName(entry.key)
+        local name=assert(C.renderProRowItem)(row,entry.key) or A.ProItemName(entry.key)
         row:SetText(A.FitItemName and row.itemTitle and
           (A.FitItemName(name,row.itemTitle,245) or name) or name)
-        row.itemIcon:SetTexture(texture or "Interface\\Icons\\INV_Misc_QuestionMark")
-        row.itemIcon:Show()
         local allocationMode=p.mode=="allocation"
         local offset=allocationMode and 1 or 7
         if row.itemTitle then
@@ -348,7 +340,7 @@ function B.portfolio(root)
         row:Show()
       else
         row:Hide()
-        row.itemIcon:Hide()
+        C.renderProRowItem(row,nil)
         row.itemMetrics:SetText("")
         row:SetScript("OnEnter",nil)
         row:SetScript("OnClick",nil)
@@ -365,5 +357,6 @@ function B.portfolio(root)
   -- Initialize the live bag snapshot even if the Crafting stock setting is off.
   if A.RefreshPortfolioStock then A.RefreshPortfolioStock(false) end
   p.update()
+  if C.watchProRowIcons then C.watchProRowIcons(p,p.rows) end
   return p
 end

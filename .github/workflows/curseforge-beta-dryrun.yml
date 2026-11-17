@@ -40,7 +40,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for test in test-toc test-ui-modules test-craft-batch test-craft-report test-graph-cursor test-journal-analysis test-journal-ui test-dashboard-ui test-portfolio test-portfolio-ui test-mail-import test-portfolio-stock test-portfolio-sales test-portfolio-allocation; do
+          for test in test-toc test-ui-modules test-craft-batch test-craft-report test-graph-cursor test-journal-analysis test-journal-ui test-dashboard-ui test-portfolio test-portfolio-ui test-mail-import test-portfolio-stock test-portfolio-sales test-portfolio-allocation test-pro-item-icons; do
             echo "Checking $test"
             lua5.1 "scripts/$test.lua"
           done

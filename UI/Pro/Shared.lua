@@ -449,6 +449,82 @@ local function newPage(root)
   p:Hide()
   return p
 end
+-- One item-icon renderer for all Pro lists (Portfolio + Trading Journal).
+-- Late Classic item metadata can have a name WITHOUT an icon. Never mistake
+-- such a partially cached entry for a fully loaded item; retry in a bounded way.
+local PRO_UNKNOWN_ICON="Interface\\Icons\\INV_Misc_QuestionMark"
+local function attachProRowIcon(row,x,size)
+  size=size or 21
+  local icon=row:CreateTexture(nil,"OVERLAY")
+  icon:SetSize(size,size)
+  icon:SetPoint("LEFT",row,"LEFT",x or 7,0)
+  icon:SetTexture(PRO_UNKNOWN_ICON)
+  -- OVERLAY keeps item art above the UIPanelButtonTemplate normal texture.
+  if icon.SetTexCoord then icon:SetTexCoord(.06,.94,.06,.94) end
+  row.itemIcon=icon
+  local placeholder=row:CreateFontString(nil,"OVERLAY","GameFontNormalSmall")
+  placeholder:SetPoint("CENTER",icon,"CENTER",0,0)
+  placeholder:SetText("?")
+  placeholder:SetTextColor(1,.82,.42)
+  row.itemIconFallback=placeholder
+  placeholder:Show()
+  return icon
+end
+local function renderProRowItem(row,key)
+  if not row or not row.itemIcon then return nil end
+  if key==nil then
+    row._atsIconKey=nil
+    row._atsIconRequested=nil
+    row._atsIconAttempts=0
+    row._atsIconPending=false
+    row.itemIcon:Hide()
+    row.itemIconFallback:Hide()
+    return nil
+  end
+  if row._atsIconKey~=key then
+    row._atsIconKey=key
+    row._atsIconRequested=nil
+    row._atsIconAttempts=0
+  end
+  local name,texture,id
+  if A.ProItemMeta then name,texture,id=A.ProItemMeta(key) end
+  local missing=texture==nil or texture=="" or texture==PRO_UNKNOWN_ICON or
+    texture=="INV_Misc_QuestionMark"
+  row.itemIcon:SetTexture(missing and PRO_UNKNOWN_ICON or texture)
+  row.itemIcon:Show()
+  if missing then row.itemIconFallback:Show() else row.itemIconFallback:Hide() end
+  row._atsIconPending=missing and id~=nil
+  if row._atsIconPending and not row._atsIconRequested and A.QueueScannerItemMetadata then
+    row._atsIconRequested=true
+    A.QueueScannerItemMetadata({{key=key}},1)
+  end
+  return name
+end
+local function watchProRowIcons(page,rows)
+  if not page or not page.SetScript then return end
+  local elapsed=0
+  page:SetScript("OnUpdate",function(self,dt)
+    elapsed=elapsed+(tonumber(dt) or 0)
+    if elapsed<1.0 then return end
+    elapsed=0
+    local needsRetry=false
+    for _,row in ipairs(rows) do
+      if row._atsIconPending and (row._atsIconAttempts or 0)<24 and
+         (not row.IsShown or row:IsShown()) then
+        needsRetry=true
+      end
+    end
+    if not needsRetry then return end
+    if A.RetryPendingItemInfo then A.RetryPendingItemInfo(6) end
+    for _,row in ipairs(rows) do
+      if row._atsIconPending and (row._atsIconAttempts or 0)<24 and
+         (not row.IsShown or row:IsShown()) then
+        row._atsIconAttempts=row._atsIconAttempts+1
+        renderProRowItem(row,row._atsIconKey)
+      end
+    end
+  end)
+end
 local function lineList(p,n,start,spacing)
   local rows={}
   for i=1,n do
@@ -690,6 +766,9 @@ A.ProUIShared = {
   inspect=inspect,
   newPage=newPage,
   lineList=lineList,
+  attachProRowIcon=attachProRowIcon,
+  renderProRowItem=renderProRowItem,
+  watchProRowIcons=watchProRowIcons,
   captureRow=captureRow,
   labelNumber=labelNumber,
   makeItemIdentity=makeItemIdentity,
