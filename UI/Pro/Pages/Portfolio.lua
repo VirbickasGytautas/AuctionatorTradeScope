@@ -6,11 +6,6 @@ local B=assert(A.ProUIBuilders)
 local l,fs,button,newPage,heading,lineList,tex,currency=
   C.l,C.fs,C.button,C.newPage,C.heading,C.lineList,C.tex,C.currency
 local PAGE_SIZE=6
-local function labelName(key,control,width)
-  local name=A.ProItemName(key)
-  if A.FitItemName then return A.FitItemName(name,control:GetFontString(),width) or name end
-  return name
-end
 local function ageText(epoch)
   if type(epoch)~="number" or type(time)~="function" then return "?" end
   local hours=math.max(0,(time()-epoch)/3600)
@@ -166,22 +161,48 @@ function B.portfolio(root)
   p.allocationSource:Hide()
   tex(p,20,-250,693,1,.43,.33,.16,.64)
   p.rows=lineList(p,PAGE_SIZE,-263,32)
+  -- Shared portfolio row layout, matching the Market Scanner's 21px item icon.
+  -- Keep the item name and metrics in separate columns; Allocation alone adds
+  -- a full-width, 7px distribution bar below the headline.
+  local ICON_SIZE=21
+  local BAR_WIDTH,BAR_HEIGHT=640,7
+  local UNKNOWN_ICON="Interface\\Icons\\INV_Misc_QuestionMark"
   p.allocationBars={}
   for i,row in ipairs(p.rows) do
-    if row.CreateTexture then
-      local track=row:CreateTexture(nil,"ARTWORK")
-      track:SetTexture("Interface\\Buttons\\WHITE8X8")
-      track:SetVertexColor(.24,.29,.34,.9)
-      track:SetPoint("BOTTOMRIGHT",row,"BOTTOMRIGHT",-12,4)
-      track:SetSize(120,3)
-      local fill=row:CreateTexture(nil,"OVERLAY")
-      fill:SetTexture("Interface\\Buttons\\WHITE8X8")
-      fill:SetVertexColor(.99,.75,.28,1)
-      fill:SetPoint("BOTTOMLEFT",track,"BOTTOMLEFT",0,0)
-      fill:SetSize(1,3)
-      track:Hide();fill:Hide()
-      p.allocationBars[i]={track=track,fill=fill}
+    local icon=row:CreateTexture(nil,"ARTWORK")
+    icon:SetSize(ICON_SIZE,ICON_SIZE)
+    icon:SetPoint("TOPLEFT",row,"TOPLEFT",7,-2)
+    icon:SetTexture(UNKNOWN_ICON)
+    row.itemIcon=icon
+
+    local title=row:GetFontString()
+    if title then
+      title:ClearAllPoints()
+      title:SetPoint("TOPLEFT",row,"TOPLEFT",36,-7)
+      title:SetWidth(245)
+      title:SetJustifyH("LEFT")
+      if title.SetWordWrap then title:SetWordWrap(false) end
     end
+    row.itemTitle=title
+    local metrics=row:CreateFontString(nil,"ARTWORK","GameFontHighlightSmall")
+    metrics:SetPoint("TOPRIGHT",row,"TOPRIGHT",-11,-7)
+    metrics:SetWidth(385)
+    metrics:SetJustifyH("RIGHT")
+    if metrics.SetWordWrap then metrics:SetWordWrap(false) end
+    row.itemMetrics=metrics
+
+    local track=row:CreateTexture(nil,"ARTWORK")
+    track:SetTexture("Interface\\Buttons\\WHITE8X8")
+    track:SetVertexColor(.17,.23,.28,.97)
+    track:SetSize(BAR_WIDTH,BAR_HEIGHT)
+    track:SetPoint("BOTTOMLEFT",row,"BOTTOMLEFT",36,2)
+    local fill=row:CreateTexture(nil,"OVERLAY")
+    fill:SetTexture("Interface\\Buttons\\WHITE8X8")
+    fill:SetVertexColor(.98,.76,.31,1)
+    fill:SetSize(1,BAR_HEIGHT)
+    fill:SetPoint("BOTTOMLEFT",track,"BOTTOMLEFT",0,0)
+    track:Hide();fill:Hide()
+    p.allocationBars[i]={track=track,fill=fill,width=BAR_WIDTH,height=BAR_HEIGHT}
   end
   p.empty=fs(p,"",25,-323,674)
   p.note=fs(p,"",20,-466,693)
@@ -278,28 +299,44 @@ function B.portfolio(root)
       local entry=list[(p.pageIndex-1)*PAGE_SIZE+i]
       local row=p.rows[i]
       if entry then
-        local name=labelName(entry.key,row,196)
-        if p.mode=="allocation" then
-          row:SetText(name.."  "..string.format("%.1f%%",entry.share)..
-            l("   Value ","   Стоимость ")..currency(entry.value))
+        -- ProItemMeta uses the same localized icon resolver as the scanner.
+        -- Fall back to a question-mark icon if the item is not cached yet.
+        local name,texture
+        if A.ProItemMeta then name,texture=A.ProItemMeta(entry.key) end
+        name=name or A.ProItemName(entry.key)
+        row:SetText(A.FitItemName and row.itemTitle and
+          (A.FitItemName(name,row.itemTitle,245) or name) or name)
+        row.itemIcon:SetTexture(texture or "Interface\\Icons\\INV_Misc_QuestionMark")
+        row.itemIcon:Show()
+        local allocationMode=p.mode=="allocation"
+        local offset=allocationMode and 1 or 7
+        if row.itemTitle then
+          row.itemTitle:ClearAllPoints()
+          row.itemTitle:SetPoint("TOPLEFT",row,"TOPLEFT",36,-offset)
+        end
+        row.itemMetrics:ClearAllPoints()
+        row.itemMetrics:SetPoint("TOPRIGHT",row,"TOPRIGHT",-11,-offset)
+        if allocationMode then
+          -- The percentage is printed, not just encoded as a bar length.
+          row.itemMetrics:SetText(string.format("%.1f%%",entry.share).."   "..currency(entry.value))
           row:SetScript("OnEnter",function(self)allocationTip(self,entry,allocation)end)
         elseif p.mode=="sales" then
-          row:SetText(name.." x"..entry.qty..
+          row.itemMetrics:SetText("x"..entry.qty..
             l("   Net ","   Выручка ")..currency(entry.net)..
             (entry.unmatched>0 and l("   COST UNKNOWN","   НЕТ СЕБЕСТ.") or ""))
           row:SetScript("OnEnter",function(self)saleTip(self,entry)end)
         elseif p.mode=="ledger" then
           local status=entry.status=="priced" and currency(entry.pnl) or
             (entry.status=="stale" and l("STALE","УСТАРЕЛО") or l("NO PRICE","НЕТ ЦЕНЫ"))
-          row:SetText(name.." x"..entry.qty..l("   Cost ","   Закупка ")..
+          row.itemMetrics:SetText("x"..entry.qty..l("   Cost ","   Закупка ")..
             currency(entry.cost)..l("   Est. ","   Оценка ")..status)
           row:SetScript("OnEnter",function(self)positionTip(self,entry)end)
         else
           local estimate=entry.status=="priced" and currency(entry.bagValue) or
             (entry.status=="stale" and l("STALE","УСТАРЕЛО") or l("NO PRICE","НЕТ ЦЕНЫ"))
-          row:SetText(name..l("   Bags ","   Сумки ")..entry.bagQty..
+          row.itemMetrics:SetText(l("Bags ","Сумки ")..entry.bagQty..
             l("   Bank* ","   Банк* ")..entry.bankQty..
-            l("   Bags value ","   Цена сумок ")..estimate)
+            l("   Value ","   Цена ")..estimate)
           row:SetScript("OnEnter",function(self)stockTip(self,entry,inventory)end)
         end
         row:SetScript("OnClick",function()
@@ -310,14 +347,18 @@ function B.portfolio(root)
         row:SetScript("OnLeave",function()if GameTooltip then GameTooltip:Hide()end end)
         row:Show()
       else
-        row:Hide();row:SetScript("OnEnter",nil);row:SetScript("OnClick",nil)
+        row:Hide()
+        row.itemIcon:Hide()
+        row.itemMetrics:SetText("")
+        row:SetScript("OnEnter",nil)
+        row:SetScript("OnClick",nil)
       end
       local bar=p.allocationBars[i]
-      if bar then
-        if entry and p.mode=="allocation" then
-          bar.track:Show();bar.fill:Show()
-          bar.fill:SetSize(math.max(1,120*math.min(100,entry.share)/100),3)
-        else bar.track:Hide();bar.fill:Hide() end
+      if entry and p.mode=="allocation" then
+        bar.track:Show();bar.fill:Show()
+        bar.fill:SetSize(math.max(1,math.floor(bar.width*math.max(0,math.min(100,entry.share))/100+.5)),bar.height)
+      else
+        bar.track:Hide();bar.fill:Hide()
       end
     end
   end
