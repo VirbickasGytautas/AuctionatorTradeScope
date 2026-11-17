@@ -1,4 +1,8 @@
-# Auctionator TradeScope 4.5.0-beta3 — WoW Forever
+# Auctionator TradeScope 4.5.0-beta4 — WoW Forever
+
+### 4.5.0-beta4 — Portfolio allocation and concentration (testing only)
+
+Portfolio gains an **Allocation** screen with directly selectable sources: priced current bags, last-known bank, open Journal purchase cost, or confirmed auction-mail net revenue. Each distribution uses **one source only**, with sorted per-item shares, in-row bars and hover details. Warnings identify missing/stale quote coverage, disproportionate concentration (top item 50%+), and bank snapshots older than 24 hours. Unknown acquisition cost remains unknown. Source totals must not be added together, and allocation shares do not predict profit or risk-adjusted returns. No SavedVariables changes, CurseForge upload or stable tag.
 
 ### 4.5.0-beta3 - Physical inventory and confirmed sale revenue (local test)
 

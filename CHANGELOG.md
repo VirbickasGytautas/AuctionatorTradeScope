@@ -1,3 +1,11 @@
+## 4.5.0-beta4 — Portfolio allocation and source concentration
+- New Portfolio Allocation page with an explicit dropdown: priced bags, last-known bank, open Journal cost or confirmed AH net revenue.
+- Ranked per-item shares, lightweight row bars, top-one and top-three coverage metrics, and hover source details.
+- Alerts for missing/stale quote coverage, 50%+ single-item concentration, and bank snapshots older than 24 hours.
+- Uses one non-overlapping data source per calculation; never mixes cash, physical inventory and journal positions into misleading total capital.
+- Maintains Trading Journal, confirmed mail import, saved data and earlier graphs without migrations.
+- Test-only beta; no CurseForge upload or stable tag.
+
 ## 4.5.0-beta3 - Automatic stock and confirmed auction revenue
 - Added bag inventory snapshots independent of crafting tracking and a per-character bank snapshot updated on bank visits.
 - Separate Portfolio modes for physical Stock, confirmed auction Sales and Journal Cost Basis.

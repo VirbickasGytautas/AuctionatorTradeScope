@@ -1,3 +1,9 @@
+## 4.5.0-beta4 — Allocation & Concentration (local beta)
+- Portfolio now shows how observed value or verified receipts are distributed across items.
+- Choose bags, bank snapshot, Journal cost or confirmed sales from a dropdown, without double counting.
+- Displays top-item shares, coverage and risk-of-concentration indicators; old bank data and missing quotes are flagged.
+- SavedVariables and previous transaction accounting are unchanged. No CurseForge publication.
+
 ## 4.5.0-beta3 - Live Stock & Verified Revenue (local test)
 - Automatically reads bag contents; last-known bank contents from bank visits.
 - Portfolio tabs: Stock, Sales (confirmed mail receipts), Cost basis (Journal positions).
