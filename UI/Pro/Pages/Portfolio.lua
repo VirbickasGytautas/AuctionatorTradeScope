@@ -74,24 +74,78 @@ local function saleTip(control,row)
   GameTooltip:Show()
 end
 
+local function allocationTip(control,row,report)
+  if not GameTooltip then return end
+  GameTooltip:SetOwner(control,"ANCHOR_RIGHT")
+  GameTooltip:SetText(A.ProItemName(row.key))
+  GameTooltip:AddDoubleLine(l("Source value","Стоимость источника"),currency(row.value),1,1,1,.91,.85,.52)
+  GameTooltip:AddDoubleLine(l("Share of priced subset","Доля в оценённой части"),
+    string.format("%.1f%%",row.share),1,1,1,.76,.92,.65)
+  GameTooltip:AddDoubleLine(l("Units / trades","Единиц / продаж"),tostring(row.qty),1,1,1,.77,.86,.96)
+  if report.basis=="bags" or report.basis=="bank" then
+    GameTooltip:AddLine(l("Measured market value, not known profit.",
+      "Рыночная оценка, а не известная прибыль."),1,.79,.47,true)
+  elseif report.basis=="sales" then
+    GameTooltip:AddLine(l("Confirmed NET mail-sale revenue, not profit.",
+      "Чистая выручка по подтверждённым письмам, не прибыль."),1,.79,.47,true)
+  else
+    GameTooltip:AddLine(l("Open Journal purchase cost, not physical holdings.",
+      "Закупочная стоимость журнала, не запасы сумок."),1,.79,.47,true)
+  end
+  if report.basis=="bank" then
+    GameTooltip:AddLine(l("Last bank visit: ","Последнее посещение банка: ")..
+      (report.bankAge and string.format("%.1f h",report.bankAge/3600) or "?"),.78,.83,.9)
+  end
+  if report.excluded>0 then
+    GameTooltip:AddLine(l("Unpriced/stale items are excluded from shares.",
+      "Предметы без свежей цены не включены в доли."),1,.76,.42,true)
+  end
+  GameTooltip:Show()
+end
+local function allocationWarning(report)
+  local messages={
+    not_scanned={"Source has not been scanned.","Источник ещё не проверен."},
+    no_comparable_value={"No comparable value available.","Нет сопоставимых оценок."},
+    partial_quotes={"Some items lack recent prices: shares cover the priced subset only.",
+      "Часть цен отсутствует: доли только среди оценённых предметов."},
+    single_item={"Only one valued item: diversification cannot be assessed.",
+      "Оценён один предмет: диверсификацию оценить нельзя."},
+    top_heavy={"Concentration: one item is 50%+ of this source.",
+      "Концентрация: один предмет занимает 50%+ этого источника."},
+    top_three_heavy={"Concentration: top three items are 85%+ of the source.",
+      "Концентрация: три предмета дают 85%+ стоимости источника."},
+    bank_stale={"Bank snapshot is over 24h old (or time unknown).",
+      "Снимок банка старше 24 ч (или время неизвестно)."},
+  }
+  local words={}
+  for i,code in ipairs(report.warnings or {}) do
+    local msg=messages[code]
+    if msg then words[#words+1]=l(msg[1],msg[2]) end
+  end
+  if #words==0 then return l("No concentration warning for this source.",
+    "Для этого источника предупреждений нет.") end
+  return table.concat(words,"  |  ")
+end
+
 function B.portfolio(root)
   local p=newPage(root)
   heading(p,l("Trading Portfolio: stock, sales and cost basis",
     "Торговый портфель: запасы, продажи и себестоимость"),-12)
-  p.mode="stock";p.pageIndex=1
-  local modes={stock={"Stock","Запасы"},sales={"Sales","Продажи"},ledger={"Cost basis","Себестоимость"}}
-  button(p,l("Refresh","Обновить"),20,-53,126,function()
+  p.mode="stock";p.pageIndex=1;p.allocationBasis="bags"
+  local modes={stock={"Stock","Запасы"},sales={"Sales","Продажи"},
+    ledger={"Cost basis","Себестоимость"},allocation={"Allocation","Распределение"}}
+  button(p,l("Refresh","Обновить"),20,-53,106,function()
     if A.RefreshPortfolioStock then A.RefreshPortfolioStock(true) end
     p.update()
   end)
-  for _,control in ipairs({{id="stock",x=159,width=112},{id="sales",x=284,width=112},
-    {id="ledger",x=409,width=150}}) do
+  for _,control in ipairs({{id="stock",x=137,width=101},{id="sales",x=249,width=101},
+    {id="ledger",x=361,width=130},{id="allocation",x=502,width=121}}) do
     p[control.id.."Mode"]=button(p,l(modes[control.id][1],modes[control.id][2]),
       control.x,-53,control.width,function()
         p.mode=control.id;p.pageIndex=1;p.update()
       end)
   end
-  button(p,l("Journal","Журнал"),573,-53,138,function()A.ShowProTab("journal")end)
+  button(p,l("Journal","Журнал"),634,-53,77,function()A.ShowProTab("journal")end)
   p.subtitle=fs(p,"",20,-94,696)
   tex(p,18,-113,695,103,.063,.085,.107,.78)
   tex(p,18,-113,695,1,.48,.37,.19,.73)
@@ -99,9 +153,36 @@ function B.portfolio(root)
   p.revenue=fs(p,"",25,-148,685)
   p.profit=fs(p,"",25,-174,685)
   p.stock=fs(p,"",25,-200,685)
-  p.section=fs(p,"",20,-231,692,true)
+  p.section=fs(p,"",20,-231,486,true)
+  p.allocationSource=assert(C.dropdown)(p,l("ALLOCATION BASIS","ОСНОВА РАСПРЕДЕЛЕНИЯ"),
+    510,-225,200,{
+      {value="bags",text=l("Bags: observed value","Сумки: рыночная оценка")},
+      {value="bank",text=l("Bank: last-known value","Банк: последний снимок")},
+      {value="cost",text=l("Journal: invested cost","Журнал: вложения")},
+      {value="sales",text=l("AH sales: net revenue","Продажи: чистая выручка")},
+    },function()return p.allocationBasis end,function(value)
+      p.allocationBasis=value;p.pageIndex=1;p.update()
+    end)
+  p.allocationSource:Hide()
   tex(p,20,-250,693,1,.43,.33,.16,.64)
   p.rows=lineList(p,PAGE_SIZE,-263,32)
+  p.allocationBars={}
+  for i,row in ipairs(p.rows) do
+    if row.CreateTexture then
+      local track=row:CreateTexture(nil,"ARTWORK")
+      track:SetTexture("Interface\\Buttons\\WHITE8X8")
+      track:SetVertexColor(.24,.29,.34,.9)
+      track:SetPoint("BOTTOMRIGHT",row,"BOTTOMRIGHT",-12,4)
+      track:SetSize(120,3)
+      local fill=row:CreateTexture(nil,"OVERLAY")
+      fill:SetTexture("Interface\\Buttons\\WHITE8X8")
+      fill:SetVertexColor(.99,.75,.28,1)
+      fill:SetPoint("BOTTOMLEFT",track,"BOTTOMLEFT",0,0)
+      fill:SetSize(1,3)
+      track:Hide();fill:Hide()
+      p.allocationBars[i]={track=track,fill=fill}
+    end
+  end
   p.empty=fs(p,"",25,-323,674)
   p.note=fs(p,"",20,-466,693)
   p.prev=button(p,l("< Back","< Назад"),20,-515,126,function()
@@ -115,7 +196,22 @@ function B.portfolio(root)
     local sales=A.PortfolioSalesReport()
     local ledger=A.PortfolioSnapshot()
     local inventory=A.PortfolioHoldings()
+    local allocation=A.PortfolioAllocation(inventory,ledger,sales,p.allocationBasis)
     local hasMatched=sales.matched>0
+    if p.mode=="allocation" then
+      p.allocationSource:Show()
+      local basisNames={bags=l("Bags: market value","Сумки: рыночная стоимость"),
+        bank=l("Bank: last-known","Банк: последний снимок"),
+        cost=l("Journal: known cost","Журнал: закупочная стоимость"),
+        sales=l("AH sales: net receipts","Продажи: чистая выручка")}
+      p.allocationSource:SetText(basisNames[p.allocationBasis])
+      p.subtitle:SetText(l("One source at a time. Shares exclude unpriced items.",
+        "Один источник за раз. Предметы без цены исключены из долей."))
+    else
+      if p.allocationSource.popup then p.allocationSource.popup:Hide() end
+      p.allocationSource:Hide()
+      p.subtitle:SetText("")
+    end
     p.sales:SetText(l("Confirmed AH sales: ","Подтверждённых продаж: ")..sales.count..
       l("   Units: ","   Штук: ")..sales.units..
       l("   Gross: ","   До комиссии: ")..currency(sales.gross))
@@ -130,7 +226,18 @@ function B.portfolio(root)
       (inventory.bankKnown and tostring(inventory.bankUnits) or "?")..
       l("   Bags value: ","   Цена сумок: ")..currency(inventory.bagValue))
     local list
-    if p.mode=="sales" then
+    if p.mode=="allocation" then
+      list=allocation.rows
+      p.section:SetText(l("DISTRIBUTION OF ONE SOURCE","РАСПРЕДЕЛЕНИЕ ОДНОГО ИСТОЧНИКА"))
+      local sourceWord=l("Valued: ","Оценено: ")..allocation.count.."/"..allocation.eligible
+      local top=string.format("%.1f%%",allocation.topShare)
+      p.subtitle:SetText(sourceWord..l("   Top item: ","   Крупнейший: ")..top..
+        l("   Top 3: ","   Топ-3: ")..string.format("%.1f%%",allocation.topThreeShare))
+      p.note:SetText(l("Basis total: ","Всего по источнику: ")..currency(allocation.total)..
+        "   "..allocationWarning(allocation))
+      p.empty:SetText(l("No comparable values for the selected source.",
+        "Нет сопоставимых оценок для выбранного источника."))
+    elseif p.mode=="sales" then
       list=sales.sales
       p.section:SetText(l("CONFIRMED AUCTION SALES (latest first)",
         "ПОДТВЕРЖДЁННЫЕ ПРОДАЖИ (сначала новые)"))
@@ -172,7 +279,11 @@ function B.portfolio(root)
       local row=p.rows[i]
       if entry then
         local name=labelName(entry.key,row,196)
-        if p.mode=="sales" then
+        if p.mode=="allocation" then
+          row:SetText(name.."  "..string.format("%.1f%%",entry.share)..
+            l("   Value ","   Стоимость ")..currency(entry.value))
+          row:SetScript("OnEnter",function(self)allocationTip(self,entry,allocation)end)
+        elseif p.mode=="sales" then
           row:SetText(name.." x"..entry.qty..
             l("   Net ","   Выручка ")..currency(entry.net)..
             (entry.unmatched>0 and l("   COST UNKNOWN","   НЕТ СЕБЕСТ.") or ""))
@@ -200,6 +311,13 @@ function B.portfolio(root)
         row:Show()
       else
         row:Hide();row:SetScript("OnEnter",nil);row:SetScript("OnClick",nil)
+      end
+      local bar=p.allocationBars[i]
+      if bar then
+        if entry and p.mode=="allocation" then
+          bar.track:Show();bar.fill:Show()
+          bar.fill:SetSize(math.max(1,120*math.min(100,entry.share)/100),3)
+        else bar.track:Hide();bar.fill:Hide() end
       end
     end
   end
