@@ -1,6 +1,8 @@
 -- Test the journal page filter/button integration with WoW-independent widgets.
 ATS={locale="enUS",db={pro={journal={},journalFee=5}}}
 local A=ATS
+assert(loadfile("UI/Pro/Shared.lua"))()
+local proIcons=A.ProUIShared
 local now=1700000000
 function time()return now end
 function date(_,n)return tostring(n) end
@@ -8,6 +10,7 @@ function UnitName()return "Tester" end
 function A.Init()end
 function A.RealmKey()return "Realm" end
 function A.ProItemName(key)return "Item "..key end
+function A.ProItemMeta(key) return "Item "..key,"Interface\\Icons\\INV_Ore_Iron_01",tonumber(tostring(key):match("db:(%d+)")) end
 function A.FitItemName(n) return n end
 A.Money=function(n)return tostring(n)end
 local function w(text)
@@ -20,6 +23,18 @@ local function w(text)
   function o:Hide()self.shown=false end
   function o:GetFontString()return self end
   function o:SetEnabled(v)self.enabled=v end
+  function o:IsShown()return self.shown end
+  function o:SetSize(width,height)self.width=width;self.height=height end
+  function o:SetWidth(width)self.width=width end
+  function o:SetPoint(...)self.point={...}end
+  function o:ClearAllPoints()self.point=nil end
+  function o:SetJustifyH(value)self.justify=value end
+  function o:SetWordWrap(value)self.wordWrap=value end
+  function o:SetTexture(value)self.texture=value end
+  function o:SetTexCoord(...)self.texCoord={...}end
+  function o:SetTextColor(...)self.textColor={...}end
+  function o:CreateTexture()return w("")end
+  function o:CreateFontString()return w("")end
   return o
 end
 local function button(p,label,x,y,width,fn)
@@ -71,6 +86,8 @@ local function lineList(p,n)
   return rows
 end
 A.ProUIShared={l=function(en) return en end,fs=fs,tex=tex,button=button,dropdown=dropdown,edit=edit,
+ attachProRowIcon=proIcons.attachProRowIcon,renderProRowItem=proIcons.renderProRowItem,
+ watchProRowIcons=proIcons.watchProRowIcons,
   marketInput=marketInput,anyItem=function(p)return p.selection.itemKey end,
   fillMarketEdit=function(e,v)e.itemKey=v.key;e:SetText(v.text)end,
   shareMarketChoice=function()end,
@@ -104,6 +121,8 @@ assert(p.pageText.text=="Page 1 / 3")
 assert(not p.emptyTitle.shown and not p.emptyHint.shown)
 assert(p.prev.enabled==false and p.next.enabled==true)
 assert(p.rows[1].text:find("db:2",1,true))
+assert(p.rows[1].itemIcon.shown and not p.rows[1].itemIconFallback.shown)
+assert(p.rows[1].itemIcon.texture=="Interface\\Icons\\INV_Ore_Iron_01")
 assert(p.rows[8].shown)
 p.next.scripts.OnClick()
 assert(p.pageIndex==2 and p.pageText.text=="Page 2 / 3")
@@ -114,6 +133,7 @@ selectOption(p.kindFilter,"sell")
 assert(p.filter.kind=="sell" and p.filterSummary.text:find("Records: 7",1,true))
 selectOption(p.itemFilter,"selected")
 assert(p.filter.onlyItem and p.filterSummary.text:find("Records: 0",1,true))
+assert(not p.rows[1].itemIcon.shown and not p.rows[1].itemIconFallback.shown)
 assert(p.emptyTitle.shown and p.emptyHint.shown)
 assert(p.prev.enabled==false and p.next.enabled==false)
 p.selection.itemKey="db:1"

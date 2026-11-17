@@ -1,6 +1,8 @@
 -- Beta4 portfolio screen: four modes and direct allocation-source dropdown.
 ATS={db={pro={journalFee=5}}}
 local A=ATS
+assert(loadfile("UI/Pro/Shared.lua"))()
+local proIcons=A.ProUIShared
 local function widget(text)
  local w={text=text or "",visible=true,scripts={}}
  function w:SetText(t)self.text=t end
@@ -19,6 +21,9 @@ local function widget(text)
  function w:ClearAllPoints()self.point=nil end
  function w:SetJustifyH(dir)self.justify=dir end
  function w:SetWordWrap(v)self.wordWrap=v end
+ function w:SetTextColor(...)self.textColor={...}end
+ function w:IsShown()return self.visible end
+ function w:SetTexCoord(...)self.texCoord={...}end
  function w:CreateTexture()return widget()end
  function w:CreateFontString()return widget()end
  return w
@@ -43,6 +48,8 @@ local function lineList(_,count)
  local list={};for i=1,count do list[i]=widget() end;return list
 end
 A.ProUIShared={l=function(en)return en end,fs=fs,button=button,dropdown=dropdown,
+ attachProRowIcon=proIcons.attachProRowIcon,renderProRowItem=proIcons.renderProRowItem,
+ watchProRowIcons=proIcons.watchProRowIcons,
  newPage=function()return {}end,heading=function()end,lineList=lineList,
  tex=function()end,currency=function(n)return tostring(n)end}
 A.ProUIBuilders={}
@@ -80,6 +87,7 @@ assert(p.stock.text:find("Bags: 90",1,true))
 assert(p.rows[1].text=="Item db:1")
 assert(p.rows[1].itemIcon.texture=="Interface\\Icons\\INV_Ore_Iron_01")
 assert(p.rows[1].itemIcon.visible and p.rows[1].itemMetrics.text:find("Bags 1",1,true))
+assert(not p.rows[1].itemIconFallback.visible)
 assert(p.rows[1].itemTitle.point[4]==36 and p.rows[1].itemTitle.width==245)
 assert(p.pageText.text=="Page 1 / 2")
 assert(p.prev.enabled==false and p.next.enabled==true)
@@ -136,6 +144,7 @@ stock.count=1;stock.bagKnown=true;stock.bagUnits=1
 A.ProItemMeta=function(key)return "Unknown "..key,nil end
 p.update()
 assert(p.rows[1].itemIcon.texture=="Interface\\Icons\\INV_Misc_QuestionMark")
+assert(p.rows[1].itemIconFallback.visible)
 assert(p.rows[1].itemIcon.visible and not p.allocationBars[1].track.visible)
 -- Empty state after the item is removed: icon must be hidden again.
 stock.items={};stock.count=0;p.update()
