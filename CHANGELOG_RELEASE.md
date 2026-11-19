@@ -1,3 +1,22 @@
+## 4.5.0 - Stable Release
+
+### Trading Portfolio
+- Inventory view: current bag stock and a clearly labeled **last-observed bank snapshot**.
+- Confirmed sales view: Auction House invoice receipts, gross amounts, fees and net revenue; unknown purchase cost is shown as unknown profit, **not** zero profit.
+- Cost Basis view: open Journal positions, weighted-average purchase cost and realized/estimated P&L when an acquisition price is recorded.
+- Allocation view: item shares by selected source, wide visual bars, market-price coverage, bank-age and concentration warnings. Inventory value, Journal cost and historical revenue are **not** added together.
+
+### Auction mail and interface
+- Optional automatic Journal import of verified completed auction-mail purchases and sales when the mailbox is opened. Strict invoice validation, source labels and repeated-mail protection. Enable in the Journal or with `/ats mail on`.
+- Matching 21px item icons in Portfolio and Trading Journal, including late-load retries and visible placeholders; cleaner layout of localized names and amounts.
+- Existing charts, scanner, crafting tools and history remain available.
+
+### Important limitations and compatibility
+- Import is **off by default** on a fresh installation; it cannot recover deleted mail and does not take items or gold. Incomplete or ambiguous invoices are not imported.
+- Revenue cannot be treated as profit for items with unknown acquisition cost. Bank counts reflect the last visit; market values use recent local Auctionator observations, not guaranteed sale prices.
+- Previously saved Journal, market history, recipes, watchlist and settings are preserved; new mail and inventory state is stored in separate namespaces.
+- Built from the user-tested **4.5.0-beta6** without changes to the feature logic. WoW Forever 1.60.1 (Interface 16001).
+
 ## 4.5.0-beta6 - Item icons (local test)
 - Trading Journal now shows an icon next to every recorded item, consistent with the Portfolio and Market Scanner.
 - Portfolio and Journal retry missing icon textures even when item names are already cached.

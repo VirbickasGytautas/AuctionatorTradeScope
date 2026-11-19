@@ -1,4 +1,14 @@
-# Auctionator TradeScope 4.5.0-beta6 — WoW Forever
+# Auctionator TradeScope 4.5.0 — WoW Forever
+
+### 4.5.0 - Stable release: Trading Portfolio and auction-mail accounting
+
+Released from **in-game-tested 4.5.0-beta6**. TradeScope now has a four-mode **Trading Portfolio**: live bag stock and last-visited bank snapshot; **confirmed Auction House sales** including gross receipts, fees and net revenue; **known-cost purchase lots** from the Trading Journal; and **Allocation** by a single chosen source. Allocation includes readable bars, item icons, price-data coverage and concentration warnings. The Trading Journal also displays item icons and marks imported mail entries.
+
+**Auction-mail import is optional**: switch on **Auto-mail** in Trading Journal or run `/ats mail on`, then open a mailbox. The addon reads completed auction invoices when their item, amount and quantity can be verified. It does **not** collect mail attachments or money. Ambiguous/unconfirmed invoices are skipped. Previously deleted mail cannot be recovered.
+
+**Accounting limits:** Revenue is not profit when purchase cost is unknown; bag and bank stock is not assumed to have been bought. Bank counts are labeled *last seen*, market estimates use actual recent Auctionator observations, and priced bags/bank, journal cost and sales revenue are **never summed as one capital figure**. The existing SavedVariables schema remains backward compatible; new, namespaced mail-import and stock records preserve prior history.
+
+Stable promotion changes the version and release documentation only; the functional code is identical to the tested beta6.
 
 ### 4.5.0-beta6 - Missing item icons and Journal row icons (local test)
 

@@ -1,3 +1,14 @@
+## 4.5.0 - Stable Trading Portfolio and verified auction-mail accounting
+- Promoted the in-game-tested 4.5.0-beta6 revision. No functional Lua changes except the version constant in Core.lua.
+- Opt-in automatic import of completed Auction House BUY/SELL invoices via the in-game mailbox, with strict field validation and duplicate protection; no collecting attachments or gold.
+- Trading Journal retains manual transactions and records validated mail imports with their source; confirmed gross/net revenue and auction fees are tracked separately from cost-basis profit.
+- Trading Portfolio distinguishes current bag stock, last-known bank contents, known-cost Journal lots and confirmed sales. No double counting across data sources.
+- Per-item Allocation uses a directly selected source, broad progress bars, percentage labels, coverage diagnostics and concentration warnings; stale bank snapshots and prices are identified.
+- Consistent late-loading item icons and readable row layouts in Market Scanner, Portfolio and Trading Journal, with a visible unknown-icon placeholder.
+- Added character-scoped mail-deduplication and inventory-snapshot SavedVariables without resetting existing history, watchlists, recipes, settings or journal data.
+- Limits: no recovery of deleted mail; no assumption that sale revenue is profit without a recorded cost; no direct auction transaction capture without opening the mailbox.
+- WoW Forever interface 16001; last candidate 4.5.0-beta6 passed the in-game regression checklist.
+
 ## 4.5.0-beta6 - Resolve missing icons and add Journal item images
 - Fixed name-only item cache entries: texture data continues to load and retry even after the name is available.
 - Shared 21px overlay icon renderer for all Portfolio modes and Trading Journal, matching the Market Scanner item layout.
