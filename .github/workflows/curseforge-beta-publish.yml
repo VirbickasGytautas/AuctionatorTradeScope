@@ -4,12 +4,6 @@ name: TradeScope - Publish to CurseForge
 # Beta tags publish Beta files; stable version tags publish Release files.
 # Pushes to branches never publish to CurseForge.
 on:
-  workflow_dispatch:
-    inputs:
-      release_tag:
-        description: 'Exact release tag to publish (verified on main)'
-        type: string
-        required: true
   push:
     tags:
       - 'v*'
@@ -25,7 +19,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.release_tag || github.ref }}
 
       - name: Require release commit on main
         shell: bash
@@ -40,22 +33,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          # workflow_dispatch runs from main but checks out the specified tag.
-          # Normal tag pushes still use the native GITHUB_REF_NAME.
           tag="$GITHUB_REF_NAME"
-          if [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
-            tag="${{ inputs.release_tag }}"
-            if [[ "$tag" != "v4.5.0" ]]; then
-              echo "::error::Recovery dispatch is restricted to v4.5.0"
-              exit 1
-            fi
-          fi
           if ! [[ "$tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-beta[0-9]+)?$ ]]; then
             echo "::error::Invalid release tag"
             exit 1
           fi
           test "$(git describe --exact-match --tags HEAD)" = "$tag" || {
-            echo "::error::Checked out revision is not the requested release tag"
+            echo "::error::Checked out revision is not the requested tag"
             exit 1
           }
           expected="${tag#v}"
