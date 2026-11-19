@@ -4,6 +4,7 @@ name: TradeScope - Publish to CurseForge
 # Beta tags publish Beta files; stable version tags publish Release files.
 # Pushes to branches never publish to CurseForge.
 on:
+  workflow_dispatch:
   push:
     tags:
       - 'v*'
