@@ -26,7 +26,7 @@ jobs:
           set -euo pipefail
           repo="$GITHUB_REPOSITORY"
           parent=$(gh api "repos/$repo/commits/$GITHUB_SHA" --jq '.parents[0].sha')
-          test "$parent" = 9dabebf2791581de0870515dc372343aa5fb2f25
+          test "$parent" = 99c405abeff112f395bf571599bfd04fddc61623
           ref_sha=$(gh api "repos/$repo/git/ref/tags/v4.5.0" --jq '.object.sha')
           target=$(gh api "repos/$repo/git/tags/$ref_sha" --jq '.object.sha')
           test "$target" = bb533f909cf273f68739d0bb6caf29885a3d2ae6 || {
@@ -40,5 +40,5 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          gh api -X POST "repos/$GITHUB_REPOSITORY/actions/workflows/curseforge-beta-publish.yml/dispatches" -f ref=v4.5.0
-          echo "Dispatched validated CurseForge publish workflow on refs/tags/v4.5.0"
+          gh api -X POST "repos/$GITHUB_REPOSITORY/actions/workflows/curseforge-beta-publish.yml/dispatches" -f ref=main -f 'inputs[release_tag]=v4.5.0'
+          echo "Dispatched verified v4.5.0 from main via workflow_dispatch"
