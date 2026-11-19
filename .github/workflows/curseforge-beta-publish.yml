@@ -5,6 +5,11 @@ name: TradeScope - Publish to CurseForge
 # Pushes to branches never publish to CurseForge.
 on:
   workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Exact release tag to publish (verified on main)'
+        type: string
+        required: true
   push:
     tags:
       - 'v*'
@@ -20,12 +25,13 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.release_tag || github.ref }}
 
       - name: Require release commit on main
         shell: bash
         run: |
           git fetch origin main --quiet
-          if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
+          if ! git merge-base --is-ancestor "$(git rev-parse HEAD)" origin/main; then
             echo "::error::Release tags must point to commits already merged into main"
             exit 1
           fi
@@ -34,7 +40,25 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          expected="${GITHUB_REF_NAME#v}"
+          # workflow_dispatch runs from main but checks out the specified tag.
+          # Normal tag pushes still use the native GITHUB_REF_NAME.
+          tag="$GITHUB_REF_NAME"
+          if [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
+            tag="${{ inputs.release_tag }}"
+            if [[ "$tag" != "v4.5.0" ]]; then
+              echo "::error::Recovery dispatch is restricted to v4.5.0"
+              exit 1
+            fi
+          fi
+          if ! [[ "$tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-beta[0-9]+)?$ ]]; then
+            echo "::error::Invalid release tag"
+            exit 1
+          fi
+          test "$(git describe --exact-match --tags HEAD)" = "$tag" || {
+            echo "::error::Checked out revision is not the requested release tag"
+            exit 1
+          }
+          expected="${tag#v}"
           actual="$(sed -n 's/^## Version:[[:space:]]*//p' AuctionatorTradeScope.toc | tr -d '\r')"
           if [[ "$expected" != "$actual" || ! "$expected" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-beta[0-9]+)?$ ]]; then
             echo "::error::Tag and TOC version mismatch, or invalid beta tag"
@@ -61,6 +85,16 @@ jobs:
           CF_API_TOKEN: ${{ secrets.CF_API_KEY }}
         with:
           args: -p 1796279
+
+      - name: Require a real release package
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$(find .release -maxdepth 1 -name '*.zip' -type f -print -quit)" || {
+            echo '::error::Packager produced no release ZIP (not published)'
+            exit 1
+          }
+          while IFS= read -r -d '' zipfile; do unzip -t "$zipfile"; done < <(find .release -maxdepth 1 -name '*.zip' -type f -print0)
 
       - name: Preserve generated ZIP for troubleshooting
         if: always()
