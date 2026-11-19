@@ -46,7 +46,9 @@ local helpContent={
  alerts={"Choose a condition: price threshold, deviation from median, price change, supply reduction, volatility or Opportunity Score. Signals only evaluate new Auctionator scans. Price and supply changes are not confirmed trades.","Выберите условие: цена, отклонение от медианы, изменение цены, сокращение предложения, волатильность или Opportunity Score. Сигналы проверяются при новых сканах Auctionator. Это не подтверждённые сделки."},
  candles={"OHLC candles summarize observed prices by time buckets. Empty time slots have no observations; candles are not recorded market trades.","Свечи OHLC объединяют наблюдаемые цены по времени. Пробелы означают отсутствие замеров, а не отсутствие сделок."},
  activity={"The activity index is an estimate based on changes in observed quotes and supply; it is not actual sales volume.","Индекс активности оценивает изменения наблюдаемых цен и предложения, а не реальный объём продаж."},
- journal={"Record purchases and sales manually. Filter by selected item, BUY/SELL and last 7/30/90 days. Hover a sale to view matched cost, fees, P&L and ROI. Unmatched sale units are excluded from realized profit.","Вносите покупки и продажи вручную. Фильтры: выбранный предмет, ПОКУПКА/ПРОДАЖА, последние 7/30/90 дней. Наведите на продажу для себестоимости, комиссий, прибыли и ROI. Продажи без закупки не включаются в прибыль."},
+ journal={"Enable Auto-mail, then open a mailbox. Completed Auction House invoices are imported when item, amount and quantity are unambiguous. Missing prices, ambiguous items and duplicate-looking mail are skipped. Manual trades, filters, per-sale cost and ROI remain available.","Включите «Почта», затем откройте почтовый ящик. Подтверждённые аукционные счета импортируются при точном определении предмета, суммы и количества. Неполные и похожие письма пропускаются. Ручные сделки, фильтры и прибыль остаются доступны."},
+ portfolio={"Portfolio modes: Stock (live bags, last-known bank), Sales (confirmed net revenue), Cost basis (journal lots), Allocation (choose ONE source). Shares use priced values only; large concentration indicates exposure, not predicted loss or profit.",
+"Режимы портфеля: Запасы (сумки и последний банк), Продажи (подтверждённая выручка), Себестоимость (журнал), Распределение (выберите ОДИН источник). Доли считаются по оценённым предметам; высокая концентрация — не прогноз убытка или прибыли."},
  craft={"Open a profession and click Scan recipes. Then select a saved recipe by name or output item ID. Crafts sets the batch size. Bag/bank tracking reduces additional purchases, but owned materials still have market value. Bank counts are from its last opening.",
 "Откройте окно профессии и нажмите «Сканировать рецепты». Затем выберите сохранённый рецепт по названию или ID предмета. «Изготовлений» задаёт размер партии. Учёт сумок и банка уменьшает закупки, но свои ресурсы также имеют рыночную стоимость. Данные банка — с последнего открытия."},
  indicators={"Indicators use actual observed time buckets. Missing buckets are never filled. Short histories produce explicitly marked preliminary values, not reliable signals.","Индикаторы используют реальные интервалы наблюдений. Пустые часы не заполняются. При короткой истории значения предварительные, а не надёжные сигналы."},
@@ -118,6 +120,12 @@ local function create()
   logo:SetTexture("Interface\\AddOns\\AuctionatorTradeScope\\Media\\Icon")
   logo:SetSize(31,31);logo:SetPoint("TOPLEFT",f,"TOPLEFT",23,-22)
   f.title=fs(f,"TradeScope | "..l("Trading Workstation","Торговый терминал").."  v"..tostring(A.version or "?"),63,-28,715,true)
+  -- A portfolio shortcut belongs in the header, not a third row that would
+  -- overlap the existing tool pages. The original ten tabs are unchanged.
+  f.portfolioShortcut=button(f,l("Portfolio","Портфель"),802,-27,136,function()
+    A.ShowProTab("portfolio")
+  end,27)
+  if A.StyleButton then A.StyleButton(f.portfolioShortcut,"tab") end
   local close=CreateFrame("Button",nil,f,"UIPanelCloseButton")
   close:SetPoint("TOPRIGHT",f,"TOPRIGHT",-8,-8)
   f.nav={}
@@ -233,11 +241,17 @@ function A.ShowProTab(id)
       if not ok then A.lastError=tostring(err);A.Say(err) end
     end
   end
+  if f.portfolioShortcut and A.StyleButton then
+    A.StyleButton(f.portfolioShortcut,id=="portfolio" and "activeTab" or "tab")
+  end
   for key,buttonFrame in pairs(f.nav) do
     local chosen=key==id
     if buttonFrame.activeBackground then buttonFrame.activeBackground:Hide() end
     if A.StyleButton then A.StyleButton(buttonFrame,chosen and "activeTab" or "tab") end
   end
+end
+function A.OpenPortfolio()
+  A.OpenProTool("portfolio")
 end
 function A.OpenProTool(id)
   A.Init()

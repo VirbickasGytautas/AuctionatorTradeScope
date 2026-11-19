@@ -1,6 +1,6 @@
 -- Auctionator TradeScope 4.1.0 -- WoW Forever / Lua 5.1
 -- A fresh standalone addon; no legacy history is imported.
-ATS = { version = "4.4.0", source = "none" }
+ATS = { version = "4.5.0", source = "none" }
 local A = ATS
 _G.AuctionatorTradeScope = A
 
@@ -275,6 +275,30 @@ SlashCmdList.AUCTIONATORTRADESCOPE = function(message)
   elseif command == "test" then
     A.testUntil = GetTime() + 8
     A.Draw(nil, nil, true)
+  elseif command == "mail" then
+    if type(A.MailImportState)~="function" then A.Say("Mail importer unavailable")
+    elseif argument=="on" or argument=="enable" then
+      A.SetMailImportEnabled(true)
+      A.Say("Auction-mail importer enabled. Open the mailbox to scan confirmed invoices.")
+    elseif argument=="off" or argument=="disable" then
+      A.SetMailImportEnabled(false)
+      A.Say("Auction-mail importer disabled.")
+    elseif argument=="scan" then
+      local report=A.ScanAuctionMail()
+      A.Say("Auction mail: "..(report.mailboxClosed and "open your mailbox first" or
+        ("imported="..report.imported.." ready="..(report.ready or 0)..
+        " pending="..report.pending.." duplicates="..report.duplicate)))
+      for reason,count in pairs(report.reasons or {}) do
+        A.Say("Mail pending ["..reason.."]: "..count)
+      end
+    else
+      local state=A.MailImportState()
+      local status=A.MailImportLastStatus()
+      A.Say("Auction mail: "..(state.enabled and "enabled" or "disabled")..
+        "; last scan: "..(status.imported or 0).." imported, "..
+        (status.ready or 0).." ready, "..(status.pending or 0).." pending")
+      A.Say("Commands: /ats mail on | off | scan | status")
+    end
   elseif command == "stock" then
     if type(A.DebugCraftStock)=="function" then
       A.Say(A.DebugCraftStock(argument))

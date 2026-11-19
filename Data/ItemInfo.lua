@@ -183,8 +183,9 @@ function A.ResolveItemInfo(link,fallback)
     directLink=directLink or bagLink
   end
   if name or icon or directLink then A.RememberItem(directLink or fullLink or ("item:"..id),name,icon) end
-  if not name then
-    -- Classic GetItemInfo queues an asynchronous load; retail API is optional.
+  if not name or not validIcon(icon) then
+    -- Name-only cached entries still need their REAL icon requested. Previously
+    -- only missing names were queued, so mail-imported items kept blank icons.
     pending[id] = true
     priorityPending[id] = priorityPending[id] or {attempts=0,next=0}
     if C_Item and type(C_Item.RequestLoadItemDataByID)=="function" then
@@ -283,12 +284,19 @@ function A.CacheIndexedItem(id)
   if not id or (not pending[id] and not attempted[id] and not priorityPending[id]) then return end
   local name,icon,link=info(id)
   if name then
+    local realIcon=icon or iconByID(id)
     if not transient[id] then indexStats.resolved=indexStats.resolved+1 end
-    transient[id]={name=name,icon=icon or iconByID(id),link=link}
-    persistIndexed(id,name,icon or iconByID(id))
-    A.RememberItem(link or ("item:"..id),name,icon or iconByID(id))
-    pending[id]=nil
-    priorityPending[id]=nil
+    transient[id]={name=name,icon=realIcon,link=link}
+    persistIndexed(id,name,realIcon)
+    A.RememberItem(link or ("item:"..id),name,realIcon)
+    -- A localized name alone is NOT proof that the corresponding texture was
+    -- loaded. Keep bounded retries active until an icon is actually present.
+    if validIcon(realIcon) then
+      pending[id]=nil
+      priorityPending[id]=nil
+    else
+      pending[id]=true
+    end
   end
 end
 
@@ -378,8 +386,9 @@ local scanQueue,scanQueued,scanAt,scanWorker={}, {},1,nil
 local probeTooltip
 local function probeItem(id)
   local n,i,link=info(id)
-  if n then
-    A.RememberItem(link or ("item:"..id),n,i or iconByID(id))
+  local realIcon=i or iconByID(id)
+  if n then A.RememberItem(link or ("item:"..id),n,realIcon) end
+  if n and validIcon(realIcon) then
     pending[id]=nil
     return
   end

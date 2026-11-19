@@ -55,6 +55,24 @@ end
 function B.journal(root)
   local p=newPage(root)
   heading(p,l("Trading Journal: weighted-cost P&L","Журнал сделок: прибыль с учётом себестоимости"),-12)
+  -- Explicit opt-in: no mail is imported until the user enables it.
+  p.mailToggle=button(p,"",528,-13,178,function()
+    if type(A.MailImportState)=="function" then
+      A.SetMailImportEnabled(not A.MailImportState().enabled)
+      if p.update then p.update() end
+    end
+  end)
+  if p.mailToggle.SetScript then
+    p.mailToggle:SetScript("OnEnter",function(self)
+      if not GameTooltip then return end
+      GameTooltip:SetOwner(self,"ANCHOR_RIGHT")
+      GameTooltip:SetText(l("Auction-mail import","Импорт аукционной почты"))
+      GameTooltip:AddLine(l("Opt in, then open a mailbox. Only validated invoices are recorded. Unresolved mail is skipped.",
+        "Включите и откройте почту. Только подтверждённые счета записываются, спорные письма пропускаются."),1,1,1,true)
+      GameTooltip:Show()
+    end)
+    p.mailToggle:SetScript("OnLeave",function()if GameTooltip then GameTooltip:Hide()end end)
+  end
   -- Inputs use a shared baseline. Actions and summaries have independent rows.
   p.selection=marketInput(p,20,-55,200)
   p.qty=edit(p,l("Quantity","Количество"),236,-55,92,"1",true)
@@ -80,6 +98,10 @@ function B.journal(root)
   end
   button(p,l("Record BUY","Записать ПОКУПКУ"),20,-125,180,function()record("buy")end)
   button(p,l("Record SELL","Записать ПРОДАЖУ"),211,-125,180,function()record("sell")end)
+  -- First portfolio beta: explicit route from the existing manual journal.
+  button(p,l("Portfolio","Портфель"),402,-125,115,function()
+    A.ShowProTab("portfolio")
+  end)
   p.undo=button(p,l("Undo last trade","Отменить последнюю"),529,-125,180,function()
     local ledger=A.ProJournal()
     if #ledger>0 then A.DeleteJournalTrade(#ledger) end
@@ -128,6 +150,18 @@ function B.journal(root)
 
   -- Compact row rhythm fits eight trades and navigation inside the 557px page.
   p.rows=lineList(p,PAGE_SIZE,-298,25)
+  -- Match the Market Scanner/Portfolio layout: icon at left, text inset 35px.
+  for _,row in ipairs(p.rows) do
+    assert(C.attachProRowIcon)(row,7,21)
+    local label=row:GetFontString()
+    if label then
+      label:ClearAllPoints()
+      label:SetPoint("LEFT",row,"LEFT",36,0)
+      label:SetWidth(652)
+      label:SetJustifyH("LEFT")
+      if label.SetWordWrap then label:SetWordWrap(false) end
+    end
+  end
   p.emptyTitle=fs(p,l("No trades to show","Нет сделок для отображения"),34,-340,660,true)
   p.emptyHint=fs(p,l("Record a purchase or sale above, or change the filters.",
     "Добавьте покупку или продажу выше либо измените фильтры."),34,-364,660)
@@ -166,6 +200,15 @@ function B.journal(root)
     p.filterSummary:SetText(l("Records: ","Записей: ")..#report.entries..
       "    "..l("All open units: ","Общий остаток: ")..report.openUnits..
       (p.filter.onlyItem and not key and l("   Select an item first.","   Сначала выберите предмет.") or ""))
+    if type(A.MailImportState)=="function" then
+      local enabled=A.MailImportState().enabled
+      p.mailToggle:SetText(enabled and l("Auto-mail: ON","Почта: ВКЛ") or
+        l("Auto-mail: OFF","Почта: ВЫКЛ"))
+      local status=A.MailImportLastStatus and A.MailImportLastStatus() or {}
+      p.filterSummary:SetText(p.filterSummary:GetText()..
+        l("   Mail new: ","   Почта новых: ")..tostring(status.imported or 0)..
+        l("   Pending: ","   Пропущено: ")..tostring(status.pending or 0))
+    end
     p.pageText:SetText(l("Page ","Страница ")..page.." / "..pages)
     local empty=#report.entries==0
     if empty then
@@ -179,11 +222,12 @@ function B.journal(root)
       local entry=pageRows[i]
       local row=p.rows[i]
       if entry then
-        local name=A.ProItemName(entry.key)
-        if A.FitItemName then name=A.FitItemName(name,row:GetFontString(),218) or name end
+        local name=assert(C.renderProRowItem)(row,entry.key) or A.ProItemName(entry.key)
+        if A.FitItemName then name=A.FitItemName(name,row:GetFontString(),185) or name end
         local side=entry.kind=="buy" and l("BUY","ПОКУПКА") or l("SELL","ПРОДАЖА")
         local tail=entry.kind=="sell" and ("   P&L "..feeText(entry)) or ""
-        row:SetText(date("%d.%m %H:%M",entry.t).."  "..side.." x"..entry.qty..
+        local fromMail=entry.source=="auction_mail" and l("[MAIL] ","[ПОЧТА] ") or ""
+        row:SetText(fromMail..date("%d.%m %H:%M",entry.t).."  "..side.." x"..entry.qty..
           "  "..name.."  "..currency(entry.price)..tail)
         row:SetScript("OnClick",function()
           fillMarketEdit(p.selection,{key=entry.key,text=A.ProItemName(entry.key)})
@@ -195,11 +239,13 @@ function B.journal(root)
         row:Show()
       else
         row:Hide()
+        C.renderProRowItem(row,nil)
         row:SetScript("OnClick",nil)
         row:SetScript("OnEnter",nil)
       end
     end
   end
   p.update()
+  if C.watchProRowIcons then C.watchProRowIcons(p,p.rows) end
   return p
 end

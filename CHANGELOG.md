@@ -1,3 +1,64 @@
+## 4.5.0 - Stable Trading Portfolio and verified auction-mail accounting
+- Promoted the in-game-tested 4.5.0-beta6 revision. No functional Lua changes except the version constant in Core.lua.
+- Opt-in automatic import of completed Auction House BUY/SELL invoices via the in-game mailbox, with strict field validation and duplicate protection; no collecting attachments or gold.
+- Trading Journal retains manual transactions and records validated mail imports with their source; confirmed gross/net revenue and auction fees are tracked separately from cost-basis profit.
+- Trading Portfolio distinguishes current bag stock, last-known bank contents, known-cost Journal lots and confirmed sales. No double counting across data sources.
+- Per-item Allocation uses a directly selected source, broad progress bars, percentage labels, coverage diagnostics and concentration warnings; stale bank snapshots and prices are identified.
+- Consistent late-loading item icons and readable row layouts in Market Scanner, Portfolio and Trading Journal, with a visible unknown-icon placeholder.
+- Added character-scoped mail-deduplication and inventory-snapshot SavedVariables without resetting existing history, watchlists, recipes, settings or journal data.
+- Limits: no recovery of deleted mail; no assumption that sale revenue is profit without a recorded cost; no direct auction transaction capture without opening the mailbox.
+- WoW Forever interface 16001; last candidate 4.5.0-beta6 passed the in-game regression checklist.
+
+## 4.5.0-beta6 - Resolve missing icons and add Journal item images
+- Fixed name-only item cache entries: texture data continues to load and retry even after the name is available.
+- Shared 21px overlay icon renderer for all Portfolio modes and Trading Journal, matching the Market Scanner item layout.
+- Added a visible '?' placeholder until the real icon arrives, avoiding the thin empty mark seen on some WoW Forever items.
+- Bounded refresh of visible list rows, including pagination/mode switching and clearing hidden entries, without spamming the entire item database.
+- Preserved the existing trade accounting, mail importer, market calculations, saved data and 640px allocation bars.
+- Local beta only: no CurseForge release or tag.
+
+## 4.5.0-beta5 - Portfolio icons and readable allocation bars
+- Added 21px localized item icons to all four Portfolio views: Stock, Sales, Cost Basis and Allocation, using the same metadata source as Market Scanner.
+- Replaced the tiny right-aligned 120x3 allocation line with a high-contrast 640x7 distribution track beneath each item name and value; kept explicit numeric percentages.
+- Split Portfolio rows into a fixed item-name column and a separate right-aligned metrics column to reduce collisions with long localized names.
+- Restored question-mark fallback when item metadata is not yet cached and cleared icons/bars when rows are hidden or modes/pages change.
+- All Portfolio accounting, mail import, existing SavedVariables and published stable release are unchanged.
+- Local-only beta for UI regression tests; no CurseForge publishing.
+
+## 4.5.0-beta4 — Portfolio allocation and source concentration
+- New Portfolio Allocation page with an explicit dropdown: priced bags, last-known bank, open Journal cost or confirmed AH net revenue.
+- Ranked per-item shares, lightweight row bars, top-one and top-three coverage metrics, and hover source details.
+- Alerts for missing/stale quote coverage, 50%+ single-item concentration, and bank snapshots older than 24 hours.
+- Uses one non-overlapping data source per calculation; never mixes cash, physical inventory and journal positions into misleading total capital.
+- Maintains Trading Journal, confirmed mail import, saved data and earlier graphs without migrations.
+- Test-only beta; no CurseForge upload or stable tag.
+
+## 4.5.0-beta3 - Automatic stock and confirmed auction revenue
+- Added bag inventory snapshots independent of crafting tracking and a per-character bank snapshot updated on bank visits.
+- Separate Portfolio modes for physical Stock, confirmed auction Sales and Journal Cost Basis.
+- Confirmed invoice sales report gross receipts, fees and net revenue even without a corresponding purchased lot; unmatched profit remains unknown.
+- Current bag and last-known bank quantities display separately; stale or missing Auctionator quotes do not contribute to valuations.
+- Preserved matched-only weighted average journal profit, manual trades, old records and watched items.
+- Fixed the unreadable 'Mail: 0 / ?0' UI status to show new imports and pending items clearly.
+- SavedVariables compatibility: added only a namespaced per-character portfolio stock snapshot; no forced migration or loss of old data.
+- Game-test beta only; no release tag and no CurseForge upload.
+
+## 4.5.0-beta2 - Opt-in confirmed auction-mail import
+- Added invoice-based auction-mail reading on MAIL_SHOW / MAIL_INBOX_UPDATE in WoW Forever.
+- Auto-imports only fully validated BUY/SELL invoices with unambiguous item ID, count and price; completed sales require positive payout and matching bid/buyout, deposit and commission.
+- An opt-in toggle in the Trading Journal (or /ats mail on/off/scan/status) controls import. No auto-collection of items, money or opening mail text.
+- Mail fingerprints prevent repeated imports; indistinguishable simultaneous mails, pending payouts, uncertain prices and unresolved items are held for diagnostic review.
+- Imported entries are marked as mail-sourced and feed the existing manual-journal portfolio without modifying previous trades.
+- Added mail-specific regression tests. Game-testing beta only; no CurseForge publishing.
+
+## 4.5.0-beta1 - Manual Trading Portfolio foundations
+- Added read-only portfolio accounting from the current character's manual Trading Journal purchases and matched sales.
+- Exposed open quantity, weighted-average cost, invested amount and separate realized/unrealized estimates.
+- Mark-to-market uses real Auctionator history quotes, with a 7-day freshness limit; missing/stale prices are identified and excluded from valuation totals.
+- Added the Portfolio page to the Trading Workstation header and a direct button in the Trading Journal; existing ten tabs remain on two rows.
+- The 4.4.0 SavedVariables schema and calculation semantics are unchanged; no automatic trade capture or inventory assumptions.
+- Local test beta; no CurseForge upload or version tag.
+
 ## 4.4.0 - Stable modular architecture and Trading Journal improvements
 - Promoted the in-game-tested 4.4.0-beta7 sources without gameplay or trading calculation changes.
 - Reorganized Lua modules and split the former ProUI workstation into shared controls, independent pages and a window controller.

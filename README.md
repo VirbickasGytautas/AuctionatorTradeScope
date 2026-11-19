@@ -1,4 +1,38 @@
-# Auctionator TradeScope 4.4.0 — WoW Forever
+# Auctionator TradeScope 4.5.0 — WoW Forever
+
+### 4.5.0 - Stable release: Trading Portfolio and auction-mail accounting
+
+Released from **in-game-tested 4.5.0-beta6**. TradeScope now has a four-mode **Trading Portfolio**: live bag stock and last-visited bank snapshot; **confirmed Auction House sales** including gross receipts, fees and net revenue; **known-cost purchase lots** from the Trading Journal; and **Allocation** by a single chosen source. Allocation includes readable bars, item icons, price-data coverage and concentration warnings. The Trading Journal also displays item icons and marks imported mail entries.
+
+**Auction-mail import is optional**: switch on **Auto-mail** in Trading Journal or run `/ats mail on`, then open a mailbox. The addon reads completed auction invoices when their item, amount and quantity can be verified. It does **not** collect mail attachments or money. Ambiguous/unconfirmed invoices are skipped. Previously deleted mail cannot be recovered.
+
+**Accounting limits:** Revenue is not profit when purchase cost is unknown; bag and bank stock is not assumed to have been bought. Bank counts are labeled *last seen*, market estimates use actual recent Auctionator observations, and priced bags/bank, journal cost and sales revenue are **never summed as one capital figure**. The existing SavedVariables schema remains backward compatible; new, namespaced mail-import and stock records preserve prior history.
+
+Stable promotion changes the version and release documentation only; the functional code is identical to the tested beta6.
+
+### 4.5.0-beta6 - Missing item icons and Journal row icons (local test)
+
+Fixed the item-info cache edge case where a localized name was already known but its icon had not yet loaded. Visible entries in all **Portfolio** modes and the **Trading Journal** now use one 21px icon renderer and bounded asynchronous retries, including late WoW Forever item metadata. Unavailable textures display a visible question-mark placeholder rather than a nearly blank mark. UI pagination preserves the correct icon and clears hidden rows. This beta makes no accounting, auto-mail import, or SavedVariables changes. Not published to CurseForge.
+
+### 4.5.0-beta5 - Portfolio item icons and distribution bars (local test)
+
+All Portfolio pages now show 21px item icons using the same icon metadata lookup as Market Scanner. The Allocation screen has a wide 640x7 distribution bar beneath the item and its explicit value/percentage, instead of a hard-to-see 120x3 marker on the far right. Item names and metrics use separate columns for better localization and pagination. No changes to journal calculations, confirmed sales, bank snapshots, SavedVariables or CurseForge publishing.
+
+### 4.5.0-beta4 — Portfolio allocation and concentration (testing only)
+
+Portfolio gains an **Allocation** screen with directly selectable sources: priced current bags, last-known bank, open Journal purchase cost, or confirmed auction-mail net revenue. Each distribution uses **one source only**, with sorted per-item shares, in-row bars and hover details. Warnings identify missing/stale quote coverage, disproportionate concentration (top item 50%+), and bank snapshots older than 24 hours. Unknown acquisition cost remains unknown. Source totals must not be added together, and allocation shares do not predict profit or risk-adjusted returns. No SavedVariables changes, CurseForge upload or stable tag.
+
+### 4.5.0-beta3 - Physical inventory and confirmed sale revenue (local test)
+
+The Portfolio page now has three distinct views: **Stock** (automatic current bags plus last-known bank snapshots), **Sales** (confirmed Auction House mail receipts, gross and net of fees), and **Cost basis** (the original matched manual/auto Journal lots). A sale without a recorded purchase is counted as revenue, **not** as known profit. Bag holdings are not assumed to be purchased stock: their origin and cost basis remain unknown. Only actual recent Auctionator quotes enter market valuations. The bank is read when opened; bank counts thereafter remain labelled as last observed. No reset of previous data. Build-only beta, not published on CurseForge.
+
+### 4.5.0-beta2 - Optional auction-mail import (local test)
+
+The Trading Journal now has an Auto-mail: OFF/ON toggle. Turn it on, open an in-game mailbox, and the addon checks the game's actual Auction House invoices for confirmed BUY/SELL transactions. The scanner does not take items or money and never edits the mail body. Only transactions with a unique item ID, count, paid/received price and valid fee information are saved; duplicate or ambiguous mails are rejected instead of producing fictional P&L. Use /ats mail scan in the mailbox to display pending reasons, /ats mail status to inspect status and /ats mail off to disable. Old mail that has already been deleted cannot be recovered. Imported rows appear with [MAIL] in the journal and enter Portfolio positions. Default OFF for this testing beta. No CurseForge publication.
+
+### 4.5.0-beta1 - Trading Portfolio preview (local test)
+
+A separate Portfolio view tracks positions created by current-character manual Journal buys and matched sells. It displays quantities, weighted-average purchase cost, invested cost, latest observed Auctionator price, and unrealized estimates net of the configured auction fee. Missing/stale quotes are excluded (7-day maximum age), and partial portfolio estimates are identified. Open it with the Portfolio button in the Trading Workstation header or Trading Journal. **There is no automatic auction transaction import.** This preview does not change SavedVariables and is not published on CurseForge.
 
 ### 4.4.0 - Stable release
 
