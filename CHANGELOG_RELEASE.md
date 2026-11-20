@@ -1,3 +1,10 @@
+## 4.6.0-beta1 - Trading Strategies (local game test only)
+- Read-only strategy research: value watch, exit review with known-cost scenarios, and stock concentration warnings.
+- Transparent freshness/quality/risk gates; unknown data means no candidate, not a made-up signal.
+- Dedicated localized page in the Pro workstation, directly selectable profile and item icons.
+- No purchases, listings, automatic orders, profit guarantees or SavedVariables schema changes.
+- No CurseForge upload.
+
 ## 4.5.0 - Stable Release
 
 ### Trading Portfolio

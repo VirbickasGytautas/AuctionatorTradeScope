@@ -1,4 +1,14 @@
-# Auctionator TradeScope 4.5.0 — WoW Forever
+# Auctionator TradeScope 4.6.0-beta1 — WoW Forever
+
+### 4.6.0-beta1 - Trading Strategies, read-only research preview
+
+A **Strategies** shortcut appears beside Portfolio in the Trading Workstation header, leaving the original 10 tools in their two rows. Three directly selectable profiles provide **evidence-gated research**, not automatic orders:
+
+- **Value watch**: candidates from an explicitly run scanner (not older than 24 hours), with a recent Auctionator quote (within 6 hours), at least 12% below the scanned median, sufficient observation quality, bounded risk, plausible market supply and volatility.
+- **Exit review**: open Journal positions with a known purchase cost and recent observed price. Displays **estimated** net return after auction fees only when estimated ROI is at least 10%. It is not a confirmed sale or guaranteed profit.
+- **Concentration**: an item representing at least 50% of the **valued part of current bags**. Missing/stale prices are excluded and marked; this is a diversification cue, not a sell instruction.
+
+All strategies are read-only and work from existing scanner results, market observations, Journal positions and physical stock snapshots. No transaction automation, no backtest fabricated from snapshots, no new SavedVariables migration. Use Market Scanner's existing scan button to refresh candidates. This beta is for local WoW Forever testing only; CurseForge and `main` remain on stable 4.5.0.
 
 ### 4.5.0 - Stable release: Trading Portfolio and auction-mail accounting
 

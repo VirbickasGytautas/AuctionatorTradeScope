@@ -1,3 +1,12 @@
+## 4.6.0-beta1 - Trading Strategies research foundations
+- New read-only Strategy Research page with a header shortcut, preserving the original ten tool buttons.
+- Value watch: relies on a user-initiated scanner run not older than 24 h and verified quote age <=6 h; requires >=12% median discount, >=8 observations, quality >=55, risk <=55, score >=25, quantity >=3 and observed volatility <=65%.
+- Exit review: existing character's Journal cost positions; actual observed quote <=6 h, estimated ROI after configured fee >=10%; excludes unknown cost and incomplete quotes.
+- Concentration: identifies >=50% exposure within the priced subset of physical bags; shares never include unknown/stale values or assume the bags' acquisition cost.
+- Visible refusal states when sources are unavailable or stale; profile dropdown, row icons, explanatory tooltips and page navigation.
+- No trading automation, no speculative backtest and no modification to past trades or SavedVariables; gameplay testing required before any stable release.
+- 17 Lua regression suites in GitHub Actions. Build-only branch; no CurseForge publication.
+
 ## 4.5.0 - Stable Trading Portfolio and verified auction-mail accounting
 - Promoted the in-game-tested 4.5.0-beta6 revision. No functional Lua changes except the version constant in Core.lua.
 - Opt-in automatic import of completed Auction House BUY/SELL invoices via the in-game mailbox, with strict field validation and duplicate protection; no collecting attachments or gold.
