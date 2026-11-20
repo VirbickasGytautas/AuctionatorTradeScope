@@ -6,6 +6,7 @@ on:
       - main
       - beta/4.4.0-refactor
       - beta/4.5.0-portfolio
+      - beta/4.6.0-strategies
   workflow_dispatch:
 
 permissions:
@@ -40,7 +41,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for test in test-toc test-ui-modules test-craft-batch test-craft-report test-graph-cursor test-journal-analysis test-journal-ui test-dashboard-ui test-portfolio test-portfolio-ui test-mail-import test-portfolio-stock test-portfolio-sales test-portfolio-allocation test-pro-item-icons; do
+          for test in test-toc test-ui-modules test-craft-batch test-craft-report test-graph-cursor test-journal-analysis test-journal-ui test-dashboard-ui test-portfolio test-portfolio-ui test-mail-import test-portfolio-stock test-portfolio-sales test-portfolio-allocation test-pro-item-icons test-strategies test-strategies-ui; do
             echo "Checking $test"
             lua5.1 "scripts/$test.lua"
           done
