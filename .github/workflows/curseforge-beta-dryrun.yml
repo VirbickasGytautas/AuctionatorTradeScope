@@ -58,6 +58,22 @@ jobs:
           for zip in package-artifacts/*.zip; do
             unzip -t "$zip"
           done
+      - name: Create exact source archive for VS Code
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERSION="$(sed -n 's/^## Version:[[:space:]]*//p' AuctionatorTradeScope.toc | tr -d '\r')"
+          test -n "$VERSION"
+          mkdir -p source-artifacts
+          git archive --format=zip --output="source-artifacts/TradeScope_${VERSION}_Source.zip" HEAD
+          unzip -t "source-artifacts/TradeScope_${VERSION}_Source.zip"
+      - name: Preserve VS Code source archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: tradescope-source-build
+          path: source-artifacts/*.zip
+          if-no-files-found: error
+          retention-days: 7
       - name: Preserve dry-run package
         uses: actions/upload-artifact@v4
         with:
