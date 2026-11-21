@@ -848,6 +848,10 @@ end
 
 -- frame = a graph created by NewGraph; singleKind used by the market terminal.
 function A.RenderGraph(frame,key,legacy,singleKind)
+  if A.InCombat and A.InCombat() then
+    if frame then frame:Hide() end
+    return 0
+  end
   A.Init()
   local active={}
   if singleKind then active[1]=singleKind

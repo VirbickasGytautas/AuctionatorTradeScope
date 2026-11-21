@@ -437,6 +437,7 @@ function A.RefreshBalanceWindow()
 end
 
 function A.OpenBalanceWindow()
+  if A.InCombat and A.InCombat() then return end
   A.Init()
   local f=createWindow()
   if UIParent and UIParent.GetWidth and UIParent.GetHeight then
@@ -448,10 +449,12 @@ function A.OpenBalanceWindow()
   return f
 end
 function A.ToggleBalanceWindow()
+  if A.InCombat and A.InCombat() then return end
   if A.balanceFrame and A.balanceFrame:IsShown() then A.balanceFrame:Hide()
   else A.OpenBalanceWindow() end
 end
 function A.ShowBalance()
+  if A.InCombat and A.InCombat() then return end
   -- Coin hover opens a *persistent* window: it remains until closed by user.
   if A.db and A.db.trackBalance then A.OpenBalanceWindow() end
 end

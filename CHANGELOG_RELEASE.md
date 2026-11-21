@@ -1,3 +1,34 @@
+## 4.6.0 — Trading Strategies and Combat UI Safety
+
+### Trading Strategies
+- New read-only research page: Value watch (verified scanner discounts), Exit review (known-cost positions) and Concentration (share of priced bag stock).
+- Displays relevant recent evidence, risk controls and missing-data warnings. Signals do not predict or guarantee a completed trade.
+- Profile dropdown, localized item icons, tooltips and market history links.
+
+### Emergency combat protection
+- On entering combat, all TradeScope-owned windows, popup graphs, delayed crafting previews, minimap tool flyouts, and addon option dialogs close immediately.
+- Opening the addon UI via /ats commands, minimap, chart hovers, wallet shortcuts or Pro buttons is blocked during combat.
+- Windows remain closed after combat; WoW's native windows are left alone.
+
+### Compatibility and release status
+- Preserves Trading Journal, Portfolio, Auctionator history, crafting, alerts, and previously saved data.
+- WoW Forever 1.60.1 (Interface 16001), Lua 5.1.
+- Automated tests passed; in-game testing of this combat patch remains outstanding.
+- CurseForge publication is **not** triggered by the main-branch merge; tagged upload is deferred until explicitly approved.
+
+## 4.6.0-beta2 - Combat Window Safety (local game test)
+- Automatically closes all TradeScope windows, mini tool palettes and floating graphs when combat begins.
+- Prevents the addon UI from opening via buttons, slash commands and tooltip previews during combat.
+- Never restores closed windows after combat; native WoW windows are unaffected.
+- Preserves Trading Strategies beta1 and previously saved data; publishing is deferred.
+
+## 4.6.0-beta1 - Trading Strategies (local game test only)
+- Read-only strategy research: value watch, exit review with known-cost scenarios, and stock concentration warnings.
+- Transparent freshness/quality/risk gates; unknown data means no candidate, not a made-up signal.
+- Dedicated localized page in the Pro workstation, directly selectable profile and item icons.
+- No purchases, listings, automatic orders, profit guarantees or SavedVariables schema changes.
+- No CurseForge upload.
+
 ## 4.5.0 - Stable Release
 
 ### Trading Portfolio

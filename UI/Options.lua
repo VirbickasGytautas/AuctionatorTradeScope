@@ -93,6 +93,7 @@ local function addSlider(f,name,text,x,y,lo,hi,step,field,suffix)
 end
 
 function A.ShowClearConfirmation()
+  if A.InCombat and A.InCombat() then return end
   if type(StaticPopup_Show)~="function" or type(StaticPopupDialogs)~="table" then
     A.Say(A.L.CLEAR_CONFIRM)
     return
@@ -318,6 +319,14 @@ function A.RegisterOptions()
   analysis:SetScript("OnShow",refresh)
   A.options={main=general,charts=charts,analysis=analysis,marketData=marketData,
     appearance=appearance,opacity=opacity,wallet=wallet,trading=trading}
+  -- Prevent addon options panels from reappearing via native Settings in combat.
+  for _,category in pairs(A.options) do
+    if category and category.HookScript then
+      category:HookScript("OnShow",function(self)
+        if A.InCombat and A.InCombat() then self:Hide() end
+      end)
+    end
+  end
   -- Both the modern Settings API and the legacy Interface Options use categories.
   if type(Settings)=="table" and type(Settings.RegisterCanvasLayoutCategory)=="function"
      and type(Settings.RegisterAddOnCategory)=="function" then
@@ -352,6 +361,7 @@ function A.RegisterOptions()
   if type(A.AddProOptions)=="function" then A.AddProOptions(general) end
 end
 function A.OpenOptions()
+  if A.InCombat and A.InCombat() then return end
   A.RegisterOptions()
   local root=A.options.main
   if root.category and Settings and type(Settings.OpenToCategory)=="function" then

@@ -6,6 +6,7 @@ on:
       - main
       - beta/4.4.0-refactor
       - beta/4.5.0-portfolio
+      - beta/4.6.0-strategies
   workflow_dispatch:
 
 permissions:
@@ -40,7 +41,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for test in test-toc test-ui-modules test-craft-batch test-craft-report test-graph-cursor test-journal-analysis test-journal-ui test-dashboard-ui test-portfolio test-portfolio-ui test-mail-import test-portfolio-stock test-portfolio-sales test-portfolio-allocation test-pro-item-icons; do
+          for test in test-toc test-ui-modules test-craft-batch test-craft-report test-graph-cursor test-journal-analysis test-journal-ui test-dashboard-ui test-portfolio test-portfolio-ui test-mail-import test-portfolio-stock test-portfolio-sales test-portfolio-allocation test-pro-item-icons test-strategies test-strategies-ui test-combat; do
             echo "Checking $test"
             lua5.1 "scripts/$test.lua"
           done
@@ -57,6 +58,22 @@ jobs:
           for zip in package-artifacts/*.zip; do
             unzip -t "$zip"
           done
+      - name: Create exact source archive for VS Code
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERSION="$(sed -n 's/^## Version:[[:space:]]*//p' AuctionatorTradeScope.toc | tr -d '\r')"
+          test -n "$VERSION"
+          mkdir -p source-artifacts
+          git archive --format=zip --output="source-artifacts/TradeScope_${VERSION}_Source.zip" HEAD
+          unzip -t "source-artifacts/TradeScope_${VERSION}_Source.zip"
+      - name: Preserve VS Code source archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: tradescope-source-build
+          path: source-artifacts/*.zip
+          if-no-files-found: error
+          retention-days: 7
       - name: Preserve dry-run package
         uses: actions/upload-artifact@v4
         with:

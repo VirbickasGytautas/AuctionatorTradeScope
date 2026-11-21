@@ -57,12 +57,17 @@ local function mainButton()
   return b
 end
 local function openTool(id)
+  if A.InCombat and A.InCombat() then return end
   if id=="balance" then A.ToggleBalanceWindow()
   elseif id=="terminal" then A.ToggleDashboard()
   elseif A.OpenProTool then A.OpenProTool(id) end
 end
 function A.UpdateMinimapButtons()
   if not A.minimapMain then return end
+  if A.InCombat and A.InCombat() then
+    if A.minimapFlyout then A.minimapFlyout:Hide() end
+    return
+  end
   local p=A.db.pro
   if not p.minimapEnabled then
     A.minimapMain:Hide()
@@ -168,10 +173,12 @@ function A.RegisterMinimap()
     text:SetPoint("LEFT",b,"LEFT",34,0);text:SetWidth(87)
     text:SetJustifyH("LEFT");text:SetText(label(key))
     b:SetScript("OnClick",function()
+      if A.InCombat and A.InCombat() then return end
       A.db.pro.minimapExpanded=false;A.UpdateMinimapButtons()
       openTool(key)
     end)
     b:SetScript("OnEnter",function(self)
+      if A.InCombat and A.InCombat() then return end
       background:SetVertexColor(.19,.18,.11,1)
       if GameTooltip then
         GameTooltip:SetOwner(self,"ANCHOR_RIGHT")
@@ -188,6 +195,7 @@ function A.RegisterMinimap()
     A.minimapTools[key]=b
   end
   main:SetScript("OnClick",function(_,button)
+    if A.InCombat and A.InCombat() then return end
     if button=="RightButton" then A.OpenOptions()
     elseif IsShiftKeyDown and IsShiftKeyDown() then A.ToggleDashboard()
     else
@@ -222,6 +230,7 @@ function A.RegisterMinimap()
     A.UpdateMinimapButtons()
   end)
   main:SetScript("OnEnter",function(self)
+    if A.InCombat and A.InCombat() then return end
     if self.iconGlow then self.iconGlow:Show() end
     if not GameTooltip then return end
     GameTooltip:SetOwner(self,"ANCHOR_LEFT")

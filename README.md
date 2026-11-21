@@ -1,4 +1,34 @@
-# Auctionator TradeScope 4.5.0 — WoW Forever
+# Auctionator TradeScope 4.6.0 — WoW Forever
+
+### 4.6.0 — Trading Strategies 2.0 foundation and combat lockdown
+
+This release is built from **4.6.0-beta2** and contains the same feature code. The Trading Workstation has a read-only **Strategies** page with three evidence-based profiles: Value watch, Exit review and Concentration. All scenarios require sufficiently recent and trustworthy observations, and no automatic purchases or listings are made.
+
+**Emergency combat safety:** entering combat immediately closes all TradeScope-owned UI, floating charts, craft previews, addon options and minimap tool flyouts. Combat checks also prevent reopening via slash commands, minimap, coin tooltip and other entry points until combat ends. All windows stay closed until manually reopened afterward. Native WoW UI remains unchanged.
+
+Compatibility: existing Journal, Portfolio, market data, saved recipes, alerts and settings stay intact. The new combat guard does not alter SavedVariables schema or historical accounting. WoW Forever 1.60.1, Lua 5.1.
+
+**Validation status:** Lua 5.1 automated regression suites pass, but 4.6.0 combat behavior and strategy page still require in-game verification before external CurseForge publication. Do not create or push `v4.6.0` until the publisher explicitly authorizes it.
+
+### 4.6.0-beta2 — Emergency automatic combat lockdown
+
+**TradeScope-owned windows close instantly when the player enters combat** (`PLAYER_REGEN_DISABLED`): the market terminal, Pro workstation, portfolio, strategies, coin-history window, floating tooltip graphs and delayed crafting graph previews, minimap tool flyout, and addon configuration dialogs. Existing pending previews and item picking are cancelled.
+
+**During combat** every explicit window-opening path is blocked, including `/ats`, the minimap launcher, market search, Journal/Portfolio/Strategies/other Pro tabs, wallet hover, addon settings, manual graph testing, tooltip charts, and crafting preview timers. Both `InCombatLockdown()` and `UnitAffectingCombat("player")` are used as fallback guards around the combat event.
+
+**After combat:** windows do not re-open automatically; the user may reopen them normally. This fixes the earlier problem where hiding Pro would restore the market terminal. Standard WoW windows and Blizzard item tooltips are intentionally not hidden.
+
+This beta is for in-game testing. The validated 4.6.0-beta1 Trading Strategies remain unchanged; SavedVariables schema is preserved. CurseForge publication is deferred pending explicit authorization.
+
+### 4.6.0-beta1 - Trading Strategies, read-only research preview
+
+A **Strategies** shortcut appears beside Portfolio in the Trading Workstation header, leaving the original 10 tools in their two rows. Three directly selectable profiles provide **evidence-gated research**, not automatic orders:
+
+- **Value watch**: candidates from an explicitly run scanner (not older than 24 hours), with a recent Auctionator quote (within 6 hours), at least 12% below the scanned median, sufficient observation quality, bounded risk, plausible market supply and volatility.
+- **Exit review**: open Journal positions with a known purchase cost and recent observed price. Displays **estimated** net return after auction fees only when estimated ROI is at least 10%. It is not a confirmed sale or guaranteed profit.
+- **Concentration**: an item representing at least 50% of the **valued part of current bags**. Missing/stale prices are excluded and marked; this is a diversification cue, not a sell instruction.
+
+All strategies are read-only and work from existing scanner results, market observations, Journal positions and physical stock snapshots. No transaction automation, no backtest fabricated from snapshots, no new SavedVariables migration. Use Market Scanner's existing scan button to refresh candidates. This beta is for local WoW Forever testing only; CurseForge and `main` remain on stable 4.5.0.
 
 ### 4.5.0 - Stable release: Trading Portfolio and auction-mail accounting
 

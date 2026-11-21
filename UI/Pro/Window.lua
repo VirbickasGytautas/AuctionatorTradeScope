@@ -49,6 +49,8 @@ local helpContent={
  journal={"Enable Auto-mail, then open a mailbox. Completed Auction House invoices are imported when item, amount and quantity are unambiguous. Missing prices, ambiguous items and duplicate-looking mail are skipped. Manual trades, filters, per-sale cost and ROI remain available.","Включите «Почта», затем откройте почтовый ящик. Подтверждённые аукционные счета импортируются при точном определении предмета, суммы и количества. Неполные и похожие письма пропускаются. Ручные сделки, фильтры и прибыль остаются доступны."},
  portfolio={"Portfolio modes: Stock (live bags, last-known bank), Sales (confirmed net revenue), Cost basis (journal lots), Allocation (choose ONE source). Shares use priced values only; large concentration indicates exposure, not predicted loss or profit.",
 "Режимы портфеля: Запасы (сумки и последний банк), Продажи (подтверждённая выручка), Себестоимость (журнал), Распределение (выберите ОДИН источник). Доли считаются по оценённым предметам; высокая концентрация — не прогноз убытка или прибыли."},
+ strategies={"Three read-only research profiles: value watch requires current verified quotes and quality checks, exit review requires known purchase costs, concentration reviews current bag valuations. Strategy outputs are NOT predictions, purchase instructions or automatically placed orders.",
+"Три исследовательских профиля: скидки по проверенным ценам и качеству данных, сценарии выхода только с известной закупкой и концентрация оценённых запасов сумок. Это НЕ прогнозы, торговые приказы или автосделки."},
  craft={"Open a profession and click Scan recipes. Then select a saved recipe by name or output item ID. Crafts sets the batch size. Bag/bank tracking reduces additional purchases, but owned materials still have market value. Bank counts are from its last opening.",
 "Откройте окно профессии и нажмите «Сканировать рецепты». Затем выберите сохранённый рецепт по названию или ID предмета. «Изготовлений» задаёт размер партии. Учёт сумок и банка уменьшает закупки, но свои ресурсы также имеют рыночную стоимость. Данные банка — с последнего открытия."},
  indicators={"Indicators use actual observed time buckets. Missing buckets are never filled. Short histories produce explicitly marked preliminary values, not reliable signals.","Индикаторы используют реальные интервалы наблюдений. Пустые часы не заполняются. При короткой истории значения предварительные, а не надёжные сигналы."},
@@ -119,7 +121,13 @@ local function create()
   local logo=f:CreateTexture(nil,"ARTWORK")
   logo:SetTexture("Interface\\AddOns\\AuctionatorTradeScope\\Media\\Icon")
   logo:SetSize(31,31);logo:SetPoint("TOPLEFT",f,"TOPLEFT",23,-22)
-  f.title=fs(f,"TradeScope | "..l("Trading Workstation","Торговый терминал").."  v"..tostring(A.version or "?"),63,-28,715,true)
+  f.title=fs(f,"TradeScope | "..l("Trading Workstation","Торговый терминал").."  v"..tostring(A.version or "?"),63,-28,560,true)
+  -- Strategies and Portfolio are header shortcuts. The original ten tools
+  -- remain two complete rows, preserving all existing button positions.
+  f.strategiesShortcut=button(f,l("Strategies","Стратегии"),650,-27,136,function()
+    A.ShowProTab("strategies")
+  end,27)
+  if A.StyleButton then A.StyleButton(f.strategiesShortcut,"tab") end
   -- A portfolio shortcut belongs in the header, not a third row that would
   -- overlap the existing tool pages. The original ten tabs are unchanged.
   f.portfolioShortcut=button(f,l("Portfolio","Портфель"),802,-27,136,function()
@@ -182,7 +190,7 @@ local function create()
       if page.sortMenu then page.sortMenu:Hide() end
     end
     if A.HideCraftPreview then A.HideCraftPreview() end
-    if self.restoreDashboard and A.dashboard then
+    if self.restoreDashboard and A.dashboard and not (A.InCombat and A.InCombat()) then
       self.restoreDashboard=false
       A.dashboard:Show()
       if A.RefreshDashboard then A.RefreshDashboard() end
@@ -193,6 +201,7 @@ local function create()
   return f
 end
 function A.ShowProTab(id)
+  if A.InCombat and A.InCombat() then return end
   A.Init()
   local f=create()
   if not builders[id] then id="scanner" end
@@ -244,16 +253,23 @@ function A.ShowProTab(id)
   if f.portfolioShortcut and A.StyleButton then
     A.StyleButton(f.portfolioShortcut,id=="portfolio" and "activeTab" or "tab")
   end
+  if f.strategiesShortcut and A.StyleButton then
+    A.StyleButton(f.strategiesShortcut,id=="strategies" and "activeTab" or "tab")
+  end
   for key,buttonFrame in pairs(f.nav) do
     local chosen=key==id
     if buttonFrame.activeBackground then buttonFrame.activeBackground:Hide() end
     if A.StyleButton then A.StyleButton(buttonFrame,chosen and "activeTab" or "tab") end
   end
 end
+function A.OpenStrategies()
+  A.OpenProTool("strategies")
+end
 function A.OpenPortfolio()
   A.OpenProTool("portfolio")
 end
 function A.OpenProTool(id)
+  if A.InCombat and A.InCombat() then return end
   A.Init()
   local f=create()
   local sx=(UIParent:GetWidth()-22)/WIDTH
@@ -269,6 +285,7 @@ function A.OpenProTool(id)
 end
 -- Open alert configuration for the exact item selected in the market terminal.
 function A.OpenProAlertForItem(key)
+  if A.InCombat and A.InCombat() then return end
   A.OpenProTool("alerts")
   local f=A.proWindow
   local p=f and f.pages and f.pages.alerts
@@ -283,6 +300,7 @@ function A.OpenProAlertForItem(key)
   end
 end
 function A.ToggleProTool(id)
+  if A.InCombat and A.InCombat() then return end
   if A.proWindow and A.proWindow:IsShown() and A.proWindow.active==id then
     A.proWindow:Hide()
   else A.OpenProTool(id) end

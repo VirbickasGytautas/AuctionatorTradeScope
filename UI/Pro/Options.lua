@@ -9,6 +9,9 @@ end
 local function panel(name,desc)
   local p=CreateFrame("Frame",nil,UIParent)
   p.name=name;p:SetSize(635,580);p:Hide();p.controls={}
+  if p.HookScript then p:HookScript("OnShow",function(self)
+    if A.InCombat and A.InCombat() then self:Hide() end
+  end) end
   text(p,name,18,-16,570,true)
   text(p,desc,18,-49,590)
   return p

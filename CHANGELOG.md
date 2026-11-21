@@ -1,3 +1,29 @@
+## 4.6.0 - Trading Strategies and combat UI safety
+- Built from 4.6.0-beta2 without changing Lua business logic; version and documentation only.
+- Trading Strategies page with three read-only research profiles: recent high-quality scanner discounts, estimated known-cost exits, and concentration in currently valued bags.
+- Strict evidence, quote freshness and quality/risk requirements; missing data yields no signal.
+- Emergency combat lockdown: PLAYER_REGEN_DISABLED immediately closes all TradeScope-owned windows, floating charts, crafting previews, tool flyouts and addon options; no UI opening via addon APIs during combat.
+- Restoring the market terminal when Pro closes is explicitly disabled during combat. Native Blizzard windows and item tooltips are not affected.
+- No automated Auction House actions; no SavedVariables migration, import or destructive changes.
+- Automated CI tested: 18 Lua 5.1 suites, complete TOC validation and ZIP integrity. In-game verification pending before CurseForge tag/publication.
+
+## 4.6.0-beta2 - Emergency combat lockdown and UI safety
+- New Engine/Combat.lua listens for PLAYER_REGEN_DISABLED/ENABLED and immediately dismisses every TradeScope-owned top-level window: Dashboard, Pro tools, wallet, floating graphs, craft preview, minimap flyout, addon configuration and confirmation dialogs.
+- Pro's OnHide cannot re-open the dashboard during combat; queued craft previews and automatic hover graphs are cancelled.
+- Blocks all manual opening methods and /ats UI commands during combat, with UnitAffectingCombat and InCombatLockdown fallbacks. Native WoW windows/item tooltips remain untouched.
+- Windows never auto-reopen at combat end. No transaction, scanner, strategies, market history or SavedVariables changes.
+- Added Lua 5.1 combat regression including event transitions, no-restore, option panels, stock popups and complete UI entry-point coverage.
+- Build-only beta branch; no CurseForge tag or publication.
+
+## 4.6.0-beta1 - Trading Strategies research foundations
+- New read-only Strategy Research page with a header shortcut, preserving the original ten tool buttons.
+- Value watch: relies on a user-initiated scanner run not older than 24 h and verified quote age <=6 h; requires >=12% median discount, >=8 observations, quality >=55, risk <=55, score >=25, quantity >=3 and observed volatility <=65%.
+- Exit review: existing character's Journal cost positions; actual observed quote <=6 h, estimated ROI after configured fee >=10%; excludes unknown cost and incomplete quotes.
+- Concentration: identifies >=50% exposure within the priced subset of physical bags; shares never include unknown/stale values or assume the bags' acquisition cost.
+- Visible refusal states when sources are unavailable or stale; profile dropdown, row icons, explanatory tooltips and page navigation.
+- No trading automation, no speculative backtest and no modification to past trades or SavedVariables; gameplay testing required before any stable release.
+- 17 Lua regression suites in GitHub Actions. Build-only branch; no CurseForge publication.
+
 ## 4.5.0 - Stable Trading Portfolio and verified auction-mail accounting
 - Promoted the in-game-tested 4.5.0-beta6 revision. No functional Lua changes except the version constant in Core.lua.
 - Opt-in automatic import of completed Auction House BUY/SELL invoices via the in-game mailbox, with strict field validation and duplicate protection; no collecting attachments or gold.

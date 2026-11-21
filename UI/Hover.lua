@@ -14,6 +14,10 @@ local function clearState()
   A.Hide()
 end
 local function tick()
+  if A.InCombat and A.InCombat() then
+    if A.graph and A.graph.IsShown and A.graph:IsShown() then A.Hide() end
+    return
+  end
   A.Init()
   if A.craftPreviewActive then return end
   if not A.db.enabled then clearState();return end
