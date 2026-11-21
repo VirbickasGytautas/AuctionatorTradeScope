@@ -1,4 +1,14 @@
-# Auctionator TradeScope 4.6.0-beta2 — WoW Forever
+# Auctionator TradeScope 4.6.0 — WoW Forever
+
+### 4.6.0 — Trading Strategies 2.0 foundation and combat lockdown
+
+This release is built from **4.6.0-beta2** and contains the same feature code. The Trading Workstation has a read-only **Strategies** page with three evidence-based profiles: Value watch, Exit review and Concentration. All scenarios require sufficiently recent and trustworthy observations, and no automatic purchases or listings are made.
+
+**Emergency combat safety:** entering combat immediately closes all TradeScope-owned UI, floating charts, craft previews, addon options and minimap tool flyouts. Combat checks also prevent reopening via slash commands, minimap, coin tooltip and other entry points until combat ends. All windows stay closed until manually reopened afterward. Native WoW UI remains unchanged.
+
+Compatibility: existing Journal, Portfolio, market data, saved recipes, alerts and settings stay intact. The new combat guard does not alter SavedVariables schema or historical accounting. WoW Forever 1.60.1, Lua 5.1.
+
+**Validation status:** Lua 5.1 automated regression suites pass, but 4.6.0 combat behavior and strategy page still require in-game verification before external CurseForge publication. Do not create or push `v4.6.0` until the publisher explicitly authorizes it.
 
 ### 4.6.0-beta2 — Emergency automatic combat lockdown
 

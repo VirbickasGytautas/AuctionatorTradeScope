@@ -1,3 +1,12 @@
+## 4.6.0 - Trading Strategies and combat UI safety
+- Built from 4.6.0-beta2 without changing Lua business logic; version and documentation only.
+- Trading Strategies page with three read-only research profiles: recent high-quality scanner discounts, estimated known-cost exits, and concentration in currently valued bags.
+- Strict evidence, quote freshness and quality/risk requirements; missing data yields no signal.
+- Emergency combat lockdown: PLAYER_REGEN_DISABLED immediately closes all TradeScope-owned windows, floating charts, crafting previews, tool flyouts and addon options; no UI opening via addon APIs during combat.
+- Restoring the market terminal when Pro closes is explicitly disabled during combat. Native Blizzard windows and item tooltips are not affected.
+- No automated Auction House actions; no SavedVariables migration, import or destructive changes.
+- Automated CI tested: 18 Lua 5.1 suites, complete TOC validation and ZIP integrity. In-game verification pending before CurseForge tag/publication.
+
 ## 4.6.0-beta2 - Emergency combat lockdown and UI safety
 - New Engine/Combat.lua listens for PLAYER_REGEN_DISABLED/ENABLED and immediately dismisses every TradeScope-owned top-level window: Dashboard, Pro tools, wallet, floating graphs, craft preview, minimap flyout, addon configuration and confirmation dialogs.
 - Pro's OnHide cannot re-open the dashboard during combat; queued craft previews and automatic hover graphs are cancelled.
