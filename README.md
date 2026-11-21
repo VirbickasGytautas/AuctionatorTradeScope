@@ -1,4 +1,14 @@
-# Auctionator TradeScope 4.6.0-beta1 — WoW Forever
+# Auctionator TradeScope 4.6.0-beta2 — WoW Forever
+
+### 4.6.0-beta2 — Emergency automatic combat lockdown
+
+**TradeScope-owned windows close instantly when the player enters combat** (`PLAYER_REGEN_DISABLED`): the market terminal, Pro workstation, portfolio, strategies, coin-history window, floating tooltip graphs and delayed crafting graph previews, minimap tool flyout, and addon configuration dialogs. Existing pending previews and item picking are cancelled.
+
+**During combat** every explicit window-opening path is blocked, including `/ats`, the minimap launcher, market search, Journal/Portfolio/Strategies/other Pro tabs, wallet hover, addon settings, manual graph testing, tooltip charts, and crafting preview timers. Both `InCombatLockdown()` and `UnitAffectingCombat("player")` are used as fallback guards around the combat event.
+
+**After combat:** windows do not re-open automatically; the user may reopen them normally. This fixes the earlier problem where hiding Pro would restore the market terminal. Standard WoW windows and Blizzard item tooltips are intentionally not hidden.
+
+This beta is for in-game testing. The validated 4.6.0-beta1 Trading Strategies remain unchanged; SavedVariables schema is preserved. CurseForge publication is deferred pending explicit authorization.
 
 ### 4.6.0-beta1 - Trading Strategies, read-only research preview
 

@@ -1,3 +1,11 @@
+## 4.6.0-beta2 - Emergency combat lockdown and UI safety
+- New Engine/Combat.lua listens for PLAYER_REGEN_DISABLED/ENABLED and immediately dismisses every TradeScope-owned top-level window: Dashboard, Pro tools, wallet, floating graphs, craft preview, minimap flyout, addon configuration and confirmation dialogs.
+- Pro's OnHide cannot re-open the dashboard during combat; queued craft previews and automatic hover graphs are cancelled.
+- Blocks all manual opening methods and /ats UI commands during combat, with UnitAffectingCombat and InCombatLockdown fallbacks. Native WoW windows/item tooltips remain untouched.
+- Windows never auto-reopen at combat end. No transaction, scanner, strategies, market history or SavedVariables changes.
+- Added Lua 5.1 combat regression including event transitions, no-restore, option panels, stock popups and complete UI entry-point coverage.
+- Build-only beta branch; no CurseForge tag or publication.
+
 ## 4.6.0-beta1 - Trading Strategies research foundations
 - New read-only Strategy Research page with a header shortcut, preserving the original ten tool buttons.
 - Value watch: relies on a user-initiated scanner run not older than 24 h and verified quote age <=6 h; requires >=12% median discount, >=8 observations, quality >=55, risk <=55, score >=25, quantity >=3 and observed volatility <=65%.

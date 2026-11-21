@@ -1,3 +1,9 @@
+## 4.6.0-beta2 - Combat Window Safety (local game test)
+- Automatically closes all TradeScope windows, mini tool palettes and floating graphs when combat begins.
+- Prevents the addon UI from opening via buttons, slash commands and tooltip previews during combat.
+- Never restores closed windows after combat; native WoW windows are unaffected.
+- Preserves Trading Strategies beta1 and previously saved data; publishing is deferred.
+
 ## 4.6.0-beta1 - Trading Strategies (local game test only)
 - Read-only strategy research: value watch, exit review with known-cost scenarios, and stock concentration warnings.
 - Transparent freshness/quality/risk gates; unknown data means no candidate, not a made-up signal.
