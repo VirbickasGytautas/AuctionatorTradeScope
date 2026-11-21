@@ -1,6 +1,6 @@
 -- Auctionator TradeScope 4.1.0 -- WoW Forever / Lua 5.1
 -- A fresh standalone addon; no legacy history is imported.
-ATS = { version = "4.6.0-beta1", source = "none" }
+ATS = { version = "4.6.0-beta2", source = "none" }
 local A = ATS
 _G.AuctionatorTradeScope = A
 
@@ -261,6 +261,19 @@ SLASH_AUCTIONATORTRADESCOPE1 = "/ats"
 SlashCmdList.AUCTIONATORTRADESCOPE = function(message)
   A.Init()
   local command, argument = string.match(message or "", "^(%S*)%s*(.-)$")
+  -- /ats mail controls and status still work, but no UI may open in combat.
+  local mayOpen=command=="" or command=="show" or command=="toggle" or
+    command=="options" or command=="config" or command=="balance" or
+    command=="wallet" or command=="scanner" or command=="alerts" or
+    command=="candles" or command=="activity" or command=="journal" or
+    command=="craft" or command=="indicators" or command=="heatmap" or
+    command=="quality" or command=="workspace" or command=="craftscan" or
+    command=="strategies" or command=="portfolio" or command=="pro" or
+    command=="tools" or command=="test" or command=="clear" or
+    (command~="mail" and command~="stock" and command~="status" and
+      command~="hours" and command~="add" and command~="watch" and
+      command~="help")
+  if mayOpen and A.InCombat and A.InCombat() then return end
   if command == "options" or command == "config" then
     A.OpenOptions()
   elseif command == "balance" or command == "wallet" then
@@ -268,7 +281,8 @@ SlashCmdList.AUCTIONATORTRADESCOPE = function(message)
   elseif command == "scanner" or command == "alerts" or command == "candles" or
          command == "activity" or command == "journal" or command == "craft" or
          command == "indicators" or command == "heatmap" or command == "quality" or
-         command == "workspace" or command == "craftscan" then
+         command == "workspace" or command == "craftscan" or
+         command == "strategies" or command == "portfolio" then
     if A.OpenProTool then A.OpenProTool(command == "workspace" and "craftscan" or command) end
   elseif command == "pro" or command == "tools" then
     if A.OpenProTool then A.OpenProTool("scanner") end

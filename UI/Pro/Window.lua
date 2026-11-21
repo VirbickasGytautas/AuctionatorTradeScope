@@ -190,7 +190,7 @@ local function create()
       if page.sortMenu then page.sortMenu:Hide() end
     end
     if A.HideCraftPreview then A.HideCraftPreview() end
-    if self.restoreDashboard and A.dashboard then
+    if self.restoreDashboard and A.dashboard and not (A.InCombat and A.InCombat()) then
       self.restoreDashboard=false
       A.dashboard:Show()
       if A.RefreshDashboard then A.RefreshDashboard() end
@@ -201,6 +201,7 @@ local function create()
   return f
 end
 function A.ShowProTab(id)
+  if A.InCombat and A.InCombat() then return end
   A.Init()
   local f=create()
   if not builders[id] then id="scanner" end
@@ -268,6 +269,7 @@ function A.OpenPortfolio()
   A.OpenProTool("portfolio")
 end
 function A.OpenProTool(id)
+  if A.InCombat and A.InCombat() then return end
   A.Init()
   local f=create()
   local sx=(UIParent:GetWidth()-22)/WIDTH
@@ -283,6 +285,7 @@ function A.OpenProTool(id)
 end
 -- Open alert configuration for the exact item selected in the market terminal.
 function A.OpenProAlertForItem(key)
+  if A.InCombat and A.InCombat() then return end
   A.OpenProTool("alerts")
   local f=A.proWindow
   local p=f and f.pages and f.pages.alerts
@@ -297,6 +300,7 @@ function A.OpenProAlertForItem(key)
   end
 end
 function A.ToggleProTool(id)
+  if A.InCombat and A.InCombat() then return end
   if A.proWindow and A.proWindow:IsShown() and A.proWindow.active==id then
     A.proWindow:Hide()
   else A.OpenProTool(id) end

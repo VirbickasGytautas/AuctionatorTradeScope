@@ -39,6 +39,7 @@ function A.DeferCraftPreview()
   if f and f:IsShown() then f.leaveAt=GetTime()+0.85 end
 end
 function A.ShowCraftPreview(source,id)
+  if A.InCombat and A.InCombat() then return end
   if not source or not id then return end
   A.Init()
   if A.db.enabled==false or A.db.showTooltip==false then return end
@@ -111,6 +112,7 @@ end
 -- available at once. The delayed graph opens only if the same source is still
 -- hovered after the user's existing graphDelay setting has elapsed.
 function A.ScheduleCraftPreview(source,id)
+  if A.InCombat and A.InCombat() then return end
   if not source or not id then return end
   A.Init()
   if A.db.enabled==false or A.db.showTooltip==false then return end
@@ -148,6 +150,7 @@ craftPreviewDelayWorker:SetScript("OnUpdate",function(self,dt)
 end)
 
 function A.Draw(tooltip,key,isTest,legacy)
+  if A.InCombat and A.InCombat() then A.Hide();return end
   if not A.db.showTooltip and not isTest then A.Hide();return end
   if not A.graph then A.graph=A.NewGraph(UIParent) end
   local frame=A.graph

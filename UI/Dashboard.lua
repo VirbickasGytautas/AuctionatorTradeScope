@@ -95,6 +95,7 @@ local function signalColor(sig)
 end
 
 function A.SelectItem(raw)
+  if A.InCombat and A.InCombat() then return false end
   local key,legacy,link=parseItem(raw)
   if not key then return false end
   local f=A.dashboard
@@ -521,6 +522,7 @@ function A.RefreshDashboard()
   end
 end
 local function show()
+  if A.InCombat and A.InCombat() then return end
   local f=create()
   local sx=(UIParent:GetWidth()-25)/WIDTH
   local sy=(UIParent:GetHeight()-25)/HEIGHT
@@ -530,6 +532,7 @@ local function show()
   return f
 end
 function A.ToggleDashboard()
+  if A.InCombat and A.InCombat() then return end
   A.Init()
   local f=create()
   if f:IsShown() then f:Hide();A.bagPicking=false;return end
@@ -538,6 +541,7 @@ function A.ToggleDashboard()
   if key and link then A.SelectItem(link) end
 end
 function A.OpenDashboardItem(raw)
+  if A.InCombat and A.InCombat() then return end
   show()
   if not A.SelectItem(raw) then A.Say(A.L.SELECT_ITEM) end
 end
@@ -545,6 +549,7 @@ end
 -- Preserve the exact scan-history DB key when navigating from Pro scanner.
 -- Resolving a bare item ID alone may select a different item variant.
 function A.OpenDashboardScanKey(key)
+  if A.InCombat and A.InCombat() then return end
   if type(key)~="string" or not A.ProItemLink then return end
   local link=A.ProItemLink(key)
   if not link then return end
