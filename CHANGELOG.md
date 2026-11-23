@@ -1,9 +1,13 @@
-## 5.0.0 — stable package prepared (not published)
-- Promoted from 5.0.0-rc1 after five confirmed in-game smoke checks.
-- Game-facing code and calculations unchanged except displayed version.
-- All 28 local TeX Lua tests pass. Lua 5.1 CI still requires an isolated branch push.
-- No release tag, CurseForge deployment, SavedVariables reset or automatic trading.
+## 5.0.0 — Stable release (published 23 November 2026)
+- Promoted from the game-tested 5.0.0-rc1; functional Lua code unchanged except version metadata.
+- Unified TradeScope window, consolidated Activity / Quality page, improved crafting navigation and OHLC chart layout.
+- Confirmed 7 beta7 gameplay checks plus 5 RC1 smoke checks.
+- GitHub Actions [Build Only #45140016911](https://github.com/VirbickasGytautas/AuctionatorTradeScope/actions/runs/45140016911): all 28 Lua 5.1 regression tests, syntax checks and ZIP packaging passed.
+- Tag [`v5.0.0`](https://github.com/VirbickasGytautas/AuctionatorTradeScope/tree/v5.0.0) published from main commit `986ced9`; [CurseForge upload workflow #45141207710](https://github.com/VirbickasGytautas/AuctionatorTradeScope/actions/runs/45141207710) succeeded.
+- SavedVariables and existing market, crafting, portfolio and journal data preserved; no automatic trading.
 
+### Historical pre-release entries
+Older notes below describe the validation stages **before** the 5.0.0 stable release. Their pending status statements are historical.
 ## 5.0.0-rc1 — Pre-release candidate (not published)
 - Identical functionality to game-tested 5.0.0-beta7; only version strings change in game modules.
 - Expanded Build Only validation from 20 selected checks to all test scripts, with Lua 5.1 syntax verification.
