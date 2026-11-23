@@ -1,9 +1,14 @@
-## 5.0.0 — stable package prepared (not published)
-- Promoted from 5.0.0-rc1 after five confirmed in-game smoke checks.
-- Game-facing code and calculations unchanged except displayed version.
-- All 28 local TeX Lua tests pass. Lua 5.1 CI still requires an isolated branch push.
-- No release tag, CurseForge deployment, SavedVariables reset or automatic trading.
+## 5.0.0 — Stable release (published 23 November 2026)
+- Promoted from user-tested `5.0.0-rc1` without changes to game behavior other than version metadata.
+- A single unified TradeScope window, contextual help, embedded Terminal and Gold History, combined Activity / Quality page, improved charts and crafting navigation.
+- Seven beta7 gameplay checks and five RC1 smoke checks confirmed in WoW Forever.
+- GitHub Actions on `main` passed **28 Lua 5.1 test suites**, `luac5.1` syntax validation and ZIP packaging (run [45140016911](https://github.com/VirbickasGytautas/AuctionatorTradeScope/actions/runs/45140016911)).
+- Git tag [`v5.0.0`](https://github.com/VirbickasGytautas/AuctionatorTradeScope/tree/v5.0.0) points to commit `986ced9`.
+- CurseForge publishing workflow [45141207710](https://github.com/VirbickasGytautas/AuctionatorTradeScope/actions/runs/45141207710) succeeded, including the tagged upload of `AuctionatorTradeScope-v5.0.0-forever.zip` for WoW Forever 1.60.1.
+- Existing SavedVariables, price history, journal, portfolio and crafting calculations are preserved. No automatic trading.
 
+### Historical candidate details
+The following entries describe earlier *unpublished candidates* when they were under test; their pending release gates no longer apply to the current 5.0.0 stable release.
 ## 5.0.0-rc1 — Pre-release candidate (not published)
 - Identical functionality to game-tested 5.0.0-beta7; only version strings change in game modules.
 - Expanded Build Only validation from 20 selected checks to all test scripts, with Lua 5.1 syntax verification.
