@@ -249,7 +249,7 @@ function B.alerts(root)
   p.status=fs(p,"",20,-248,700)
   p.status:SetTextColor(.80,.91,.98)
   p.selectedRule=nil;p.rulePage=1;p.historyPage=1
-  local perPage=3
+  local perPage=4
   local function applyRule()
     local entered=p.selection:GetText() or ""
     local key=itemKey(p.selection)
@@ -305,10 +305,10 @@ function B.alerts(root)
   header1:SetTextColor(1,.76,.21)
   local function itemRow(y)
     local b=CreateFrame("Button",nil,p)
-    b:SetSize(696,26);b:SetPoint("TOPLEFT",p,"TOPLEFT",20,y)
-    b.background=tex(b,0,0,696,26,.11,.15,.17,.68)
+    b:SetSize(902,26);b:SetPoint("TOPLEFT",p,"TOPLEFT",20,y)
+    b.background=tex(b,0,0,902,26,.11,.15,.17,.68)
     local label=b:CreateFontString(nil,"ARTWORK","GameFontHighlightSmall")
-    label:SetPoint("LEFT",b,"LEFT",9,0);label:SetWidth(675);label:SetJustifyH("LEFT")
+    label:SetPoint("LEFT",b,"LEFT",9,0);label:SetWidth(884);label:SetJustifyH("LEFT")
     b.label=label
     b:SetScript("OnEnter",function(self)self.background:SetVertexColor(.26,.23,.12,.9)end)
     b:SetScript("OnLeave",function(self)
@@ -320,27 +320,27 @@ function B.alerts(root)
   end
   p.ruleRows={}
   for i=1,perPage do p.ruleRows[i]=itemRow(-289-(i-1)*29) end
-  button(p,l("< Rules","< Правила"),20,-378,106,function()
+  button(p,l("< Rules","< Правила"),20,-413,106,function()
     p.rulePage=math.max(1,p.rulePage-1);p.update()
   end)
-  button(p,l("Rules >","Правила >"),138,-378,106,function()
+  button(p,l("Rules >","Правила >"),138,-413,106,function()
     p.rulePage=p.rulePage+1;p.update()
   end)
-  p.rulePageLabel=fs(p,"",259,-386,441)
-  local header2=fs(p,l("NOTIFICATION HISTORY (select to view item)","ИСТОРИЯ СИГНАЛОВ (нажмите для просмотра)"),20,-414,700)
+  p.rulePageLabel=fs(p,"",259,-421,441)
+  local header2=fs(p,l("NOTIFICATION HISTORY (select to view item)","ИСТОРИЯ СИГНАЛОВ (нажмите для просмотра)"),20,-455,890)
   header2:SetTextColor(1,.76,.21)
   p.historyRows={}
-  for i=1,3 do p.historyRows[i]=itemRow(-438-(i-1)*27) end
-  button(p,l("< History","< История"),20,-525,110,function()
+  for i=1,4 do p.historyRows[i]=itemRow(-478-(i-1)*27) end
+  button(p,l("< History","< История"),20,-590,110,function()
     p.historyPage=math.max(1,p.historyPage-1);p.update()
   end)
-  button(p,l("History >","История >"),145,-525,110,function()
+  button(p,l("History >","История >"),145,-590,110,function()
     p.historyPage=p.historyPage+1;p.update()
   end)
-  button(p,l("Clear history","Очистить историю"),462,-525,168,function()
+  button(p,l("Clear history","Очистить историю"),732,-590,168,function()
     A.ClearSmartAlertHistory();p.historyPage=1;p.update()
   end)
-  p.historyPageLabel=fs(p,"",269,-531,185)
+  p.historyPageLabel=fs(p,"",269,-597,185)
   p.update=function()
     if p.selectedRule and not p.selectedRule.legacy then
       if p.selectedRule.enabled then
@@ -389,11 +389,11 @@ function B.alerts(root)
     end
     local logs=A.GetSmartAlertHistory()
     local count=#logs
-    local hpages=math.max(1,math.ceil(count/3))
+    local hpages=math.max(1,math.ceil(count/#p.historyRows))
     p.historyPage=math.max(1,math.min(p.historyPage,hpages))
     p.historyPageLabel:SetText(string.format(l("Page %d/%d", "Стр. %d/%d"),p.historyPage,hpages))
     for i=1,#p.historyRows do
-      local entry=logs[(p.historyPage-1)*3+i]
+      local entry=logs[(p.historyPage-1)*#p.historyRows+i]
       local b=p.historyRows[i]
       if entry then
         b.label:SetText(date("%d.%m %H:%M",entry.t).."  "..A.ProItemName(entry.key).."  | "..

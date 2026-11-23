@@ -109,8 +109,8 @@ function B.journal(root)
   end)
 
   -- Same quiet gold-toned summary as the market scanner, without overlapping buttons.
-  tex(p,18,-159,698,50,.055,.075,.095,.73)
-  tex(p,18,-159,698,1,.49,.36,.15,.65)
+  tex(p,18,-159,900,50,.055,.075,.095,.73)
+  tex(p,18,-159,900,1,.49,.36,.15,.65)
   p.total=fs(p,"",25,-165,686,true)
   p.summary=fs(p,"",25,-187,686)
   fs(p,l("FILTER TRANSACTIONS","ФИЛЬТРЫ СДЕЛОК"),20,-213,690)
@@ -146,12 +146,13 @@ function B.journal(root)
     resetPage()
   end)
   p.filterSummary=fs(p,"",20,-266,696)
-  tex(p,20,-284,696,1,.43,.34,.17,.60)
+  tex(p,20,-284,900,1,.43,.34,.17,.60)
 
   -- Compact row rhythm fits eight trades and navigation inside the 557px page.
-  p.rows=lineList(p,PAGE_SIZE,-298,25)
+  p.rows=lineList(p,PAGE_SIZE,-298,35)
   -- Match the Market Scanner/Portfolio layout: icon at left, text inset 35px.
   for _,row in ipairs(p.rows) do
+    -- Existing row height (26) and wider 35px rhythm preserve legacy UI mocks.
     assert(C.attachProRowIcon)(row,7,21)
     local label=row:GetFontString()
     if label then
@@ -165,11 +166,11 @@ function B.journal(root)
   p.emptyTitle=fs(p,l("No trades to show","Нет сделок для отображения"),34,-340,660,true)
   p.emptyHint=fs(p,l("Record a purchase or sale above, or change the filters.",
     "Добавьте покупку или продажу выше либо измените фильтры."),34,-364,660)
-  p.prev=button(p,l("< Prev","< Назад"),20,-520,120,function()
+  p.prev=button(p,l("< Prev","< Назад"),20,-611,120,function()
     if p.pageIndex>1 then p.pageIndex=p.pageIndex-1;p.update() end
   end)
-  p.pageText=fs(p,"",156,-527,285)
-  p.next=button(p,l("Next >","Вперёд >"),591,-520,117,function()
+  p.pageText=fs(p,"",156,-618,285)
+  p.next=button(p,l("Next >","Вперёд >"),797,-611,117,function()
     p.pageIndex=p.pageIndex+1;p.update()
   end)
 

@@ -141,13 +141,13 @@ function B.portfolio(root)
       end)
   end
   button(p,l("Journal","Журнал"),634,-53,77,function()A.ShowProTab("journal")end)
-  p.subtitle=fs(p,"",20,-94,696)
-  tex(p,18,-113,695,103,.063,.085,.107,.78)
-  tex(p,18,-113,695,1,.48,.37,.19,.73)
-  p.sales=fs(p,"",25,-121,685,true)
-  p.revenue=fs(p,"",25,-148,685)
-  p.profit=fs(p,"",25,-174,685)
-  p.stock=fs(p,"",25,-200,685)
+  p.subtitle=fs(p,"",20,-94,895)
+  tex(p,18,-113,900,103,.063,.085,.107,.78)
+  tex(p,18,-113,900,1,.48,.37,.19,.73)
+  p.sales=fs(p,"",25,-121,885,true)
+  p.revenue=fs(p,"",25,-148,885)
+  p.profit=fs(p,"",25,-174,885)
+  p.stock=fs(p,"",25,-200,885)
   p.section=fs(p,"",20,-231,486,true)
   p.allocationSource=assert(C.dropdown)(p,l("ALLOCATION BASIS","ОСНОВА РАСПРЕДЕЛЕНИЯ"),
     510,-225,200,{
@@ -159,30 +159,31 @@ function B.portfolio(root)
       p.allocationBasis=value;p.pageIndex=1;p.update()
     end)
   p.allocationSource:Hide()
-  tex(p,20,-250,693,1,.43,.33,.16,.64)
-  p.rows=lineList(p,PAGE_SIZE,-263,32)
+  tex(p,20,-250,899,1,.43,.33,.16,.64)
+  p.rows=lineList(p,PAGE_SIZE,-263,48)
   -- Shared portfolio row layout, matching the Market Scanner's 21px item icon.
   -- Keep the item name and metrics in separate columns; Allocation alone adds
   -- a full-width, 7px distribution bar below the headline.
   local ICON_SIZE=21
-  local BAR_WIDTH,BAR_HEIGHT=640,7
+  local BAR_WIDTH,BAR_HEIGHT=840,7
   local UNKNOWN_ICON="Interface\\Icons\\INV_Misc_QuestionMark"
   p.allocationBars={}
   for i,row in ipairs(p.rows) do
+    row:SetHeight(43)
     assert(C.attachProRowIcon)(row,7,ICON_SIZE)
 
     local title=row:GetFontString()
     if title then
       title:ClearAllPoints()
       title:SetPoint("TOPLEFT",row,"TOPLEFT",36,-7)
-      title:SetWidth(245)
+      title:SetWidth(400)
       title:SetJustifyH("LEFT")
       if title.SetWordWrap then title:SetWordWrap(false) end
     end
     row.itemTitle=title
     local metrics=row:CreateFontString(nil,"ARTWORK","GameFontHighlightSmall")
     metrics:SetPoint("TOPRIGHT",row,"TOPRIGHT",-11,-7)
-    metrics:SetWidth(385)
+    metrics:SetWidth(420)
     metrics:SetJustifyH("RIGHT")
     if metrics.SetWordWrap then metrics:SetWordWrap(false) end
     row.itemMetrics=metrics
@@ -201,12 +202,12 @@ function B.portfolio(root)
     p.allocationBars[i]={track=track,fill=fill,width=BAR_WIDTH,height=BAR_HEIGHT}
   end
   p.empty=fs(p,"",25,-323,674)
-  p.note=fs(p,"",20,-466,693)
-  p.prev=button(p,l("< Back","< Назад"),20,-515,126,function()
+  p.note=fs(p,"",20,-564,900)
+  p.prev=button(p,l("< Back","< Назад"),20,-611,126,function()
     if p.pageIndex>1 then p.pageIndex=p.pageIndex-1;p.update() end
   end)
-  p.pageText=fs(p,"",162,-521,270)
-  p.next=button(p,l("Next >","Вперёд >"),584,-515,126,function()
+  p.pageText=fs(p,"",162,-618,270)
+  p.next=button(p,l("Next >","Вперёд >"),790,-611,126,function()
     p.pageIndex=p.pageIndex+1;p.update()
   end)
   p.update=function()

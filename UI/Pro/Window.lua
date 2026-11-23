@@ -42,10 +42,14 @@ local miniLine=C.miniLine
 local attachIndicatorCursor=C.attachIndicatorCursor
 
 local helpContent={
+ terminal={"Choose an item by ID, link, name, bag or watchlist. Compare historical quotes, supply and estimated decline; wheel zooms the chart. Quotes do not confirm sales.",
+  "Выберите предмет по ID, ссылке, названию, из сумки или списка наблюдения. Сравнивайте историю цен и предложения; колесо меняет масштаб графика. Наблюдения не подтверждают сделки."},
+ balance={"Optional history of your character's observed gold balance. Day, week and month change the period; cursor shows the last known value, not a continuous measured balance.",
+  "История наблюдений золота персонажа. День, неделя и месяц меняют период; курсор показывает последнее известное значение, а не непрерывные замеры."},
  scanner={"Find quotes below their observed median. Opportunity Score combines discount, data quality, freshness, volatility, quantity and evidence. Risk Score measures uncertainty, not sale probability. Configure filters under Market Scanner 2.0.","Поиск цен ниже исторической медианы. Рейтинг учитывает скидку, качество, свежесть, волатильность и количество. Риск оценивает неопределённость, не вероятность продажи. Фильтры — в настройках Сканера 2.0."},
  alerts={"Choose a condition: price threshold, deviation from median, price change, supply reduction, volatility or Opportunity Score. Signals only evaluate new Auctionator scans. Price and supply changes are not confirmed trades.","Выберите условие: цена, отклонение от медианы, изменение цены, сокращение предложения, волатильность или Opportunity Score. Сигналы проверяются при новых сканах Auctionator. Это не подтверждённые сделки."},
  candles={"OHLC candles summarize observed prices by time buckets. Empty time slots have no observations; candles are not recorded market trades.","Свечи OHLC объединяют наблюдаемые цены по времени. Пробелы означают отсутствие замеров, а не отсутствие сделок."},
- activity={"The activity index is an estimate based on changes in observed quotes and supply; it is not actual sales volume.","Индекс активности оценивает изменения наблюдаемых цен и предложения, а не реальный объём продаж."},
+ activity={"Activity on the left is estimated from Auctionator observations; data reliability on the right measures observation age, gaps, source and coverage. Both are estimates, not recorded sales.","Слева — активность по наблюдениям Auctionator, справа — надёжность истории: свежесть, пропуски, источник и покрытие. Ни один показатель не означает подтверждённую продажу."},
  journal={"Enable Auto-mail, then open a mailbox. Completed Auction House invoices are imported when item, amount and quantity are unambiguous. Missing prices, ambiguous items and duplicate-looking mail are skipped. Manual trades, filters, per-sale cost and ROI remain available.","Включите «Почта», затем откройте почтовый ящик. Подтверждённые аукционные счета импортируются при точном определении предмета, суммы и количества. Неполные и похожие письма пропускаются. Ручные сделки, фильтры и прибыль остаются доступны."},
  portfolio={"Portfolio modes: Stock (live bags, last-known bank), Sales (confirmed net revenue), Cost basis (journal lots), Allocation (choose ONE source). Shares use priced values only; large concentration indicates exposure, not predicted loss or profit.",
 "Режимы портфеля: Запасы (сумки и последний банк), Продажи (подтверждённая выручка), Себестоимость (журнал), Распределение (выберите ОДИН источник). Доли считаются по оценённым предметам; высокая концентрация — не прогноз убытка или прибыли."},
@@ -59,45 +63,8 @@ local helpContent={
  craftscan={"Browse ALL imported recipes: profit, loss and missing prices. Sort priced recipes by expected profit or ROI; incomplete ones stay visible with No data. Import each profession separately.",
 "Каталог ВСЕХ импортированных рецептов: прибыль, убыток и отсутствие цен. Рассчитанные сортируются по прибыли или ROI, неполные остаются видимыми. Каждую профессию импортируйте отдельно."},
 }
-local function toolHelpPanel(page,key)
-  local holder=CreateFrame("Frame",nil,page)
-  holder:SetSize(194,438);holder:SetPoint("TOPRIGHT",page,"TOPRIGHT",-5,-18)
-  -- Help occupies the same continuous surface as the active tool.
-  tex(holder,0,0,1,438,.40,.31,.18,.48)
-  tex(holder,11,0,183,1,.58,.41,.16,.75)
-  fs(holder,l("HOW IT WORKS","КАК ЭТО РАБОТАЕТ"),11,-17,174,true)
-  local message=helpContent[key] or {"Local market data only.","Только локальные данные рынка."}
-  local detail=fs(holder,l(message[1],message[2]),11,-55,174)
-  if detail.SetWordWrap then detail:SetWordWrap(true) end
-  if key=="craft" then
-    -- Recipe search and scan feedback are shown only in the right column.
-    -- The craft page is built before this panel, so assign its status now.
-    page.status=fs(holder,"",11,-265,171)
-    page.status:SetTextColor(.72,.77,.82)
-    if page.status.SetWordWrap then page.status:SetWordWrap(true) end
-    page.helpPanel=holder
-    return
-  end
-  if key=="indicators" then
-    fs(holder,l("EMA: weighted average of recent quotes.",
-      "EMA: средняя с большим весом свежих цен."),11,-147,174)
-    fs(holder,l("RSI: 0–100 momentum scale.",
-      "RSI: индекс импульса 0–100."),11,-192,174)
-    fs(holder,l("MACD: difference of two EMAs.",
-      "MACD: разница двух EMA."),11,-232,174)
-    fs(holder,l("Bollinger: price volatility bands.",
-      "Боллинджер: границы разброса цены."),11,-273,174)
-  end
-  local tip=(key=="activity" or key=="quality") and
-    l("Tip: hover over a result row for an explanation.",
-      "Совет: наведите на строку результата для пояснения.") or
-    l("Tip: hover over any input field for an explanation.",
-      "Совет: наведите на поле ввода для пояснения.")
-  fs(holder,tip,11,key=="indicators" and -340 or -255,174)
-  fs(holder,l("Auctionator cannot report confirmed sales made by other players.",
-              "Auctionator не сообщает о подтверждённых продажах других игроков."),11,key=="indicators" and -403 or -335,174)
-  page.helpPanel=holder
-end
+-- Permanent HOW IT WORKS sidebars are intentionally retired. Every page uses
+-- the same top-right ? tooltip and contextual hover help near its controls.
 
 local builders=B
 local function create()
@@ -111,63 +78,115 @@ local function create()
     f:SetBackdrop({edgeFile="Interface\\DialogFrame\\UI-DialogBox-Border",
       edgeSize=30,insets={left=12,right=12,top=12,bottom=12}})
   end
-  -- Same single, tracked background as the market terminal. Avoid a second
-  -- opaque backdrop below it or slider percentages would be misleading.
+  -- Beta4: all pages share one canvas immediately below the compact header.
+  -- The sidebar and content use a common top edge without legacy modal gutters.
   local mainSurface=tex(f,15,-15,WIDTH-30,HEIGHT-30,.042,.064,.086,1)
   if A.TrackBackgroundTexture then A.TrackBackgroundTexture("pro",mainSurface) end
   tex(f,21,-70,WIDTH-42,1,.38,.29,.15,.54)
-  tex(f,21,-159,WIDTH-42,2,.46,.34,.14,.9)
-  tex(f,22,-736,WIDTH-44,1,.43,.33,.16,.75)
+  tex(f,21,-738,WIDTH-42,1,.43,.33,.16,.75)
+  -- The sidebar is navigation, not an additional modal/overlay.
+  tex(f,20,-79,181,648,.031,.047,.063,.91)
+  tex(f,207,-79,1,647,.35,.30,.20,.61)
   local logo=f:CreateTexture(nil,"ARTWORK")
   logo:SetTexture("Interface\\AddOns\\AuctionatorTradeScope\\Media\\Icon")
   logo:SetSize(31,31);logo:SetPoint("TOPLEFT",f,"TOPLEFT",23,-22)
-  f.title=fs(f,"TradeScope | "..l("Trading Workstation","Торговый терминал").."  v"..tostring(A.version or "?"),63,-28,560,true)
-  -- Strategies and Portfolio are header shortcuts. The original ten tools
-  -- remain two complete rows, preserving all existing button positions.
-  f.strategiesShortcut=button(f,l("Strategies","Стратегии"),650,-27,136,function()
-    A.ShowProTab("strategies")
-  end,27)
-  if A.StyleButton then A.StyleButton(f.strategiesShortcut,"tab") end
-  -- A portfolio shortcut belongs in the header, not a third row that would
-  -- overlap the existing tool pages. The original ten tabs are unchanged.
-  f.portfolioShortcut=button(f,l("Portfolio","Портфель"),802,-27,136,function()
-    A.ShowProTab("portfolio")
-  end,27)
-  if A.StyleButton then A.StyleButton(f.portfolioShortcut,"tab") end
+  f.title=fs(f,"TradeScope",63,-20,250,true)
+  -- Page name belongs under the addon name rather than in a second header column.
+  f.contextTitle=fs(f,l("Terminal","Терминал"),63,-42,760,true)
+  f.versionLabel=fs(f,"v"..tostring(A.version or "?"),895,-31,196)
+  f.versionLabel:SetTextColor(.72,.77,.81)
+  local function headerHelp(self)
+    if not GameTooltip then return end
+    local key=f.active or "terminal"
+    local message=helpContent[key]
+    if not message then return end
+    -- Right-edge help must open inward, not off the game screen.
+    GameTooltip:SetOwner(self,"ANCHOR_BOTTOMLEFT")
+    GameTooltip:SetText(tr(key))
+    GameTooltip:AddLine(l(message[1],message[2]),1,1,1,true)
+    GameTooltip:Show()
+  end
+  f.helpButton=button(f,"?",WIDTH-85,-25,27,headerHelp,27)
+  if A.StyleButton then A.StyleButton(f.helpButton,"secondary") end
+  f.helpButton:SetScript("OnEnter",headerHelp)
+  f.helpButton:SetScript("OnLeave",function()if GameTooltip then GameTooltip:Hide() end end)
   local close=CreateFrame("Button",nil,f,"UIPanelCloseButton")
   close:SetPoint("TOPRIGHT",f,"TOPRIGHT",-8,-8)
+
   f.nav={}
   f.content=CreateFrame("Frame",nil,f)
-  f.content:SetSize(947,558);f.content:SetPoint("TOPLEFT",f,"TOPLEFT",22,-166)
+  f.content:SetSize(946,660)
+  f.content:SetPoint("TOPLEFT",f,"TOPLEFT",219,-74)
   local icons={
-    scanner="Interface\\Icons\\INV_Misc_Spyglass_03",alerts="Interface\\Icons\\INV_Misc_Bell_01",
-    candles="Interface\\Icons\\INV_Misc_Coin_02",activity="Interface\\Icons\\Ability_Hunter_MasterMarksman",
-    journal="Interface\\Icons\\INV_Misc_Book_09",craft="Interface\\Icons\\INV_Misc_Gear_02",
-    indicators="Interface\\Icons\\Spell_Holy_MindVision",heatmap="Interface\\Icons\\INV_Misc_Map_01",
-    quality="Interface\\Icons\\INV_Misc_EngGizmos_02",craftscan="Interface\\Icons\\INV_Misc_Coin_17",
+    terminal="Interface\\AddOns\\AuctionatorTradeScope\\Media\\Icon",
+    balance="Interface\\Icons\\INV_Misc_Coin_01",
+    scanner="Interface\\Icons\\INV_Misc_Spyglass_03",
+    alerts="Interface\\Icons\\INV_Misc_Bell_01",
+    candles="Interface\\Icons\\INV_Misc_Coin_02",
+    activity="Interface\\Icons\\Ability_Hunter_MasterMarksman",
+    journal="Interface\\Icons\\INV_Misc_Book_09",
+    craft="Interface\\Icons\\INV_Misc_Gear_02",
+    indicators="Interface\\Icons\\Spell_Holy_MindVision",
+    heatmap="Interface\\Icons\\INV_Misc_Map_01",
+    quality="Interface\\Icons\\INV_Misc_EngGizmos_02",
+    craftscan="Interface\\Icons\\INV_Misc_Coin_17",
+    strategies="Interface\\Icons\\INV_Misc_Note_01",
+    portfolio="Interface\\Icons\\INV_Misc_Bag_10",
   }
-  for i=1,#TOOLS do
-    local id=TOOLS[i]
-    local col=(i-1)%5;local row=math.floor((i-1)/5)
-    local b=button(f,tr(id),25+col*190,-81-row*38,178,function()A.ShowProTab(id)end,31)
-    if A.StyleButton then A.StyleButton(b,"tab") end
-    local icon=b:CreateTexture(nil,"ARTWORK")
-    icon:SetTexture(icons[id]);icon:SetSize(21,21)
-    icon:SetPoint("LEFT",b,"LEFT",5,0)
-    local title=b:GetFontString()
-    if title then
-      title:ClearAllPoints();title:SetPoint("LEFT",b,"LEFT",32,0)
-      title:SetWidth(141);title:SetJustifyH("LEFT")
+  -- Short, unambiguous labels prevent clipping in the compact sidebar.
+  -- The complete localized tool name stays visible in the header and tooltip.
+  local shortNames={
+    terminal=l("Terminal","Терминал"),balance=l("Gold history","История золота"),
+    scanner=l("Scanner","Сканер"),alerts=l("Alerts","Сигналы"),
+    candles=l("Candles","Свечи"),activity=l("Activity / quality","Активность / качество"),
+    journal=l("Journal","Журнал"),craft=l("Calculator","Калькулятор"),
+    indicators=l("Indicators","Индикаторы"),heatmap=l("Heatmap","Тепловая карта"),
+    quality=l("Data quality","Качество данных"),craftscan=l("Recipe catalog","Каталог крафта"),
+    strategies=l("Strategies","Стратегии"),portfolio=l("Portfolio","Портфель"),
+  }
+  -- Four groups, 13 destinations. Activity and quality share one two-column tab.
+  local groups={
+    {label=l("MARKET","РЫНОК"),y=-88,items={"terminal","scanner","alerts","candles","activity"}},
+    {label=l("ANALYTICS","АНАЛИТИКА"),y=-285,items={"indicators","heatmap"}},
+    {label=l("TRADING","ТОРГОВЛЯ"),y=-387,items={"strategies","portfolio","journal","balance"}},
+    {label=l("CRAFTING","КРАФТ"),y=-554,items={"craft","craftscan"}},
+  }
+  f.navGroups=groups
+  for _,group in ipairs(groups) do
+    local groupTitle=fs(f,group.label,34,group.y,147,true)
+    groupTitle:SetTextColor(.75,.69,.49)
+    for j=1,#group.items do
+      local id=group.items[j]
+      local y=group.y-24-(j-1)*31
+      local nav=CreateFrame("Button",nil,f)
+      nav:SetSize(163,31);nav:SetPoint("TOPLEFT",f,"TOPLEFT",29,y)
+      nav:EnableMouse(true)
+      local bg=tex(nav,0,0,163,31,.065,.092,.119,.70)
+      local accent=tex(nav,0,0,3,31,.92,.72,.32,1)
+      accent:Hide()
+      local icon=nav:CreateTexture(nil,"ARTWORK")
+      icon:SetTexture(icons[id]);icon:SetSize(17,17)
+      icon:SetPoint("LEFT",nav,"LEFT",9,0)
+      local label=nav:CreateFontString(nil,"ARTWORK","GameFontHighlightSmall")
+      label:SetPoint("LEFT",nav,"LEFT",32,0)
+      label:SetWidth(123);label:SetJustifyH("LEFT")
+      label:SetText(shortNames[id] or tr(id))
+      nav.bg=bg;nav.sideAccent=accent;nav.titleLabel=label;nav.icon=icon
+      nav:SetScript("OnClick",function()A.ShowProTab(id)end)
+      nav:SetScript("OnEnter",function(self)
+        if f.active~=id then self.bg:SetVertexColor(.115,.147,.170,.92) end
+        local message=helpContent[id]
+        if message then showHelp(self,tr(id),l(message[1],message[2])) end
+      end)
+      nav:SetScript("OnLeave",function(self)
+        if f.active~=id then self.bg:SetVertexColor(.065,.092,.119,.70) end
+        if GameTooltip then GameTooltip:Hide() end
+      end)
+      f.nav[id]=nav
     end
-    local focus=b:CreateTexture(nil,"BACKGROUND")
-    focus:SetTexture("Interface\\Buttons\\WHITE8X8")
-    focus:SetAllPoints(b);focus:SetVertexColor(.42,.31,.085,.42);focus:Hide()
-    b.activeBackground=focus
-    attachHelp(b,tr(id),l(helpContent[id][1],helpContent[id][2]))
-    f.nav[id]=b
   end
-  f.footer=fs(f,l("Only locally observed Auctionator data. Supply reductions are not verified sales.",
-    "Только локальные данные Auctionator. Уменьшение предложения не означает продажи."),29,-745,900)
+  f.footer=fs(f,l("Auctionator: observed market data, not confirmed transactions.",
+    "Auctionator: наблюдения рынка, а не подтверждённые сделки."),228,-746,927)
   f.footer:SetTextColor(.70,.76,.81)
   f.pages={}
   f.drag=CreateFrame("Frame",nil,f)
@@ -190,11 +209,8 @@ local function create()
       if page.sortMenu then page.sortMenu:Hide() end
     end
     if A.HideCraftPreview then A.HideCraftPreview() end
-    if self.restoreDashboard and A.dashboard and not (A.InCombat and A.InCombat()) then
-      self.restoreDashboard=false
-      A.dashboard:Show()
-      if A.RefreshDashboard then A.RefreshDashboard() end
-    end
+    -- No legacy restore-on-close: the market terminal is already a page.
+    self.restoreDashboard=false
   end)
   f:Hide()
   A.proWindow=f
@@ -203,8 +219,10 @@ end
 function A.ShowProTab(id)
   if A.InCombat and A.InCombat() then return end
   A.Init()
+  -- Keep /ats quality, old minimap shortcuts and historical links working.
+  if id=="quality" then id="activity" end
   local f=create()
-  if not builders[id] then id="scanner" end
+  if id~="terminal" and id~="balance" and not builders[id] then id="terminal" end
   -- Commit a name typed directly into another tab before its input loses
   -- visibility. This also works on clients that do not raise focus-lost when
   -- their parent frame becomes hidden.
@@ -217,9 +235,25 @@ function A.ShowProTab(id)
   for key,page in pairs(f.pages) do page:Hide() end
   local p=f.pages[id]
   if not p then
-    p=builders[id](f)
+    if id=="terminal" then
+      p=newPage(f)
+      assert(A.EmbedDashboard,"Market terminal unavailable")(p)
+      p.update=function()
+        if A.RefreshDashboard then A.RefreshDashboard() end
+        if A.StartItemNameIndex then A.StartItemNameIndex() end
+      end
+      p:HookScript("OnHide",function()
+        A.bagPicking=false
+        if A.dashboard and A.dashboard.suggestions then A.dashboard.suggestions:Hide() end
+      end)
+    elseif id=="balance" then
+      p=newPage(f)
+      assert(A.EmbedBalanceHistory,"Gold history unavailable")(p)
+      p.update=function()if A.RefreshBalanceWindow then A.RefreshBalanceWindow() end end
+    else
+      p=builders[id](f)
+    end
     f.pages[id]=p
-    toolHelpPanel(p,id)
   end
   f.active=id
   if p.proMarketEdit then
@@ -233,7 +267,7 @@ function A.ShowProTab(id)
     overlay:SetAllPoints(p)
     overlay:SetFrameLevel(p:GetFrameLevel()+30)
     overlay:EnableMouse(true)
-    tex(overlay,0,0,946,557,.025,.035,.055,.98)
+    tex(overlay,0,0,946,660,.025,.035,.055,.98)
     fs(overlay,l("This tool is disabled in settings.","Инструмент отключён в настройках."),
       65,-200,610,true)
     button(overlay,l("Open settings","Открыть настройки"),65,-257,185,
@@ -241,7 +275,10 @@ function A.ShowProTab(id)
     overlay:Hide()
     p.disabledOverlay=overlay
   end
-  local disabled=A.db.pro[id.."Enabled"]==false
+  -- Old saved activity/quality toggles remain valid; the merged tab is
+  -- disabled only when both legacy sections were explicitly disabled.
+  local disabled=(id=="activity") and (A.db.pro.activityEnabled==false and
+    A.db.pro.qualityEnabled==false) or (id~="activity" and A.db.pro[id.."Enabled"]==false)
   if disabled then p.disabledOverlay:Show()
   else
     p.disabledOverlay:Hide()
@@ -250,16 +287,18 @@ function A.ShowProTab(id)
       if not ok then A.lastError=tostring(err);A.Say(err) end
     end
   end
-  if f.portfolioShortcut and A.StyleButton then
-    A.StyleButton(f.portfolioShortcut,id=="portfolio" and "activeTab" or "tab")
-  end
-  if f.strategiesShortcut and A.StyleButton then
-    A.StyleButton(f.strategiesShortcut,id=="strategies" and "activeTab" or "tab")
-  end
-  for key,buttonFrame in pairs(f.nav) do
+  if f.contextTitle then f.contextTitle:SetText(tr(id)) end
+  for key,nav in pairs(f.nav) do
     local chosen=key==id
-    if buttonFrame.activeBackground then buttonFrame.activeBackground:Hide() end
-    if A.StyleButton then A.StyleButton(buttonFrame,chosen and "activeTab" or "tab") end
+    if chosen then
+      nav.sideAccent:Show()
+      nav.bg:SetVertexColor(.23,.19,.105,.92)
+      nav.titleLabel:SetTextColor(1,.85,.56)
+    else
+      nav.sideAccent:Hide()
+      nav.bg:SetVertexColor(.065,.092,.119,.70)
+      nav.titleLabel:SetTextColor(.85,.88,.91)
+    end
   end
 end
 function A.OpenStrategies()
@@ -275,13 +314,8 @@ function A.OpenProTool(id)
   local sx=(UIParent:GetWidth()-22)/WIDTH
   local sy=(UIParent:GetHeight()-22)/HEIGHT
   f:SetScale(math.max(.55,math.min(1,sx,sy)))
-  -- Never place the Pro workstation directly over the old terminal.
-  if A.dashboard and A.dashboard.IsShown and A.dashboard:IsShown() then
-    f.restoreDashboard=true
-    A.dashboard:Hide()
-  end
   f:Show()
-  A.ShowProTab(id or "scanner")
+  A.ShowProTab(id or "terminal")
 end
 -- Open alert configuration for the exact item selected in the market terminal.
 function A.OpenProAlertForItem(key)

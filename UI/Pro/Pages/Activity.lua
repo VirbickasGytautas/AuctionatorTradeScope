@@ -1,98 +1,138 @@
--- UI module extracted from the 4.3.0 Pro workstation without changing behavior.
+-- 5.0.0-beta5: One market research screen, one selection, two independent
+-- read-only evidence summaries. The underlying market models are unchanged.
 local A=ATS
 local C=assert(A.ProUIShared)
 local B=assert(A.ProUIBuilders)
-local WIDTH=C.WIDTH
-local HEIGHT=C.HEIGHT
-local TOOLS=C.TOOLS
-local names=C.names
-local l=C.l
-local tr=C.tr
-local tex=C.tex
-local fs=C.fs
-local button=C.button
-local helpText=C.helpText
-local showHelp=C.showHelp
-local attachHelp=C.attachHelp
-local addMetricTooltips=C.addMetricTooltips
-local asExactItem=C.asExactItem
-local itemKey=C.itemKey
-local sharedMarketChoice=C.sharedMarketChoice
-local fillMarketEdit=C.fillMarketEdit
-local shareMarketChoice=C.shareMarketChoice
-local attachItemSearch=C.attachItemSearch
-local edit=C.edit
-local marketInput=C.marketInput
-local itemID=C.itemID
-local heading=C.heading
-local pbutton=C.pbutton
-local currency=C.currency
-local asItem=C.asItem
-local selectedKey=C.selectedKey
-local anyItem=C.anyItem
-local inspect=C.inspect
-local newPage=C.newPage
-local lineList=C.lineList
-local captureRow=C.captureRow
-local labelNumber=C.labelNumber
-local makeItemIdentity=C.makeItemIdentity
-local normalizeRussian=C.normalizeRussian
-local newPlot=C.newPlot
-local miniLine=C.miniLine
-local attachIndicatorCursor=C.attachIndicatorCursor
+local l,fs,tex,button,newPage,heading=C.l,C.fs,C.tex,C.button,C.newPage,C.heading
+local currency,labelNumber=C.currency,C.labelNumber
+
+local activityHelp={
+  {"Index of observed activity (0-100), not volume of completed trades.",
+   "Индекс наблюдаемой активности (0–100), а не объём завершённых продаж."},
+  {"Number of recent market snapshots in the configured activity window.",
+   "Количество рыночных замеров за выбранный в настройках период."},
+  {"Number of observed price changes, not completed sales.",
+   "Количество изменений наблюдаемой цены, не число продаж."},
+  {"Number of changes in observed auction supply; auctions may expire or be cancelled.",
+   "Изменения наблюдаемого предложения; лоты могут истечь или быть сняты."},
+  {"Reliability of the local observations, not a probability of a sale.",
+   "Надёжность локальных замеров, не вероятность продажи."},
+  {"Last observed Auctionator price; may have changed since the last scan.",
+   "Последняя цена Auctionator; после сканирования она могла измениться."},
+  {"Variation in recorded prices, not proof of demand.",
+   "Разброс записанных цен, а не подтверждение спроса."},
+  {"Last observed quantity on the Auction House, not live availability.",
+   "Последнее наблюдаемое количество на аукционе, не показатель в реальном времени."},
+}
+local qualityHelp={
+  {"Quality score based on recency, coverage and time span, not sale probability.",
+   "Оценка полноты, свежести и длительности истории, не вероятность продажи."},
+  {"All valid price snapshots stored for this item.",
+   "Все сохранённые действительные наблюдения цены предмета."},
+  {"Number of distinct clock-hours with observations.",
+   "Число отдельных часов, в которых были замеры."},
+  {"Hours since the last observed price, smaller is fresher.",
+   "Часы после последней цены: чем меньше, тем свежее."},
+  {"Hours between the earliest and latest saved observations.",
+   "Часы между первым и последним сохранёнными замерами."},
+  {"Longest gap between consecutive scans; the intervening market is unknown.",
+   "Самый длинный перерыв между замерами; данные внутри перерыва неизвестны."},
+  {"Share of observed time intervals within the recent coverage window.",
+   "Доля временных интервалов с реальными наблюдениями за недавний период."},
+  {"Recent observations attributed to Auctionator scans.",
+   "Недавние наблюдения из сканирований Auctionator."},
+  {"Recent observations attributed to tooltip captures, not transactions.",
+   "Недавние наблюдения из подсказок, не подтверждённые сделки."},
+  {"Observations lacking a recorded source, often imported older history.",
+   "Замеры без записанного источника, часто более старая история."},
+  {"Classification of observed data quality: high, medium or low.",
+   "Категория качества наблюдений: высокое, среднее либо низкое."},
+}
+local function setRows(rows,values)
+  for i=1,#rows do rows[i]:SetText(values[i] or "") end
+end
+local function number(n)
+  return tonumber(n) or 0
+end
 
 function B.activity(root)
   local p=newPage(root)
-  heading(p,l("Observed market activity index (0-100)","Индекс активности рынка по замерам (0–100)"),-12)
-  p.selection=marketInput(p,20,-60,216)
-  button(p,l("Analyze","Анализировать"),272,-83,132,function()p.update()end)
-  p.identity=makeItemIdentity(p)
-  p.rows={}
-  for i=1,9 do p.rows[i]=fs(p,"",20,-181-(i-1)*37,694,i==1) end
-  addMetricTooltips(p,p.rows,{
-    {"Combined score (0-100) of recent observations (35%), price changes (30%), supply changes (20%), and data quality (15%). It measures observed activity, not trades.",
-     "Общий индекс (0–100): число свежих замеров (35%), изменения цены (30%), изменения предложения (20%) и качество данных (15%). Это активность наблюдений, не объём сделок."},
-    {"Number of recorded snapshots in the selected activity window (configured in Settings). Multiple scans can occur within the same hour.",
-     "Количество записанных замеров за выбранный период активности (задаётся в настройках). Несколько замеров могут приходиться на один час."},
-    {"How often the observed price differed from the preceding observation within the analysis window. Does not count sales.",
-     "Сколько раз наблюдаемая цена отличалась от предыдущего замера в пределах периода. Не показывает число продаж."},
-    {"How often the observed item quantity changed between consecutive observations. Items can disappear due to purchases, expiration, or canceled auctions.",
-     "Сколько раз изменилось число предметов между соседними замерами. Лоты могут исчезать из-за покупки, окончания срока или снятия с аукциона."},
-    {"Score of data coverage, recency, and observation span. Higher means better historical evidence, not a higher chance of selling.",
-     "Оценка полноты, свежести и продолжительности истории. Высокое значение означает более качественные данные, а не больший шанс продажи."},
-    {"Last recorded Auctionator market price. It may already be outdated if the auction was not scanned recently.",
-     "Последняя записанная цена Auctionator. Может устареть, если аукцион давно не сканировали."},
-    {"Variation of recorded prices over the observation period. Higher volatility means more unstable observed pricing, not necessarily more demand.",
-     "Разброс записанных цен за период наблюдений. Высокая волатильность означает нестабильную цену, но не обязательно высокий спрос."},
-    {"Last observed quantity available on the Auction House. This is a snapshot, not a live stock counter.",
-     "Последнее известное количество предметов на аукционе. Это сохранённый снимок, а не счётчик в реальном времени."},
-    {"Market activity is estimated only from local Auctionator observations. It is not verified traded volume or a prediction.",
-     "Активность оценивается только по локальным наблюдениям Auctionator. Это не подтверждённый объём продаж и не прогноз."},
-  },694)
+  heading(p,l("Activity and data quality", "Активность рынка и качество данных"),-12)
+  p.selection=C.marketInput(p,20,-59,232)
+  p.analyze=button(p,l("Analyze","Анализировать"),282,-82,150,function()p.update()end)
+  C.attachHelp(p.analyze,l("Update analysis","Обновить аналитику"),
+    l("Refresh both columns for the same selected item; no scans or trades are performed.",
+      "Обновить обе колонки для одного выбранного предмета; сканирования и сделки не выполняются."))
+  p.identity=C.makeItemIdentity(p)
+  -- One identity strip and one selector; the metrics are deliberately two
+  -- columns, not two old 946px pages scaled down to half size.
+  tex(p,472,-174,1,399,.40,.32,.18,.60)
+  p.activityTitle=fs(p,l("MARKET ACTIVITY","АКТИВНОСТЬ РЫНКА"),20,-177,433,true)
+  p.qualityTitle=fs(p,l("DATA QUALITY","КАЧЕСТВО ДАННЫХ"),491,-177,433,true)
+  tex(p,20,-200,435,1,.47,.36,.18,.75)
+  tex(p,490,-200,435,1,.47,.36,.18,.75)
+  p.activityRows={}
+  p.qualityRows={}
+  for i=1,#activityHelp do
+    p.activityRows[i]=fs(p,"",20,-213-(i-1)*32,435,i==1)
+  end
+  for i=1,#qualityHelp do
+    p.qualityRows[i]=fs(p,"",490,-213-(i-1)*32,435,i==1)
+  end
+  -- Text-bound hover areas reuse the shared help system. No right-side panel.
+  C.addMetricTooltips(p,p.activityRows,activityHelp,433)
+  C.addMetricTooltips(p,p.qualityRows,qualityHelp,433)
+  p.note=fs(p,l("Both scores describe observed Auctionator history; neither proves sales or demand.",
+    "Оба индекса отражают замеры Auctionator, а не подтверждённые продажи или спрос."),20,-591,906)
+  p.note:SetTextColor(.78,.81,.84)
   p.update=function()
-    local key=selectedKey(p)
+    local key=C.selectedKey(p)
     p.identity:showItem(key)
+    local prefs=A.db and A.db.pro or {}
     if not key then
-      for i=1,#p.rows do p.rows[i]:SetText("") end
-      p.rows[1]:SetText(l("Select an item.","Выберите предмет."))
+      setRows(p.activityRows,{l("Select a scanned item.","Выберите отсканированный предмет.")})
+      setRows(p.qualityRows,{l("The same item is used in both columns.",
+        "Обе колонки используют один выбранный предмет.")})
       return
     end
-    local data=A.ProActivity(key)
-    local m=data.metrics
-    local lines={
-      l("Market activity score","Индекс активности")..": "..data.score.." / 100",
-      l("Recent observations","Недавние замеры")..": "..data.observations,
-      l("Price movements","Изменения цены")..": "..data.priceChanges,
-      l("Supply movements","Изменения предложения")..": "..data.quantityChanges,
-      l("Reliability","Надёжность")..": "..data.quality.score.." / 100",
-      l("Latest market price","Последняя цена")..": "..currency(m.currentPrice),
-      l("Volatility","Волатильность")..": "..A.FmtVolatility(m.volatility),
-      l("On market","На рынке")..": "..A.FmtCount(m.currentQuantity),
-      l("Index describes observed changes, not verified trade volume.",
-        "Индекс показывает изменения в замерах, а не реальные продажи."),
-    }
-    for i=1,#p.rows do p.rows[i]:SetText(lines[i]) end
+    if prefs.activityEnabled==false then
+      setRows(p.activityRows,{l("Activity is disabled in settings.",
+        "Активность отключена в настройках.")})
+    else
+      local data=A.ProActivity(key)
+      local m=data.metrics or {}
+      setRows(p.activityRows,{
+        l("Activity index","Индекс активности")..": "..number(data.score).." / 100",
+        l("Recent snapshots","Недавние замеры")..": "..number(data.observations),
+        l("Price changes","Изменения цены")..": "..number(data.priceChanges),
+        l("Supply changes","Изменения предложения")..": "..number(data.quantityChanges),
+        l("Reliability","Надёжность")..": "..number(data.quality and data.quality.score).." / 100",
+        l("Latest price","Последняя цена")..": "..currency(m.currentPrice),
+        l("Volatility","Волатильность")..": "..A.FmtVolatility(m.volatility),
+        l("On market","На рынке")..": "..A.FmtCount(m.currentQuantity),
+      })
+    end
+    if prefs.qualityEnabled==false then
+      setRows(p.qualityRows,{l("Data quality is disabled in settings.",
+        "Качество данных отключено в настройках.")})
+    else
+      local q=A.ProQuality(A.ProSamples(key))
+      setRows(p.qualityRows,{
+        l("Quality score","Оценка качества")..": "..number(q.score).." / 100",
+        l("Total snapshots","Всего замеров")..": "..number(q.count),
+        l("Observed hours","Часов с замерами")..": "..number(q.uniqueHours),
+        l("Latest quote age (h)","Возраст цены (ч)")..": "..labelNumber(q.age),
+        l("Observation span (h)","Период наблюдений (ч)")..": "..labelNumber(q.coverage),
+        l("Longest gap (h)","Самый большой пропуск (ч)")..": "..labelNumber(q.maxGap),
+        l("Time coverage","Покрытие окон")..": "..string.format("%.1f%%",q.coveragePercent or 0)..
+          " ("..tostring(q.coverageBucketHours or 1)..l("h buckets)","ч интервалы)"),
+        l("Auction scans","Замеры сканера")..": "..number(q.scanObservations),
+        l("Tooltip snapshots","Замеры подсказок")..": "..number(q.hoverObservations),
+        l("Unknown source","Источник неизвестен")..": "..number(q.unknownObservations),
+        l("Quality class","Класс данных")..": "..(q.label=="high" and l("High","Высокое") or
+          (q.label=="medium" and l("Medium","Среднее") or l("Low","Низкое"))),
+      })
+    end
   end
   return p
 end
-

@@ -132,39 +132,42 @@ function B.craft(root)
   productIcon:SetPoint("TOPLEFT",p,"TOPLEFT",20,-125)
   productIcon:SetTexture("Interface\\Icons\\INV_Misc_QuestionMark")
   p.productName=fs(p,l("Choose a recipe to see its ingredients and costs.",
-    "Выберите рецепт, чтобы увидеть ресурсы и их стоимость."),66,-124,448,true)
+    "Выберите рецепт, чтобы увидеть ресурсы и их стоимость."),66,-124,600,true)
   p.productMade=fs(p,"",66,-147,324)
   -- Both the result icon and its name are one interactive hover target.
   local productHotspot=CreateFrame("Frame",nil,p)
-  productHotspot:SetSize(340,43)
+  productHotspot:SetSize(575,43)
   productHotspot:SetPoint("TOPLEFT",p,"TOPLEFT",20,-124)
   productHotspot:SetFrameLevel(p:GetFrameLevel()+10)
   productHotspot:EnableMouse(true)
   p.productHotspot=productHotspot
   productHotspot:Hide()
 
-  tex(p,20,-180,688,1,.40,.33,.16,.8)
+  local tableDivider=tex(p,20,-180,900,1,.40,.33,.16,.8)
+  local tableHeaders={}
   local columns={
-    {l("MATERIAL","МАТЕРИАЛ"),84,184},
-    {l("NEED","НУЖНО"),274,54},
-    {l("OWNED","ЕСТЬ"),338,58},
-    {l("BUY","ДОКУПИТЬ"),397,68},
-    {l("EACH","ЗА ШТ."),473,98},
-    {l("TOTAL","СТОИМОСТЬ"),579,129},
+    {l("MATERIAL","МАТЕРИАЛ"),84,337},
+    {l("NEED","НУЖНО"),444,54},
+    {l("OWNED","ЕСТЬ"),515,58},
+    {l("BUY","ДОКУПИТЬ"),588,71},
+    {l("EACH","ЗА ШТ."),671,96},
+    {l("TOTAL","СТОИМОСТЬ"),782,125},
   }
   for i=1,#columns do
     local c=columns[i]
     local head=fs(p,c[1],c[2],-188,c[3],true)
     head:SetTextColor(1,.82,.36)
+    tableHeaders[#tableHeaders+1]=head
   end
 
   local PAGE_SIZE=6
   local active, page = nil,1
+  local refreshBrowse
   local drawReport -- row click handlers need this forward declaration
-  fs(p,l("Crafts in batch","Изготовлений"),524,-125,111)
+  fs(p,l("Crafts in batch","Изготовлений"),730,-125,111)
   p.batchCount=CreateFrame("EditBox",nil,p,"InputBoxTemplate")
   p.batchCount:SetSize(58,24)
-  p.batchCount:SetPoint("TOPLEFT",p,"TOPLEFT",644,-121)
+  p.batchCount:SetPoint("TOPLEFT",p,"TOPLEFT",852,-121)
   p.batchCount:SetAutoFocus(false)
   p.batchCount:SetMaxLetters(3)
   if p.batchCount.SetNumeric then p.batchCount:SetNumeric(true) end
@@ -195,8 +198,8 @@ function B.craft(root)
   end)
   p.stockToggle=CreateFrame("CheckButton",nil,p,"UICheckButtonTemplate")
   p.stockToggle:SetSize(24,24)
-  p.stockToggle:SetPoint("TOPLEFT",p,"TOPLEFT",395,-150)
-  local stockLabel=fs(p,l("Count own materials (bags + bank)","Учёт собственных ресурсов (сумки + банк)"),422,-154,287)
+  p.stockToggle:SetPoint("TOPLEFT",p,"TOPLEFT",619,-150)
+  local stockLabel=fs(p,l("Count own materials (bags + bank)","Учёт собственных ресурсов (сумки + банк)"),649,-154,268)
   attachHelp(p.stockToggle,l("Use my materials","Учитывать мои ресурсы"),l(
     "Optional. Reads bags now and remembers the bank when opened. Shows remaining resources to buy and estimated additional gold to spend. Previously owned reagents still have market value!",
     "По желанию. Сумки проверяются сейчас, банк запоминается при открытии. Показывает, что нужно докупить и сколько золота потратить. Свои ресурсы также имеют рыночную стоимость!"))
@@ -207,21 +210,21 @@ function B.craft(root)
   p.materialRows={}
   for i=1,PAGE_SIZE do
     local y=-215-(i-1)*37
-    local bgrow=tex(p,20,y,688,33,.09,.14,.18,i%2==1 and .82 or .57)
+    local bgrow=tex(p,20,y,900,33,.09,.14,.18,i%2==1 and .82 or .57)
     local include=CreateFrame("CheckButton",nil,p,"UICheckButtonTemplate")
     include:SetSize(22,22);include:SetPoint("TOPLEFT",p,"TOPLEFT",21,y-5)
     include:SetFrameLevel(p:GetFrameLevel()+12)
     local icon=p:CreateTexture(nil,"ARTWORK")
     icon:SetSize(25,25)
     icon:SetPoint("TOPLEFT",p,"TOPLEFT",49,y-4)
-    local title=fs(p,"",84,y-7,184)
-    local qty=fs(p,"",276,y-7,53)
-    local owned=fs(p,"",338,y-7,54)
-    local buy=fs(p,"",400,y-7,65)
-    local unit=fs(p,"",473,y-7,97)
-    local total=fs(p,"",581,y-7,125)
+    local title=fs(p,"",84,y-7,337)
+    local qty=fs(p,"",444,y-7,53)
+    local owned=fs(p,"",515,y-7,54)
+    local buy=fs(p,"",588,y-7,70)
+    local unit=fs(p,"",671,y-7,97)
+    local total=fs(p,"",782,y-7,125)
     local hotspot=CreateFrame("Frame",nil,p)
-    hotspot:SetSize(659,33)
+    hotspot:SetSize(869,33)
     hotspot:SetPoint("TOPLEFT",p,"TOPLEFT",49,y)
     hotspot:EnableMouse(true)
     hotspot:SetScript("OnEnter",function(self)
@@ -276,9 +279,11 @@ function B.craft(root)
   p.summary2=fs(p,"",22,-495,680)
   p.summary3=fs(p,"",22,-518,680)
   p.info=fs(p,"",22,-540,690)
-  -- The recipe instructions and scan/status messages belong to the side
-  -- HOW IT WORKS panel.  No help text is placed below the recipe input.
-  -- toolHelpPanel(p,"craft") creates p.status after this page is built.
+  -- Scan feedback is actionable status, not reference documentation. Keep it
+  -- near the recipe input after removing the permanent help sidebar.
+  p.status=fs(p,"",544,-78,370)
+  p.status:SetTextColor(.76,.83,.88)
+  if p.status.SetWordWrap then p.status:SetWordWrap(true) end
   local function displayName(id,provided,providedIcon)
     local name,icon=nil,nil
     if A.ResolveItemInfo then name,icon=A.ResolveItemInfo("item:"..tostring(id),provided) end
@@ -320,7 +325,7 @@ function B.craft(root)
     return type(n)=="number" and currency(n) or l("No data","Нет данных")
   end
 
-  drawReport=assert(A.CreateCraftReportRenderer)({
+  local renderReport=assert(A.CreateCraftReportRenderer)({
     p=p,productHotspot=productHotspot,productIcon=productIcon,
     displayName=displayName,formatValue=formatValue,pageSize=PAGE_SIZE,
     getActive=function() return active end,
@@ -328,6 +333,43 @@ function B.craft(root)
     getPage=function() return page end,
     setPage=function(value) page=value end,
   })
+  -- One layout for a populated table, a compact financial summary and an
+  -- actionable browse state. A blank table should not occupy the whole pane.
+  local pageButtons={}
+  local function moveTo(control,x,y)
+    if not control then return end
+    control:ClearAllPoints()
+    control:SetPoint("TOPLEFT",p,"TOPLEFT",x,y)
+  end
+  local function alignReport()
+    local visible=active and math.min(PAGE_SIZE,math.max(0,#active.materials-(page-1)*PAGE_SIZE)) or 0
+    local navY=-215-visible*37-15
+    if navY>-379 then navY=-379 end
+    moveTo(pageButtons.prev,20,navY)
+    moveTo(pageButtons.next,143,navY)
+    moveTo(p.pageLabel,275,navY-3)
+    moveTo(pageButtons.shopping,408,navY)
+    moveTo(pageButtons.refresh,550,navY)
+    moveTo(p.summary1,22,navY-40)
+    moveTo(p.summary2,22,navY-63)
+    moveTo(p.summary3,22,navY-86)
+    moveTo(p.info,22,navY-109)
+    for _,buttonWidget in pairs(pageButtons) do
+      if active then buttonWidget:Show() else buttonWidget:Hide() end
+    end
+    if active then
+      tableDivider:Show()
+      for _,headingWidget in ipairs(tableHeaders) do headingWidget:Show() end
+    else
+      tableDivider:Hide()
+      for _,headingWidget in ipairs(tableHeaders) do headingWidget:Hide() end
+    end
+  end
+  drawReport=function()
+    renderReport()
+    alignReport()
+    if refreshBrowse then refreshBrowse() end
+  end
 
   local function applyRecipe(recipe)
     if not recipe or type(recipe.materials)~="table" or #recipe.materials==0 then return end
@@ -337,11 +379,15 @@ function B.craft(root)
     if A.ProRecipeLabel then A.ProRecipeLabel(recipe) end
     A.ProRecipes()[tostring(recipe.product)]=recipe
     p.applyingRecipe=true
+    p.recipeSelected=true
     popup:Hide()
+    -- Clear focus BEFORE replacing the query. An edit-box OnTextChanged
+    -- arriving from the catalog must not display the selector over results.
+    p.recipeQuery:ClearFocus()
     p.recipeQuery:SetText(A.ProRecipeLabel and A.ProRecipeLabel(recipe)
       or recipe.name or ("#"..tostring(recipe.product)))
     p.recipeQuery:ClearFocus()
-    p.recipeSelected=true
+    popup:Hide()
     p.applyingRecipe=false
     p.status:SetText("")
     drawReport()
@@ -379,6 +425,67 @@ function B.craft(root)
     return all
   end
   p.loadRecipeChoices=loadRecipeChoices
+
+  -- Inline saved-recipe browser: the empty calculator becomes useful rather
+  -- than showing an empty 900px material table. Unlike search suggestions,
+  -- these entries never cover the calculation or require clearing a modal.
+  local browse=CreateFrame("Frame",nil,p)
+  browse:SetSize(900,438)
+  browse:SetPoint("TOPLEFT",p,"TOPLEFT",20,-182)
+  local browseTitle=fs(browse,l("Saved recipes - choose to calculate",
+    "Сохранённые рецепты — выберите для расчёта"),0,-2,885,true)
+  browseTitle:SetTextColor(1,.84,.41)
+  local browseInfo=fs(browse,"",0,-28,880)
+  local browseRows={}
+  for i=1,12 do
+    local row=CreateFrame("Button",nil,browse)
+    row:SetSize(435,45)
+    row:SetPoint("TOPLEFT",browse,"TOPLEFT",(i-1)%2*454,-56-math.floor((i-1)/2)*54)
+    local shade=tex(row,0,0,435,45,.08,.12,.16,.90)
+    local icon=row:CreateTexture(nil,"ARTWORK")
+    icon:SetSize(27,27);icon:SetPoint("LEFT",row,"LEFT",7,0)
+    local name=fs(row,"",43,-10,370)
+    name:SetTextColor(1,.86,.47)
+    row.icon=icon;row.label=name;row.shade=shade
+    row:SetScript("OnClick",function(self)
+      if self.recipe then applyRecipe(self.recipe) end
+    end)
+    row:SetScript("OnEnter",function(self)
+      self.shade:SetVertexColor(.18,.21,.18,.96)
+    end)
+    row:SetScript("OnLeave",function(self)
+      self.shade:SetVertexColor(.08,.12,.16,.90)
+    end)
+    row:Hide()
+    browseRows[i]=row
+  end
+  refreshBrowse=function()
+    if active then browse:Hide();return end
+    local recipes=loadRecipeChoices()
+    if #recipes==0 then
+      browseInfo:SetText(l("No saved recipes. Open a profession and scan its recipes above.",
+        "Нет сохранённых рецептов. Откройте профессию и нажмите «Сканировать рецепты»."))
+    else
+      browseInfo:SetText(string.format(l("Saved: %d. Pick a recipe or use the search field.",
+        "Сохранено: %d. Выберите рецепт или воспользуйтесь поиском."),#recipes))
+    end
+    for i,row in ipairs(browseRows) do
+      local entry=recipes[i]
+      if entry then
+        row.recipe=entry.recipe
+        row.label:SetText(A.FitItemName and A.FitItemName(entry.name,row.label,350) or entry.name)
+        local texture=entry.icon
+        if A.ResolveItemInfo then
+          local _,resolved=A.ResolveItemInfo("item:"..tostring(entry.product),nil)
+          texture=resolved or texture
+        end
+        row.icon:SetTexture(texture or "Interface\\Icons\\INV_Misc_QuestionMark")
+        row:Show()
+      else row.recipe=nil;row:Hide() end
+    end
+    browse:Show()
+  end
+  p.recipeBrowse=browse
   selectRecipe=function(candidate)
     if not candidate then return end
     if candidate.recipe then applyRecipe(candidate.recipe)
@@ -389,11 +496,11 @@ function B.craft(root)
     p=p,popup=popup,choices=choices,pageCount=pageCount,
     loadRecipeChoices=loadRecipeChoices,selectRecipe=selectRecipe,
   })
-  button(p,l("< Prev","< Назад"),20,-434,110,function()
+  pageButtons.prev=button(p,l("< Prev","< Назад"),20,-434,110,function()
     if not active then return end
     page=math.max(1,page-1);drawReport()
   end)
-  button(p,l("Next >","Вперёд >"),143,-434,120,function()
+  pageButtons.next=button(p,l("Next >","Вперёд >"),143,-434,120,function()
     if not active then return end
     page=page+1;drawReport()
   end)
@@ -401,6 +508,7 @@ function B.craft(root)
     -- Also permit a click to display the same list as the hover tooltip.
     if self:GetScript("OnEnter") then self:GetScript("OnEnter")(self) end
   end)
+  pageButtons.shopping=shoppingButton
   shoppingButton:SetScript("OnEnter",function(self)
     if not GameTooltip then return end
     GameTooltip:SetOwner(self,"ANCHOR_RIGHT")
@@ -436,7 +544,7 @@ function B.craft(root)
   shoppingButton:SetScript("OnLeave",function()
     if GameTooltip then GameTooltip:Hide() end
   end)
-  button(p,l("Refresh data","Обновить данные"),550,-434,158,function()
+  pageButtons.refresh=button(p,l("Refresh data","Обновить данные"),550,-434,158,function()
     if A.RefreshCraftStock then A.RefreshCraftStock() end
     drawReport()
   end)

@@ -1,0 +1,27 @@
+-- Pre-release safety contract. No UI data and no saved variables are mutated.
+local function read(path)
+  local f=assert(io.open(path,'rb'))
+  local s=f:read('*a');f:close();return s
+end
+local toc=read('AuctionatorTradeScope.toc')
+local core=read('Engine/Core.lua')
+local function escape(s) return (s:gsub('([^%w])','%%%1')) end
+local v=toc:match('## Version:%s*([^\r\n]+)')
+assert(v=='5.0.0','candidate version mismatch')
+assert(core:find('version = "'..v..'"',1,true),'TOC/Core versions differ')
+assert(toc:find('## Interface: 16001',1,true),'target interface mismatch')
+assert(toc:find('## SavedVariables: AuctionatorTradeScopeDB',1,true),'saved-variable name changed')
+assert(toc:find('Engine\\Combat.lua',1,true),'combat module missing from TOC')
+local comb=read('Engine/Combat.lua')
+assert(comb:find('PLAYER_REGEN_DISABLED',1,true),'combat on-entry handling missing')
+assert(comb:find('PLAYER_REGEN_ENABLED',1,true),'combat on-exit handling missing')
+local main=read('UI/Pro/Window.lua')
+assert(main:find('terminal',1,true) and main:find('balance',1,true),'unified terminal routes missing')
+assert(main:find('A.EmbedDashboard',1,true) and main:find('A.EmbedBalanceHistory',1,true),'embedded tabs missing')
+local pages=read('UI/Pro/Pages/Candles.lua')
+assert(pages:find('BOTTOMLEFT',1,true),'item/plot clearance anchor missing')
+local craft=read('UI/Pro/Pages/Craft.lua')
+assert(craft:find('function B.craft',1,true),'craft page missing')
+local pkgmeta=read('pkgmeta.yaml')
+assert(pkgmeta:find('package-as: AuctionatorTradeScope',1,true),'addon output name mismatch')
+print('PASS 5.0.0 pre-release metadata, combat, unified UI and package gate')

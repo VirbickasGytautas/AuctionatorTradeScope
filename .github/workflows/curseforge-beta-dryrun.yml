@@ -7,6 +7,8 @@ on:
       - beta/4.4.0-refactor
       - beta/4.5.0-portfolio
       - beta/4.6.0-strategies
+      - beta/5.0.0-terminal-ui
+      - beta/5.0.0-ci
   workflow_dispatch:
 
 permissions:
@@ -41,10 +43,15 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for test in test-toc test-ui-modules test-craft-batch test-craft-report test-graph-cursor test-journal-analysis test-journal-ui test-dashboard-ui test-portfolio test-portfolio-ui test-mail-import test-portfolio-stock test-portfolio-sales test-portfolio-allocation test-pro-item-icons test-strategies test-strategies-ui test-combat; do
+          # Validate Lua 5.1 syntax for every source and test before execution.
+          while IFS= read -r -d '' file; do
+            luac5.1 -p "$file"
+          done < <(find Engine UI Finance Market Crafting Data Localization scripts -type f -name '*.lua' -print0)
+          # Run every test in a deterministic order, including new UI regressions.
+          while IFS= read -r -d '' test; do
             echo "Checking $test"
-            lua5.1 "scripts/$test.lua"
-          done
+            lua5.1 "$test"
+          done < <(find scripts -maxdepth 1 -type f -name 'test-*.lua' -print0 | sort -z)
       - name: Package addon without publishing
         uses: BigWigsMods/packager@v2.6.1
         with:

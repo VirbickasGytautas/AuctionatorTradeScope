@@ -99,7 +99,7 @@ function A.SelectItem(raw)
   local key,legacy,link=parseItem(raw)
   if not key then return false end
   local f=A.dashboard
-  if not f then A.ToggleDashboard();f=A.dashboard end
+  if not f and A.OpenProTool then A.OpenProTool("terminal");f=A.dashboard end
   local changed = f.key ~= key
   f.key,f.legacy,f.link = key,legacy,link
   if changed and f.graph then f.graph.zoomHours = nil end
@@ -171,24 +171,24 @@ local function create()
   end
   f.isTradeScopeTerminal=true
   local mainSurface=shade(f,10,-10,WIDTH-20,HEIGHT-20,{.042,.064,.086,1})
+  f.standaloneSurface=mainSurface
   if A.TrackBackgroundTexture then A.TrackBackgroundTexture("terminal",mainSurface) end
   -- Match the Pro workstation: one continuous panel, fine gold separators.
-  shade(f,15,-69,WIDTH-30,1,{.38,.29,.15,.62})
-  shade(f,251,-69,1,HEIGHT-112,{.50,.37,.15,.62})
+  f.topRule=shade(f,15,-69,WIDTH-30,1,{.38,.29,.15,.62})
+  f.sidebarRule=shade(f,251,-69,1,HEIGHT-112,{.50,.37,.15,.62})
   -- Keep only the separator: a second translucent surface made the lower
   -- area visibly darker than the rest of the terminal.
   -- The taller footer and aligned controls from beta6 are preserved.
-  shade(f,15,-HEIGHT+56,WIDTH-30,1,{.43,.33,.16,.65})
+  f.bottomRule=shade(f,15,-HEIGHT+56,WIDTH-30,1,{.43,.33,.16,.65})
   local logo=f:CreateTexture(nil,"ARTWORK")
   logo:SetTexture("Interface\\AddOns\\AuctionatorTradeScope\\Media\\Icon")
   logo:SetSize(31,31);logo:SetPoint("TOPLEFT",f,"TOPLEFT",22,-20)
+  f.logo=logo
   f.heading=fs(f,780,"GameFontNormalLarge")
   f.heading:SetPoint("TOPLEFT",f,"TOPLEFT",62,-27)
   f.heading:SetText(A.L.TERMINAL)
   f.close=CreateFrame("Button",nil,f,"UIPanelCloseButton")
   f.close:SetPoint("TOPRIGHT",f,"TOPRIGHT",-6,-7)
-  f.balanceButton=button(f,A.L.WALLET_OPEN_BUTTON,126,24,function() A.ToggleBalanceWindow() end)
-  f.balanceButton:SetPoint("TOPRIGHT",f,"TOPRIGHT",-46,-23)
   f.toolsToggle=button(f,A.L.TOOLS_BUTTON,131,24,function()
     f.showTools=not f.showTools
     A.RefreshDashboard()
@@ -196,18 +196,14 @@ local function create()
   -- Keep the tools control 8px lower, fully below the footer separator.
   f.toolsToggle:SetSize(131,22)
   f.toolsToggle:SetPoint("BOTTOMRIGHT",f,"BOTTOMRIGHT",-26,17)
-  f.proButton=button(f,"TradeScope Pro",118,24,function()
-    if A.OpenProTool then A.OpenProTool("scanner") end
-  end)
-  f.proButton:SetPoint("TOPRIGHT",f.balanceButton,"TOPLEFT",-8,0)
-  f.alertButton=button(f,A.locale=="ruRU" and "Сигналы" or "Alerts",85,24,function()
-    if A.OpenProAlertForItem then A.OpenProAlertForItem(f.key) end
-  end)
-  f.alertButton:SetPoint("TOPRIGHT",f.proButton,"TOPLEFT",-8,0)
+  -- Legacy upper buttons (wallet, signals, Pro) are retired. Their actions
+  -- are available as pages in the single left-hand navigation.
   local title=fs(f,210,"GameFontNormal")
   title:SetPoint("TOPLEFT",f,"TOPLEFT",25,-87);title:SetText(A.L.SELECT_ITEM_TITLE)
+  f.selectTitle=title
   local searchLabel=fs(f,208)
   searchLabel:SetPoint("TOPLEFT",f,"TOPLEFT",25,-112);searchLabel:SetText(A.L.SEARCH)
+  f.searchLabel=searchLabel
   f.query=CreateFrame("EditBox","ATSTradeScopeQuery",f,"InputBoxTemplate")
   f.query:SetSize(207,24);f.query:SetPoint("TOPLEFT",f,"TOPLEFT",25,-134)
   f.query:SetMaxLetters(255);f.query:SetAutoFocus(false)
@@ -325,6 +321,7 @@ local function create()
   end)
   local drop=CreateFrame("Button","ATSTradeScopeDrop",f)
   drop:SetPoint("TOPLEFT",f,"TOPLEFT",25,-172)
+  f.dropTarget=drop
   drop:SetSize(207,66);drop:EnableMouse(true)
   local dropTex=drop:CreateTexture(nil,"BACKGROUND")
   dropTex:SetTexture("Interface\\Buttons\\WHITE8X8")
@@ -363,9 +360,10 @@ local function create()
   f.pickHelp:SetPoint("TOPLEFT",f,"TOPLEFT",25,-283)
   f.pickHelp:SetText(A.L.PICK_HINT)
   -- Watchlist layout fits 8 rows and a control strip above the footer.
-  shade(f,23,-315,211,1,{.43,.33,.16,.64})
+  f.watchRule=shade(f,23,-315,211,1,{.43,.33,.16,.64})
   local wl=fs(f,210,"GameFontNormal")
   wl:SetPoint("TOPLEFT",f,"TOPLEFT",25,-327);wl:SetText(A.L.WATCHLIST)
+  f.watchTitle=wl
   f.watchButtons={}
   for i=1,PER_PAGE do
     local index=i
@@ -433,7 +431,7 @@ local function create()
   f.graph=A.NewGraph(f)
   -- One fixed plot viewport in the terminal for combined, price, quantity
   -- and supply-decline modes. Tooltip graphs retain their original heights.
-  f.graph.terminalChartHeight=246
+  f.graph.terminalChartHeight=246 -- standalone legacy default; reflow embedded below
   f.graph:SetPoint("TOPLEFT",f,"TOPLEFT",261,-245)
   f.graph:SetFrameStrata("DIALOG")
   f.graph:SetFrameLevel(f:GetFrameLevel()+5)
@@ -448,6 +446,7 @@ local function create()
   f.footer:SetText(A.L.FOOTNOTE)
   f.footer:SetTextColor(.78,.71,.50)
   local drag=CreateFrame("Frame",nil,f)
+  f.drag=drag
   drag:SetSize(840,45);drag:SetPoint("TOPLEFT",f,"TOPLEFT",20,-12)
   drag:EnableMouse(true);drag:RegisterForDrag("LeftButton")
   drag:SetScript("OnDragStart",function() f:StartMoving() end)
@@ -521,24 +520,97 @@ function A.RefreshDashboard()
     A.RenderGraph(f.graph,f.key,f.legacy,f.selectedGraph)
   end
 end
+-- Embed the legacy market plotting and watchlist controls in the unified
+-- workspace. Keeping this child frame preserves chart interactions without
+-- adding a second window or changing SavedVariables.
+function A.EmbedDashboard(page)
+  local f=create()
+  if f.embeddedIn~=page then
+    f:Hide()
+    f:SetParent(page)
+    f:ClearAllPoints()
+    -- A genuine native-size layout, not a scaled copy of the legacy popup.
+    f:SetScale(1)
+    f:SetSize(944,654)
+    f:SetPoint("TOPLEFT",page,"TOPLEFT",1,-2)
+    f:SetFrameStrata("DIALOG")
+    f:SetFrameLevel(page:GetFrameLevel()+2)
+    if f.SetBackdrop then f:SetBackdrop(nil) end
+    for _,part in ipairs({f.standaloneSurface,f.topRule,f.bottomRule}) do
+      if part then part:Hide() end
+    end
+    -- Decorative title and legacy navigation have moved to the sidebar.
+    for _,part in ipairs({f.logo,f.heading,f.close,f.balanceButton,f.proButton,f.alertButton,
+      f.drag}) do if part then part:Hide() end end
+    -- Reanchor the old terminal controls to the top of the actual workspace.
+    -- This removes the 70px reserved for the former standalone title bar.
+    local function place(widget,x,y)
+      if not widget then return end
+      widget:ClearAllPoints()
+      widget:SetPoint("TOPLEFT",f,"TOPLEFT",x,y)
+    end
+    place(f.selectTitle,25,-13)
+    place(f.searchLabel,25,-38)
+    place(f.query,25,-61)
+    place(f.dropTarget,25,-100)
+    place(f.pickButton,25,-172)
+    place(f.pickHelp,25,-205)
+    place(f.watchRule,23,-240)
+    place(f.watchTitle,25,-251)
+    for i,row in ipairs(f.watchButtons) do
+      place(row,23,-274-(i-1)*29)
+    end
+    place(f.prev,25,-604)
+    place(f.next,69,-604)
+    place(f.pin,113,-604)
+    place(f.selectedIcon,267,-14)
+    place(f.itemLabel,316,-22)
+    for i,metric in ipairs(f.metrics) do place(metric,267,-61-(i-1)*22) end
+    place(f.signal,267,-136)
+    for i,tab in ipairs(f.graphTabs) do place(tab,267+(i-1)*117,-165) end
+    place(f.zoomIn,741,-165)
+    place(f.graph,261,-193)
+    place(f.tradePanel,261,-227)
+    f.graph.terminalChartHeight=312
+    f.graph:SetScale(1)
+    if f.sidebarRule then
+      f.sidebarRule:ClearAllPoints()
+      f.sidebarRule:SetPoint("TOPLEFT",f,"TOPLEFT",251,-2)
+      f.sidebarRule:SetHeight(638)
+    end
+    -- The embedded child is never a separate movable/modal window.
+    f:SetMovable(false)
+    f.embeddedIn=page
+    if f.query and f.query.HookScript then
+      f.query:HookScript("OnEnter",function(self)
+        if GameTooltip then
+          GameTooltip:SetOwner(self,"ANCHOR_RIGHT")
+          GameTooltip:SetText(A.L.SEARCH)
+          GameTooltip:AddLine(A.locale=="ruRU" and
+            "Введите ID, ссылку или название предмета. Выберите результат из списка." or
+            "Enter an item ID, item link or name; choose a matching result.",1,1,1,true)
+          GameTooltip:Show()
+        end
+      end)
+      f.query:HookScript("OnLeave",function()
+        if GameTooltip then GameTooltip:Hide() end
+      end)
+    end
+  end
+  f:Show()
+  return f
+end
 local function show()
   if A.InCombat and A.InCombat() then return end
-  local f=create()
-  local sx=(UIParent:GetWidth()-25)/WIDTH
-  local sy=(UIParent:GetHeight()-25)/HEIGHT
-  f:SetScale(math.min(1,math.max(0.58,math.min(sx,sy))))
-  f:Show();A.RefreshDashboard()
+  if not A.OpenProTool then return end
+  A.OpenProTool("terminal")
   if A.StartItemNameIndex then A.StartItemNameIndex() end
-  return f
+  return A.dashboard
 end
 function A.ToggleDashboard()
   if A.InCombat and A.InCombat() then return end
   A.Init()
-  local f=create()
-  if f:IsShown() then f:Hide();A.bagPicking=false;return end
-  local key,legacy,link=A.HoveredItem()
-  show()
-  if key and link then A.SelectItem(link) end
+  if A.ToggleProTool then A.ToggleProTool("terminal") end
 end
 function A.OpenDashboardItem(raw)
   if A.InCombat and A.InCombat() then return end

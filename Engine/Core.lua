@@ -1,6 +1,6 @@
 -- Auctionator TradeScope 4.1.0 -- WoW Forever / Lua 5.1
 -- A fresh standalone addon; no legacy history is imported.
-ATS = { version = "4.6.0", source = "none" }
+ATS = { version = "5.0.0", source = "none" }
 local A = ATS
 _G.AuctionatorTradeScope = A
 
@@ -285,7 +285,8 @@ SlashCmdList.AUCTIONATORTRADESCOPE = function(message)
          command == "strategies" or command == "portfolio" then
     if A.OpenProTool then A.OpenProTool(command == "workspace" and "craftscan" or command) end
   elseif command == "pro" or command == "tools" then
-    if A.OpenProTool then A.OpenProTool("scanner") end
+    -- Legacy command aliases; never expose a second "Pro" window.
+    if A.OpenProTool then A.OpenProTool("terminal") end
   elseif command == "test" then
     A.testUntil = GetTime() + 8
     A.Draw(nil, nil, true)

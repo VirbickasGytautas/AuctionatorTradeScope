@@ -1,3 +1,52 @@
+## 5.0.0 — stable package prepared (not published)
+- Promoted from 5.0.0-rc1 after five confirmed in-game smoke checks.
+- Game-facing code and calculations unchanged except displayed version.
+- All 28 local TeX Lua tests pass. Lua 5.1 CI still requires an isolated branch push.
+- No release tag, CurseForge deployment, SavedVariables reset or automatic trading.
+
+## 5.0.0-rc1 — Pre-release candidate (not published)
+- Identical functionality to game-tested 5.0.0-beta7; only version strings change in game modules.
+- Expanded Build Only validation from 20 selected checks to all test scripts, with Lua 5.1 syntax verification.
+- Adds pre-release readiness gate for TOC/Core, combat, unified window, charts and packaging.
+- No SavedVariables changes, no public tag, no CurseForge publication. In-game RC smoke test remains pending.
+
+### 5.0.0-beta7 — Candlestick chart / item-strip separation (local test)
+- Anchored the OHLC plot below the selected-item identity strip with a 24 UI-unit gap; chart textures no longer share the item icon/name area.
+- Rebalanced chart height and moved summary/legend below the plot without changing data, candle calculations or other pages.
+- Market, Journal, Portfolio, crafting data, combat guard and SavedVariables remain unchanged. Local test only; no CurseForge publication.
+
+### 5.0.0-beta6 — Craft Calculator selection and workspace fix (local test)
+- Saved recipes now appear as a two-column inline browser when no recipe is selected, instead of an empty ingredient table.
+- Material pagination and financial summary move directly below the visible ingredient rows when a recipe is selected.
+- Catalog-to-calculator navigation selects the recipe without reopening the suggestion popup; programmatic text changes are ignored unless the recipe field has focus.
+- Explicit Saved recipes search, typing, keyboard selection and Esc dismissal remain supported.
+- SavedVariables, cost/profit formulas, market data and combat protection unchanged. No CurseForge publication.
+
+### 5.0.0-beta4 — Unified page geometry (local UI test)
+- Active page label is now below TradeScope; common top offset is reduced from 104 to 74.
+- Embedded Terminal uses native 1:1 layout and reanchored controls instead of legacy modal insets.
+- Gold History reflows plot, cursor hitbox and period controls to the shared workspace instead of enlarging a modal.
+- No market math, saved data, or combat-guard changes. In-game test required; no CurseForge publication.
+
+### 5.0.0-beta3 — Responsive workspace fixes (local UI test)
+- Enlarge embedded Terminal and Gold History within the unified window and restore sidebar icons.
+- Widen OHLC/RSI/MACD plots, heatmap, scanner, alert rules/history, recipe catalog and shared item rows; increase visible result rows where space allows.
+- Keep 14 unified navigation entries, contextual tooltips, saved data, combat guard and market math unchanged.
+- Build-only; requires in-game visual testing, do not tag or publish to CurseForge.
+
+## 5.0.0-beta2 — Unified Terminal
+- Replaced the two windows with one TradeScope navigation shell, Market → Terminal first, Trading → Gold history.
+- Removed static HOW IT WORKS help panels in favor of contextual ? and hover hints. Preserved craft scan status within the page.
+- No new trades, no data migrations, no CurseForge release.
+
+## 5.0.0-beta1 — Professional Terminal UX preview (local testing)
+- Replaces the top grid of twelve equally weighted tabs with a compact, grouped left sidebar: Market, Analytics, Trading, Crafting. All twelve tools remain accessible.
+- Gives Scanner and Strategies the entire 946-pixel work area; their permanent 'How it works' sidebars are replaced with contextual header help.
+- Scanner uses labeled item/discount/price/score/risk columns and a clear empty state with a scan action.
+- Strategies widen the evidence list and show one next step when reliable source data is missing.
+- No change to economic calculations, trades, Auctionator integrations or SavedVariables. Combat lockdown stays active.
+- Remaining ten pages retain their existing content while the 5.0 migration is tested. Do not publish this beta to CurseForge.
+
 ## 4.6.0 — Trading Strategies and Combat UI Safety
 
 ### Trading Strategies

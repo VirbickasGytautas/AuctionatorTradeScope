@@ -49,11 +49,11 @@ function B.indicators(root)
   button(p,l("Calculate","Рассчитать"),272,-83,132,function()p.update()end)
   p.identity=makeItemIdentity(p)
   p.rows={}
-  for i=1,10 do p.rows[i]=fs(p,"",20,-183-(i-1)*35,326,i==1) end
-  fs(p,"RSI",375,-163,305,true)
-  fs(p,"MACD",375,-354,305,true)
-  p.rsiPlot=newPlot(p,368,-185,338,156)
-  p.macdPlot=newPlot(p,368,-376,338,155)
+  for i=1,10 do p.rows[i]=fs(p,"",20,-181-(i-1)*41,435,i==1) end
+  fs(p,"RSI",480,-163,435,true)
+  fs(p,"MACD",480,-373,435,true)
+  p.rsiPlot=newPlot(p,478,-185,439,176)
+  p.macdPlot=newPlot(p,478,-395,439,176)
   local rsiUpper=fs(p.rsiPlot,"70",6,-41,32)
   rsiUpper:SetTextColor(.85,.48,.50)
   local rsiMid=fs(p.rsiPlot,"50",6,-74,32)
@@ -62,11 +62,11 @@ function B.indicators(root)
   rsiLower:SetTextColor(.43,.83,.60)
   attachIndicatorCursor(p.rsiPlot,"rsi")
   attachIndicatorCursor(p.macdPlot,"macd")
-  p.rsiStatus=fs(p.rsiPlot,"",20,-67,298)
+  p.rsiStatus=fs(p.rsiPlot,"",20,-67,399)
   p.rsiStatus:SetJustifyH("CENTER")
-  p.macdStatus=fs(p.macdPlot,"",20,-67,298)
+  p.macdStatus=fs(p.macdPlot,"",20,-67,399)
   p.macdStatus:SetJustifyH("CENTER")
-  p.details=fs(p,"",20,-535,695)
+  p.details=fs(p,"",20,-606,895)
   p.details:SetTextColor(.70,.82,.87)
   local glossary={
     {"EMA","Экспоненциальная средняя: больше вес последних наблюдаемых цен, по одному значению на интервал."},
@@ -85,8 +85,8 @@ function B.indicators(root)
   for i=2,8 do
     local term=i==2 and 1 or (i==3 and 2 or (i==4 and 3 or (i==5 and 4 or 5)))
     local overlay=CreateFrame("Frame",nil,p)
-    overlay:SetSize(310,28)
-    overlay:SetPoint("TOPLEFT",p,"TOPLEFT",18,-183-(i-1)*35+3)
+    overlay:SetSize(426,30)
+    overlay:SetPoint("TOPLEFT",p,"TOPLEFT",18,-181-(i-1)*41+3)
     overlay:EnableMouse(true)
     attachHelp(overlay,glossary[term][1],l(glossaryEN[term],glossary[term][2]))
   end
@@ -154,16 +154,16 @@ function B.indicators(root)
     local first=math.max(1,n-100)
     local tMin=points[first].t
     local timeSpan=math.max(1,points[n].t-tMin)
-    local function x(point) return (point.t-tMin)/timeSpan*338 end
+    local function x(point) return (point.t-tMin)/timeSpan*439 end
     if cfg.showRSI then
       for _,threshold in ipairs({30,50,70}) do
         local r,g,b=.32,.39,.49
         if threshold==70 then r,g,b=.70,.32,.34
         elseif threshold==30 then r,g,b=.28,.61,.43 end
-        rPlot:rect(0,threshold/100*156,338,1,r,g,b,.83)
+        rPlot:rect(0,threshold/100*176,439,1,r,g,b,.83)
       end
     end
-    if cfg.showMACD then mPlot:rect(0,77,338,1,.38,.45,.53,.86) end
+    if cfg.showMACD then mPlot:rect(0,88,439,1,.38,.45,.53,.86) end
     local macdRange=.1
     for i=first,n do
       local pt=points[i]
@@ -174,9 +174,9 @@ function B.indicators(root)
       for i=first,n do
         local pt=points[i]
         local xx=x(pt)
-        local val=(pt.hist or 0)/macdRange*65
-        if val>=0 then mPlot:rect(xx-2,77,4,math.max(1,val),.31,.68,.48,.62)
-        else mPlot:rect(xx-2,77+val,4,math.max(1,-val),.85,.39,.36,.62) end
+        local val=(pt.hist or 0)/macdRange*75
+        if val>=0 then mPlot:rect(xx-2,88,4,math.max(1,val),.31,.68,.48,.62)
+        else mPlot:rect(xx-2,88+val,4,math.max(1,-val),.85,.39,.36,.62) end
       end
     end
     local previousRSI,previousMACD,previousSignal
@@ -188,15 +188,15 @@ function B.indicators(root)
       -- Never draw a continuous line through an unobserved interval.
       local canJoin=prev and pt.segment==prev.segment and pt.slot-prev.slot<=2
       if cfg.showRSI and pt.rsi then
-        local yy=pt.rsi/100*156
+        local yy=pt.rsi/100*176
         if previousRSI and canJoin then miniLine(rPlot,previousRSI.x,previousRSI.y,xx,yy,.33,.89,.91) end
         rPlot:rect(xx-1.5,yy-1.5,3,3,.32,.9,1)
         previousRSI={x=xx,y=yy}
         rData[#rData+1]={x=xx,data=pt}
       else previousRSI=nil end
       if cfg.showMACD then
-        local yy=77+(pt.macd or 0)/macdRange*67
-        local sy=77+(pt.signal or 0)/macdRange*67
+        local yy=88+(pt.macd or 0)/macdRange*75
+        local sy=88+(pt.signal or 0)/macdRange*75
         if previousMACD and canJoin then miniLine(mPlot,previousMACD.x,previousMACD.y,xx,yy,.42,.9,.55) end
         if previousSignal and canJoin then miniLine(mPlot,previousSignal.x,previousSignal.y,xx,sy,1,.72,.22) end
         previousMACD={x=xx,y=yy};previousSignal={x=xx,y=sy}

@@ -1,3 +1,49 @@
+# Auctionator TradeScope 5.0.0 — stable package staged (not published)
+
+User-tested `5.0.0-rc1` has been promoted to `5.0.0` with **only version metadata changes in game-facing Lua**. GitHub Actions Lua 5.1 validation for these exact files is not yet confirmed. No CurseForge tag or upload was triggered. See `docs/RELEASE_5_0_0_STABLE.md`.
+
+# Auctionator TradeScope 5.0.0-rc1 — release candidate (not published)
+
+This release candidate has the same user-visible functions as the **in-game-tested 5.0.0-beta7**, plus a version-only change and expanded build validation. The unified terminal, two-column activity/quality page, craft calculator, candlestick layout, saved data and combat protection are retained.
+
+**Not published to CurseForge. No release tag has been created.** The GitHub CI must still validate Lua 5.1, and the candidate must undergo a short in-game smoke test. See `docs/RELEASE_5_0_0_RC1.md`.
+
+### 5.0.0-beta7 — OHLC chart item header separation (local test)
+
+The candlestick plot is now anchored 24 UI units below the selected-item strip, so candle textures cannot intersect the item icon/name. The plot footer is repositioned within the workspace. No changes to calculations, saved data or combat safety. Not published to CurseForge.
+
+### 5.0.0-beta6 — Craft Calculator UI correction (local beta)
+
+The calculator now offers **twelve saved recipe shortcuts in a two-column list** while no recipe is selected. Selecting any recipe opens the ingredient calculation on the same page, with navigation, cost totals and ROI arranged directly after the ingredients. Switching from Recipe Catalog applies the recipe without leaving a blocking saved-recipe search popup. The popup is now shown only for focused typing or an explicit Saved Recipes command.
+
+Economic calculations, market history, journal, SavedVariables and combat restrictions are unchanged. This beta must be visually tested in WoW Forever and is **not** released to CurseForge.
+
+### 5.0.0-beta5 — Workspace Optimization (local test)
+- Market Activity and Data Quality combined into a two-column research view with a shared item. Legacy `/ats quality` opens the merged tab.
+- Bottom navigation rows aligned; Strategies, Portfolio, Journal and Craft Catalog use more vertical space.
+- No saved-data, analysis-math or combat-guard changes. In-game tests pending; no CurseForge publishing.
+
+### 5.0.0-beta4 — Unified page geometry (local UI test)
+- Active page label is now below TradeScope; common top offset is reduced from 104 to 74.
+- Embedded Terminal uses native 1:1 layout and reanchored controls instead of legacy modal insets.
+- Gold History reflows plot, cursor hitbox and period controls to the shared workspace instead of enlarging a modal.
+- No market math, saved data, or combat-guard changes. In-game test required; no CurseForge publication.
+
+### 5.0.0-beta3 — Responsive workspace fixes (local UI test)
+- Enlarge embedded Terminal and Gold History within the unified window and restore sidebar icons.
+- Widen OHLC/RSI/MACD plots, heatmap, scanner, alert rules/history, recipe catalog and shared item rows; increase visible result rows where space allows.
+- Keep 14 unified navigation entries, contextual tooltips, saved data, combat guard and market math unchanged.
+- Build-only; requires in-game visual testing, do not tag or publish to CurseForge.
+
+## 5.0.0-beta2 — Unified terminal, local test only
+One window for market terminal, scanner, alerts, charts, analytics, journal, portfolio, strategies, crafting and character gold history. The market terminal is the first Market tab; gold history appears under Trading. No permanent HOW IT WORKS column: use ? and hover tooltips. The combat safety and database schema remain unchanged. Not published to CurseForge.
+
+# Auctionator TradeScope 5.0.0-beta1 — Professional Terminal preview
+
+This is an **in-game testing build**, not a stable release. The 4.6.0 Trading Strategies logic and emergency combat lockdown remain intact. The new 5.0 shell groups navigation in a left sidebar and removes permanently visible explanations from the redesigned Scanner and Strategies pages. All 12 tools remain available; the remaining pages keep their 4.6.0 layout until they are migrated and tested.
+
+**No SavedVariables reset or migration. No automatic trading. Not published on CurseForge.**
+
 # Auctionator TradeScope 4.6.0 — WoW Forever
 
 ### 4.6.0 — Trading Strategies 2.0 foundation and combat lockdown

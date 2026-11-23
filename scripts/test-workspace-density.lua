@@ -1,0 +1,45 @@
+-- Beta4 geometry tests without loading the WoW client. All source inspections are
+-- regression guards for layout, not substitutes for an in-game visual check.
+assert(loadfile("scripts/test-terminal-layout.lua"))()
+local A=ATS
+local w=A.proWindow
+assert(w.content.width==946 and w.content.height==660,"unified content not expanded")
+assert(w.nav.terminal.icon.texture=="Interface\\AddOns\\AuctionatorTradeScope\\Media\\Icon","terminal icon missing")
+assert(w.nav.balance.icon.texture=="Interface\\Icons\\INV_Misc_Coin_01","gold icon missing")
+local function source(path)
+ local f=assert(io.open(path,"rb")); local s=f:read("*a");f:close();return s
+end
+local shared=source("UI/Pro/Shared.lua")
+assert(shared:find('p:SetSize(946,660)',1,true))
+assert(shared:find('bar:SetSize(905,42)',1,true))
+assert(shared:find('18,y,903,nil,26',1,true))
+local terminal=source("UI/Dashboard.lua")
+assert(terminal:find('f:SetScale(1)',1,true))
+assert(terminal:find('f:SetPoint("TOPLEFT",page,"TOPLEFT",1,-2)',1,true))
+assert(terminal:find('f.logo,f.heading',1,true))
+local gold=source("Finance/Balance.lua")
+assert(gold:find('LEFT,RIGHT,BOTTOM,TOP=88,916,136,548',1,true))
+local candles=source("UI/Pro/Pages/Candles.lua")
+assert(candles:find('PLOT_W,PLOT_H=868,390',1,true))
+assert(not candles:find('*630',1,true),"hard-coded old candle x width")
+local alerts=source("UI/Pro/Pages/Alerts.lua")
+assert(alerts:find('b:SetSize(902,26)',1,true))
+assert(alerts:find('local perPage=4',1,true))
+local heatmap=source("UI/Pro/Pages/Heatmap.lua")
+assert(heatmap:find('79+h*34',1,true))
+local indicators=source("UI/Pro/Pages/Indicators.lua")
+assert(indicators:find('p.rsiPlot=newPlot(p,478,-185,439,176)',1,true))
+local scanner=source("UI/Pro/Pages/Scanner.lua")
+assert(scanner:find('for i=1,13 do',1,true))
+local craft=source("UI/Pro/Pages/Craft.lua")
+assert(craft:find('tex(p,20,y,900,33',1,true))
+local portfolio=source("UI/Pro/Pages/Portfolio.lua")
+assert(portfolio:find('BAR_WIDTH,BAR_HEIGHT=840,7',1,true))
+local journal=source("UI/Pro/Pages/Journal.lua")
+assert(journal:find('tex(p,18,-159,900,50',1,true))
+local catalog=source("UI/Pro/Pages/CraftCatalog.lua")
+assert(catalog:find('row:SetSize(900,39)',1,true))
+for _,path in ipairs({"Market/Strategies.lua","Finance/Journal/Ledger.lua","Data/History.lua","Engine/Combat.lua"}) do
+  assert(#source(path)>50,"core source missing: "..path)
+end
+print("PASS beta4 layout density: full canvas, restored icons, large plots, table and catalog widths")
