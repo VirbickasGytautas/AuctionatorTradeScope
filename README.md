@@ -1,12 +1,35 @@
-# Auctionator TradeScope 5.0.0 — stable package staged (not published)
+# Auctionator TradeScope
 
-User-tested `5.0.0-rc1` has been promoted to `5.0.0` with **only version metadata changes in game-facing Lua**. GitHub Actions Lua 5.1 validation for these exact files is not yet confirmed. No CurseForge tag or upload was triggered. See `docs/RELEASE_5_0_0_STABLE.md`.
+**Latest stable release: `5.0.0` (23 November 2026)** · WoW Forever 1.60.1 (`Interface 16001`) · Lua 5.1.
 
-# Auctionator TradeScope 5.0.0-rc1 — release candidate (not published)
+[CurseForge project](https://www.curseforge.com/wow/addons/auctionator-tradescope) · [Source tag `v5.0.0`](https://github.com/VirbickasGytautas/AuctionatorTradeScope/tree/v5.0.0) · [Lua 5.1 CI](https://github.com/VirbickasGytautas/AuctionatorTradeScope/actions/runs/45140016911) · [CurseForge publishing workflow](https://github.com/VirbickasGytautas/AuctionatorTradeScope/actions/runs/45141207710) · [Русская версия](README_RU.md)
 
-This release candidate has the same user-visible functions as the **in-game-tested 5.0.0-beta7**, plus a version-only change and expanded build validation. The unified terminal, two-column activity/quality page, craft calculator, candlestick layout, saved data and combat protection are retained.
+TradeScope extends Auctionator with local market research and trading tools. **Version 5.0.0 is the released stable version**, not an unpublished staging build. The `v5.0.0` tag points to the tested `main` commit `986ced9`; the release workflow completed its CurseForge upload step successfully.
 
-**Not published to CurseForge. No release tag has been created.** The GitHub CI must still validate Lua 5.1, and the candidate must undergo a short in-game smoke test. See `docs/RELEASE_5_0_0_RC1.md`.
+## What's in 5.0.0
+
+- **One unified TradeScope window**, with a grouped sidebar: Market, Analytics, Trading, Crafting; Market → Terminal is the first page.
+- **Market research:** scanner, price alerts, OHLC charts, RSI/MACD/EMA indicators and heatmaps, plus a two-column Activity / Data Quality view.
+- **Trading tools:** evidence-based strategies, portfolio holdings/cost basis, transaction journal, and embedded character gold history.
+- **Crafting:** recipe catalog and calculator, inventory-aware material costs, saved recipe selection and profitability estimates.
+- **Contextual help** via `?` and hover tooltips, not permanent help columns; clearer tables and chart geometry.
+- **Combat safety:** TradeScope-owned windows and floating graphs close on entering combat and cannot be opened during combat; they do not reopen automatically afterward.
+- **Saved data preserved:** existing Auctionator observations, journal entries, watchlist, crafting recipes and `AuctionatorTradeScopeDB` remain compatible; no reset is required.
+
+## Installation and usage
+
+Install the CurseForge package into `Interface/AddOns/AuctionatorTradeScope` in **WoW Forever 1.60.1**. Use Auctionator to collect auction observations, then open TradeScope with `/ats` or its minimap shortcut. Prices, signals and estimated profit are based on **observed local data**, not guaranteed sales; confirmed revenue is not profit when acquisition cost is unknown. The addon does not automatically buy, list or sell items.
+
+## Verification and release history
+
+- **Gameplay:** 7 beta7 checks and 5 RC1 smoke checks were confirmed in WoW Forever.
+- **Automated validation:** 28 Lua 5.1 regression tests, `luac5.1` syntax validation, and ZIP integrity checks passed on the final `main` commit.
+- **Release:** `v5.0.0` tag and CurseForge publishing workflow succeeded on 23 November 2026. A separate GitHub Releases entry is not required for CurseForge publication.
+- [Detailed 5.0.0 release notes](docs/RELEASE_5_0_0_STABLE.md) · [Changes and previous releases](CHANGELOG_RELEASE.md).
+
+### Historical development notes (pre-release status at the time)
+
+`5.0.0-rc1` was a **release candidate only**, not a separately published version. Its pending-check statements have been superseded by the successful stable 5.0.0 validation and publication above. The beta notes below describe their original testing stages.
 
 ### 5.0.0-beta7 — OHLC chart item header separation (local test)
 
@@ -54,7 +77,7 @@ This release is built from **4.6.0-beta2** and contains the same feature code. T
 
 Compatibility: existing Journal, Portfolio, market data, saved recipes, alerts and settings stay intact. The new combat guard does not alter SavedVariables schema or historical accounting. WoW Forever 1.60.1, Lua 5.1.
 
-**Validation status:** Lua 5.1 automated regression suites pass, but 4.6.0 combat behavior and strategy page still require in-game verification before external CurseForge publication. Do not create or push `v4.6.0` until the publisher explicitly authorizes it.
+**Release status (historical):** Version 4.6.0 later passed in-game validation and was published to CurseForge using the `v4.6.0` tag on 21 November 2026.
 
 ### 4.6.0-beta2 — Emergency automatic combat lockdown
 
