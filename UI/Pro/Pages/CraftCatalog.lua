@@ -46,31 +46,31 @@ function B.craftscan(root)
   heading(p,l("All imported crafting recipes", "Все импортированные рецепты крафта"),-12)
   fs(p,l("Profit, loss and missing quotes. Costs use saved Auctionator prices after auction fees.",
          "Прибыль, убыток и отсутствующие цены. Расчёт по базе Auctionator после комиссии."),20,-49,694)
-  local status=fs(p,"",20,-149,690)
+  local status=fs(p,"",20,-149,900)
   p.status=status
   p.page=1
   p.order=A.db.pro.craftScannerSort=="roi" and "roi" or "profit"
   local list={}
   local perPage=9
   local rows={}
-  fs(p,l("RECIPE","РЕЦЕПТ"),61,-171,275,true)
-  local tableHeader=fs(p,l("PROFIT PER CRAFT  /  ROI","ПРИБЫЛЬ ЗА КРАФТ  /  ROI"),337,-171,350,true)
+  fs(p,l("RECIPE","РЕЦЕПТ"),61,-171,478,true)
+  local tableHeader=fs(p,l("PROFIT PER CRAFT  /  ROI","ПРИБЫЛЬ ЗА КРАФТ  /  ROI"),539,-171,350,true)
   tableHeader:SetJustifyH("RIGHT")
-  local separator=tex(p,20,-184,690,1,.42,.31,.15,.85)
+  local separator=tex(p,20,-184,900,1,.42,.31,.15,.85)
   for i=1,perPage do
-    local y=-199-(i-1)*35
+    local y=-199-(i-1)*42
     local row=CreateFrame("Button",nil,p)
     row:SetPoint("TOPLEFT",p,"TOPLEFT",20,y)
-    row:SetSize(696,32)
-    local bg=tex(row,0,0,696,32,.085,.12,.145,.95)
+    row:SetSize(900,39)
+    local bg=tex(row,0,0,900,39,.085,.12,.145,.95)
     row.bg=bg
-    local border=tex(row,0,-31,696,1,.36,.27,.13,.55)
+    local border=tex(row,0,-38,900,1,.36,.27,.13,.55)
     local icon=row:CreateTexture(nil,"ARTWORK")
     icon:SetSize(27,27);icon:SetPoint("LEFT",row,"LEFT",5,0)
     row.icon=icon
-    local title=fs(row,"",41,-4,275)
+    local title=fs(row,"",41,-10,480)
     row.title=title
-    local metrics=fs(row,"",319,-4,367)
+    local metrics=fs(row,"",523,-10,367)
     metrics:SetJustifyH("RIGHT")
     row.metrics=metrics
     row:SetScript("OnEnter",function(self)
@@ -96,12 +96,16 @@ function B.craftscan(root)
       local recipe=self.record.recipe
       A.ShowProTab("craft")
       local craftPage=A.proWindow and A.proWindow.pages and A.proWindow.pages.craft
-      if craftPage and craftPage.applyExternalRecipe then craftPage.applyExternalRecipe(recipe) end
+      if craftPage and craftPage.applyExternalRecipe then
+        craftPage.applyExternalRecipe(recipe)
+        if craftPage.recipePopup then craftPage.recipePopup:Hide() end
+      end
+      if GameTooltip then GameTooltip:Hide() end
     end)
     row:Hide()
     rows[i]=row
   end
-  local info=fs(p,"",20,-537,694)
+  local info=fs(p,"",20,-592,900)
   local function refresh()
     list,p.counts=A.ProCraftOpportunities(p.order,
       A.db.pro.craftScannerMinProfitGold,A.db.pro.craftScannerMinROI,
@@ -122,7 +126,7 @@ function B.craftscan(root)
         end
         row.record=d
         row.icon:SetTexture(icon or "Interface\\Icons\\INV_Misc_QuestionMark")
-        row.title:SetText(A.FitItemName and A.FitItemName(name or ("#"..d.product),row.title,274)
+        row.title:SetText(A.FitItemName and A.FitItemName(name or ("#"..d.product),row.title,470)
           or (name or ("#"..d.product)))
         row.title:SetTextColor(1,.82,.38)
         if d.status=="missing" then
@@ -178,16 +182,16 @@ function B.craftscan(root)
   button(p,l("Sort: ROI","Сорт.: ROI"),557,-91,143,function()
     p.order="roi";A.db.pro.craftScannerSort="roi";p.page=1;refresh()
   end)
-  local prevBtn=button(p,l("< Previous","< Назад"),20,-515,110,function()
+  local prevBtn=button(p,l("< Previous","< Назад"),20,-608,110,function()
     p.page=math.max(1,p.page-1);refresh()
   end)
-  local nextBtn=button(p,l("Next >","Вперёд >"),142,-515,110,function()
+  local nextBtn=button(p,l("Next >","Вперёд >"),785,-608,110,function()
     p.page=math.min(math.max(1,math.ceil(#list/perPage)),p.page+1);refresh()
   end)
   local footerHint=fs(p,l("Select a row to see all materials and the calculation.",
-    "Нажмите на рецепт, чтобы посмотреть ресурсы и подробный расчёт."),268,-520,446)
+    "Нажмите на рецепт, чтобы посмотреть ресурсы и подробный расчёт."),266,-614,475)
   footerHint:SetTextColor(.96,.93,.86)
-  local footerPage=fs(p,"",20,-544,694)
+  local footerPage=fs(p,"",20,-634,900)
   local oldRefresh=refresh
   refresh=function()
     oldRefresh()

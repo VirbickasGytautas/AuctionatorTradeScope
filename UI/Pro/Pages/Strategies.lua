@@ -3,7 +3,7 @@ local A=ATS
 local C=assert(A.ProUIShared)
 local B=assert(A.ProUIBuilders)
 local l,fs,tex,button,newPage,heading,currency=C.l,C.fs,C.tex,C.button,C.newPage,C.heading,C.currency
-local PAGESIZE=5
+local PAGESIZE=7
 local titles={
  discount={"Value watch","Поиск скидки"},
  exit={"Exit review","Проверка выхода"},
@@ -79,29 +79,29 @@ function B.strategies(root)
    function()return p.mode end,function(value)p.mode=value;p.pageIndex=1;p.update()end)
  button(p,l("Refresh","Обновить"),275,-54,124,function()p.update()end)
  button(p,l("Market scanner","Сканер рынка"),414,-54,170,function()A.ShowProTab("scanner")end)
- p.counter=fs(p,"",20,-97,692,true)
- p.description=fs(p,"",20,-126,700)
- tex(p,20,-160,698,1,.48,.37,.17,.75)
- p.column=fs(p,l("CANDIDATES / REVIEW QUEUE","КАНДИДАТЫ / СПИСОК НА ПРОВЕРКУ"),20,-171,695,true)
+ p.counter=fs(p,"",20,-97,890,true)
+ p.description=fs(p,"",20,-126,890)
+ tex(p,20,-160,898,1,.48,.37,.17,.75)
+ p.column=fs(p,l("CANDIDATES / REVIEW QUEUE","КАНДИДАТЫ / СПИСОК НА ПРОВЕРКУ"),20,-171,896,true)
  p.rows={}
  for i=1,PAGESIZE do
    local row=CreateFrame("Button",nil,p)
-   row:SetSize(697,45)
-   row:SetPoint("TOPLEFT",p,"TOPLEFT",20,-197-(i-1)*48)
+   row:SetSize(895,51)
+   row:SetPoint("TOPLEFT",p,"TOPLEFT",20,-195-(i-1)*55)
    row:EnableMouse(true)
-   local bg=tex(row,0,0,697,44,.075,.106,.128,.9)
-   local line=tex(row,0,-43,697,1,.43,.33,.17,.60)
+   local bg=tex(row,0,0,895,50,.075,.106,.128,.9)
+   local line=tex(row,0,-50,895,1,.43,.33,.17,.60)
    C.attachProRowIcon(row,8,23)
    row.title=row:CreateFontString(nil,"ARTWORK","GameFontHighlightSmall")
    row.title:SetPoint("TOPLEFT",row,"TOPLEFT",40,-6)
-   row.title:SetWidth(282);row.title:SetJustifyH("LEFT")
+   row.title:SetWidth(355);row.title:SetJustifyH("LEFT")
    if row.title.SetWordWrap then row.title:SetWordWrap(false) end
    row.metric=row:CreateFontString(nil,"ARTWORK","GameFontHighlightSmall")
    row.metric:SetPoint("TOPRIGHT",row,"TOPRIGHT",-11,-7)
-   row.metric:SetWidth(357);row.metric:SetJustifyH("RIGHT")
+   row.metric:SetWidth(423);row.metric:SetJustifyH("RIGHT")
    row.more=row:CreateFontString(nil,"ARTWORK","GameFontHighlightSmall")
-   row.more:SetPoint("TOPLEFT",row,"TOPLEFT",40,-26)
-   row.more:SetWidth(640);row.more:SetJustifyH("LEFT")
+   row.more:SetPoint("TOPLEFT",row,"TOPLEFT",40,-29)
+   row.more:SetWidth(820);row.more:SetJustifyH("LEFT")
    if row.more.SetWordWrap then row.more:SetWordWrap(false) end
    row.bg=bg
    row:SetScript("OnEnter",function(self)
@@ -118,14 +118,19 @@ function B.strategies(root)
    row:Hide()
    p.rows[i]=row
  end
- p.empty=fs(p,"",30,-293,676)
- p.warning=fs(p,"",20,-446,696)
+ p.empty=fs(p,"",136,-281,690,true)
+ p.emptyHint=fs(p,l("Try refreshing observations or choose another profile.",
+   "Обновите наблюдения или выберите другой профиль."),137,-314,690)
+ p.emptyScan=button(p,l("Open market scanner","Открыть сканер рынка"),
+   325,-353,230,function()A.ShowProTab("scanner")end)
+ if A.StyleButton then A.StyleButton(p.emptyScan,"primary") end
+ p.warning=fs(p,"",20,-585,890)
  p.warning:SetTextColor(1,.78,.46)
- p.prev=button(p,l("< Back","< Назад"),20,-499,122,function()
+ p.prev=button(p,l("< Back","< Назад"),20,-620,122,function()
    p.pageIndex=math.max(1,p.pageIndex-1);p.update()
  end)
- p.pageText=fs(p,"",157,-506,390)
- p.next=button(p,l("Next >","Вперёд >"),589,-499,125,function()
+ p.pageText=fs(p,"",157,-627,390)
+ p.next=button(p,l("Next >","Вперёд >"),787,-620,125,function()
    p.pageIndex=p.pageIndex+1;p.update()
  end)
  p.update=function()
@@ -162,13 +167,19 @@ function B.strategies(root)
          "Нет кандидатов, прошедших фильтры данных и риска.") or
        l("No reliable source data yet.","Пока нет надёжных исходных данных."))
      p.empty:Show()
-   else p.empty:Hide() end
+     p.emptyHint:Show()
+     if p.mode=="discount" then p.emptyScan:Show() else p.emptyScan:Hide() end
+   else
+     p.empty:Hide()
+     p.emptyHint:Hide()
+     p.emptyScan:Hide()
+   end
    for i,row in ipairs(p.rows) do
      local entry=result.rows[(p.pageIndex-1)*PAGESIZE+i]
      row.entry=entry
      if entry then
        local name=C.renderProRowItem(row,entry.key) or A.ProItemName(entry.key)
-       if A.FitItemName then name=A.FitItemName(name,row.title,282) or name end
+       if A.FitItemName then name=A.FitItemName(name,row.title,355) or name end
        row.title:SetText(name)
        row.metric:SetText(metric(entry))
        row.more:SetText(detail(entry))

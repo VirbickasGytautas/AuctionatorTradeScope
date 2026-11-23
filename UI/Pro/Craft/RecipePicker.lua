@@ -66,6 +66,9 @@ function A.AttachCraftRecipePicker(ctx)
     popup.status:SetText(string.format(l(
       "Found: %d  |  Wheel / Up-Down / Enter / Esc",
       "Найдено: %d  |  Колесо / Вверх-Вниз / Enter / Esc"),#filtered))
+    -- Only a deliberate focus/type or Saved Recipes action opens suggestions.
+    -- Programmatic SetText from the Recipe Catalog must not obscure results.
+    if p.applyingRecipe then popup:Hide();return end
     popup:Show()
   end
   p.refreshRecipeChoices=refreshChoices
@@ -124,7 +127,12 @@ function A.AttachCraftRecipePicker(ctx)
     showSaved(true)
   end)
   p.recipeQuery:SetScript("OnTextChanged",function(self)
-    if p.applyingRecipe then return end
+    if p.applyingRecipe then popup:Hide();return end
+    if self.HasFocus and not self:HasFocus() then
+      popup:Hide()
+      return
+    end
+    p.recipeSelected=false
     p.recipeSelectedIndex=1;p.recipeOffset=0
     if self:GetText()=="" then popup:Hide();return end
     loadRecipeChoices()
@@ -155,6 +163,7 @@ function A.AttachCraftRecipePicker(ctx)
   -- WoW Forever clients report the old mouse focus here, even when the
   -- pointer is over a suggestion, which used to cancel the row click.
   -- The list closes after selection, Esc, page background click, or tab hide.
+  p:HookScript("OnShow",function() popup:Hide() end)
   p:HookScript("OnHide",function()
     popup:Hide()
     if A.HideCraftPreview then A.HideCraftPreview() end

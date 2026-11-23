@@ -1,14 +1,16 @@
 -- TradeScope 4.0: WoW-native multi-tool trading workstation.
 local A=ATS
-local WIDTH,HEIGHT=990,780
+local WIDTH,HEIGHT=1188,780
 local TOOLS={"scanner","alerts","candles","activity","journal","craft","indicators","heatmap","quality","craftscan"}
 local function l(en,ru) return A.locale=="ruRU" and ru or en end
 local names={
+ terminal={"Market terminal","Терминал"},balance={"Gold history","История золота"},
  scanner={"Market scanner","Сканер рынка"},alerts={"Price alerts","Ценовые сигналы"},
- candles={"OHLC candles","Свечные графики"},activity={"Market activity","Активность рынка"},
+ candles={"OHLC candles","Свечные графики"},activity={"Activity and data quality","Активность и качество данных"},
  journal={"Trading journal","Журнал сделок"},craft={"Crafting calculator","Калькулятор крафта"},
  indicators={"Indicators","Индикаторы"},heatmap={"Price heatmap","Тепловая карта"},
  quality={"Data quality","Качество данных"},craftscan={"Recipe catalog","Каталог крафта"},
+ strategies={"Trading strategies","Стратегии"},portfolio={"Portfolio","Портфель"},
 }
 local function tr(key) local n=names[key];return n and l(n[1],n[2]) or key end
 local function tex(p,x,y,w,h,r,g,b,a)
@@ -398,8 +400,8 @@ local function itemID(e)
 end
 
 local function heading(p,s,y)
-  fs(p,s,20,y,715,true)
-  tex(p,16,y-26,709,1,.48,.38,.16,.7)
+  fs(p,s,20,y,900,true)
+  tex(p,16,y-26,905,1,.48,.38,.16,.7)
 end
 local function pbutton(p,title,y,fn)
   return button(p,title,20,y,170,25,fn)
@@ -435,17 +437,14 @@ local function anyItem(f)
   return selectedKey(f)
 end
 local function inspect(key)
+  -- The market history is another tab in the same TradeScope window.
   if A.OpenDashboardScanKey and A.ProItemLink(key) then
-    if A.proWindow and A.proWindow:IsShown() then
-      A.proWindow.restoreDashboard=false
-      A.proWindow:Hide()
-    end
     A.OpenDashboardScanKey(key)
   end
 end
 local function newPage(root)
   local p=CreateFrame("Frame",nil,root.content)
-  p:SetSize(946,557);p:SetPoint("TOPLEFT",root.content,"TOPLEFT",0,0)
+  p:SetSize(946,660);p:SetPoint("TOPLEFT",root.content,"TOPLEFT",0,0)
   p:Hide()
   return p
 end
@@ -529,7 +528,7 @@ local function lineList(p,n,start,spacing)
   local rows={}
   for i=1,n do
     local y=start-(i-1)*(spacing or 29)
-    local b=button(p,"",18,y,706,nil,26)
+    local b=button(p,"",18,y,903,nil,26)
     local t=b:GetFontString()
     if t and t.SetJustifyH then t:SetJustifyH("LEFT") end
     b:Hide();rows[i]=b
@@ -546,14 +545,14 @@ local function labelNumber(n) return n and string.format("%.1f",n) or "-" end
 -- It deliberately shows the SAME selected item and the SAME coordinates.
 local function makeItemIdentity(page)
   local bar=CreateFrame("Frame",nil,page)
-  bar:SetSize(694,42)
+  bar:SetSize(905,42)
   bar:SetPoint("TOPLEFT",page,"TOPLEFT",20,-117)
-  tex(bar,0,0,694,42,.095,.125,.14,.90)
-  tex(bar,0,0,694,1,.46,.35,.17,.82)
+  tex(bar,0,0,905,42,.095,.125,.14,.90)
+  tex(bar,0,0,905,1,.46,.35,.17,.82)
   bar.icon=bar:CreateTexture(nil,"ARTWORK")
   bar.icon:SetSize(32,32);bar.icon:SetPoint("TOPLEFT",bar,"TOPLEFT",6,-5)
-  bar.name=fs(bar,"",47,-6,620,true)
-  bar.description=fs(bar,"",47,-24,630)
+  bar.name=fs(bar,"",47,-6,820,true)
+  bar.description=fs(bar,"",47,-24,820)
   bar:EnableMouse(true)
   bar:SetScript("OnEnter",function(self)
     if not self.key then return end

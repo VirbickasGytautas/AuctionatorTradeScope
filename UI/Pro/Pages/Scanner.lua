@@ -45,9 +45,10 @@ function B.scanner(root)
   local p=newPage(root)
   heading(p,l("Market opportunities by discount, score and risk","Рыночные возможности: скидка, рейтинг и риск"),-12)
   fs(p,l("Scores use local Auctionator observations; neither score predicts successful sales.",
-    "Оценка по локальной истории Auctionator. Баллы не прогнозируют успешную продажу."),20,-51,701)
-  p.status=fs(p,"",20,-80,704)
-  button(p,l("Scan local history","Проверить базу"),20,-111,158,function()
+    "Оценка по локальной истории Auctionator. Баллы не прогнозируют успешную продажу."),20,-51,890)
+  p.status=fs(p,"",20,-80,890)
+  local function scanHistory()
+    if A.InCombat and A.InCombat() then return end
     p.status:SetText(l("Scanning...","Анализ базы..."))
     A.StartProScanner(function(n,total)
       p.status:SetText(string.format("%d / %d",n,total))
@@ -56,7 +57,8 @@ function B.scanner(root)
       if A.QueueScannerItemMetadata then A.QueueScannerItemMetadata(results,300) end
       if p.update then p.update() end
     end)
-  end)
+  end
+  button(p,l("Scan local history","Проверить базу"),20,-111,158,scanHistory)
   p.showUnknown=A.db.pro.scannerShowUnknown==true
   local filterButton=button(p,"",187,-111,205,function()
     p.showUnknown=not p.showUnknown
@@ -171,36 +173,56 @@ function B.scanner(root)
   end)
   sortButton:SetScript("OnLeave",function()if GameTooltip then GameTooltip:Hide()end end)
   local legend=fs(p,l("Score 0–100 = opportunity   Risk 0–100 = uncertainty (lower is better)",
-    "Рейтинг 0–100 = возможность   Риск 0–100 = неопределённость (меньше лучше)"),20,-151,696)
+    "Рейтинг 0–100 = возможность   Риск 0–100 = неопределённость (меньше лучше)"),20,-151,896)
   legend:SetTextColor(.78,.83,.88)
-  tex(p,20,-176,696,1,.36,.29,.17,.66)
+  tex(p,20,-176,898,1,.36,.29,.17,.66)
+  fs(p,l("ITEM","ПРЕДМЕТ"),58,-183,382,true)
+  fs(p,l("DISCOUNT","СКИДКА"),449,-183,87,true)
+  fs(p,l("PRICE","ЦЕНА"),554,-183,175,true)
+  fs(p,l("SCORE","РЕЙТИНГ"),748,-183,74,true)
+  fs(p,l("RISK","РИСК"),844,-183,75,true)
   -- One continuous list surface, rather than a stack of red button blocks.
   -- Each full-width transparent button is only an interaction target; the
   -- subtle row divider and hover overlay are drawn over the shared background.
   p.rows={}
-  for i=1,11 do
+  for i=1,13 do
     local row=CreateFrame("Button",nil,p)
-    row:SetSize(696,27)
-    row:SetPoint("TOPLEFT",p,"TOPLEFT",20,-184-(i-1)*29)
-    local hover=tex(row,0,0,696,27,.52,.38,.12,.20)
+    row:SetSize(898,27)
+    row:SetPoint("TOPLEFT",p,"TOPLEFT",20,-205-(i-1)*29)
+    local hover=tex(row,0,0,898,27,.52,.38,.12,.20)
     hover:Hide()
     row.hoverBackground=hover
-    tex(row,0,-26,696,1,.33,.30,.24,.32)
+    tex(row,0,-26,898,1,.33,.30,.24,.32)
     local icon=row:CreateTexture(nil,"ARTWORK")
     icon:SetSize(21,21);icon:SetPoint("LEFT",row,"LEFT",7,0)
     row.scanIcon=icon
-    local label=row:CreateFontString(nil,"ARTWORK","GameFontHighlightSmall")
-    label:SetPoint("LEFT",row,"LEFT",35,0)
-    label:SetPoint("RIGHT",row,"RIGHT",-5,0)
-    label:SetJustifyH("LEFT")
-    label:SetTextColor(1,.84,.40)
-    row:SetFontString(label)
+    local columns={
+      {"itemName",35,384,"LEFT"},
+      {"discountText",429,91,"RIGHT"},
+      {"priceText",529,187,"RIGHT"},
+      {"scoreText",729,80,"RIGHT"},
+      {"riskText",827,62,"RIGHT"},
+    }
+    for _,column in ipairs(columns) do
+      local text=row:CreateFontString(nil,"ARTWORK","GameFontHighlightSmall")
+      text:SetPoint("LEFT",row,"LEFT",column[2],0)
+      text:SetWidth(column[3]);text:SetJustifyH(column[4])
+      if column[1]=="itemName" then text:SetTextColor(.96,.87,.65)
+      else text:SetTextColor(.84,.88,.91) end
+      row[column[1]]=text
+    end
     row:Hide()
     p.rows[i]=row
   end
+  p.empty=fs(p,"",178,-307,590,true)
+  p.emptyHint=fs(p,l("Quotes are observed locally; no transactions are inferred.",
+    "Цены берутся из локальных наблюдений; сделки не предполагаются."),165,-340,610)
+  p.emptyScan=button(p,l("Scan local history","Проверить базу"),
+    331,-381,207,scanHistory)
+  if A.StyleButton then A.StyleButton(p.emptyScan,"primary") end
   p.page=1
-  button(p,"<",17,-518,38,function()p.page=math.max(1,p.page-1);p.update()end)
-  button(p,">",66,-518,38,function()p.page=p.page+1;p.update()end)
+  button(p,"<",17,-590,38,function()p.page=math.max(1,p.page-1);p.update()end)
+  button(p,">",66,-590,38,function()p.page=p.page+1;p.update()end)
   p.update=function()
     p.showUnknown=A.db.pro.scannerShowUnknown==true
     local results=A.ProScanner()
@@ -244,8 +266,11 @@ function B.scanner(root)
         local itemName=view.name or string.format(l("Unknown item (#%d)","Неизвестный предмет (#%d)"),view.id or 0)
         local score=item.score and tostring(item.score) or "?"
         local risk=item.risk and tostring(item.risk) or "?"
-        row:SetText(string.format("%s   -%.1f%%   %s   S:%s R:%s",itemName,item.discount or 0,
-          currency(item.price),score,risk))
+        row.itemName:SetText(itemName)
+        row.discountText:SetText(string.format("-%.1f%%",item.discount or 0))
+        row.priceText:SetText(currency(item.price))
+        row.scoreText:SetText(score)
+        row.riskText:SetText(risk)
         row.scanIcon:SetTexture(view.icon or "Interface\\Icons\\INV_Misc_QuestionMark")
         row:SetScript("OnClick",function()inspect(item.key)end)
         row:SetScript("OnEnter",function(self)
@@ -274,8 +299,15 @@ function B.scanner(root)
         row:Hide()
       end
     end
-    if #display==0 and #results>0 then
-      p.status:SetText(p.status:GetText()..l("  |  Load names or show IDs.","  |  Загрузите имена или покажите ID."))
+    if #display==0 then
+      p.empty:SetText(#results>0 and
+        l("Names are not loaded. Enable unknown IDs or load item names.",
+          "Названия не загружены. Покажите ID или загрузите имена.") or
+        l("No current market candidates.","Нет актуальных рыночных кандидатов."))
+      p.empty:Show();p.emptyHint:Show()
+      if #results==0 then p.emptyScan:Show() else p.emptyScan:Hide() end
+    else
+      p.empty:Hide();p.emptyHint:Hide();p.emptyScan:Hide()
     end
   end
   A.RefreshProItemLabels=function()

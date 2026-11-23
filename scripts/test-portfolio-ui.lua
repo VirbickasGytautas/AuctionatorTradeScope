@@ -88,7 +88,7 @@ assert(p.rows[1].text=="Item db:1")
 assert(p.rows[1].itemIcon.texture=="Interface\\Icons\\INV_Ore_Iron_01")
 assert(p.rows[1].itemIcon.visible and p.rows[1].itemMetrics.text:find("Bags 1",1,true))
 assert(not p.rows[1].itemIconFallback.visible)
-assert(p.rows[1].itemTitle.point[4]==36 and p.rows[1].itemTitle.width==245)
+assert(p.rows[1].itemTitle.point[4]==36 and p.rows[1].itemTitle.width==400)
 assert(p.pageText.text=="Page 1 / 2")
 assert(p.prev.enabled==false and p.next.enabled==true)
 p.next.scripts.OnClick();assert(p.pageIndex==2)
@@ -113,8 +113,8 @@ assert(p.rows[1].itemMetrics.text:find("%",1,true))
 assert(p.rows[1].itemIcon.visible and p.rows[1].itemIcon.texture:find("INV_Ore",1,true))
 assert(p.allocationBars[1].width>=600 and p.allocationBars[1].height>=7)
 assert(p.allocationBars[1].fill.visible and p.allocationBars[1].track.visible)
-assert(p.allocationBars[1].fill.width>=1 and p.allocationBars[1].fill.width<=640)
-local expectedFill=math.floor(640*stock.items[9].bagValue/(
+assert(p.allocationBars[1].fill.width>=1 and p.allocationBars[1].fill.width<=840)
+local expectedFill=math.floor(840*stock.items[9].bagValue/(
   stock.items[1].bagValue+stock.items[2].bagValue+stock.items[3].bagValue+
   stock.items[4].bagValue+stock.items[5].bagValue+stock.items[6].bagValue+
   stock.items[7].bagValue+stock.items[8].bagValue+stock.items[9].bagValue)+.5)

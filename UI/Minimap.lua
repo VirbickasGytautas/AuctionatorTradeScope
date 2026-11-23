@@ -11,21 +11,24 @@ local TOOLS={
   {"craft","Interface\\Icons\\INV_Misc_Gear_02"},
   {"indicators","Interface\\Icons\\Spell_Holy_MindVision"},
   {"heatmap","Interface\\Icons\\INV_Misc_Map_01"},
-  {"quality","Interface\\Icons\\INV_Misc_EngGizmos_02"},
   {"craftscan","Interface\\Icons\\INV_Misc_Coin_17"},
   {"balance","Interface\\Icons\\INV_Misc_Coin_01"},
 }
 local function label(key)
-  local ru={scanner="Сканер рынка",alerts="Ценовые сигналы",candles="Свечи",activity="Активность",
+  local ru={scanner="Сканер рынка",alerts="Ценовые сигналы",candles="Свечи",activity="Активность / качество",
     journal="Журнал сделок",craft="Калькулятор",indicators="Индикаторы",heatmap="Тепловая карта",
     quality="Качество данных",craftscan="Выгодный крафт",balance="История золота",terminal="Терминал"}
-  local en={scanner="Market scanner",alerts="Price alerts",candles="Candles",activity="Market activity",
+  local en={scanner="Market scanner",alerts="Price alerts",candles="Candles",activity="Activity / quality",
     journal="Trade journal",craft="Crafting",indicators="Indicators",heatmap="Price heatmap",
     quality="Data quality",craftscan="Profitable crafts",balance="Gold history",terminal="Market terminal"}
   return ((A.locale=="ruRU" and ru) or en)[key] or key
 end
 local function enabled(key)
   local p=A.db and A.db.pro
+  if key=="activity" then
+    return p and p.minimapTools and p.minimapTools[key]~=false and
+      not (p.activityEnabled==false and p.qualityEnabled==false)
+  end
   return p and p.minimapTools and p.minimapTools[key]~=false and p[key.."Enabled"]~=false
 end
 local function flat(parent,layer,r,g,b,alpha)

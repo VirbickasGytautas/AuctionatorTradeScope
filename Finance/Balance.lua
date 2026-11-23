@@ -215,11 +215,13 @@ local function createWindow()
     f:SetBackdropColor(.02,.035,.055,.99)
   end
   local back=tex(f,"BACKGROUND",{.025,.035,.060},.98)
+  f.background=back
   back:SetPoint("TOPLEFT",f,"TOPLEFT",9,-9)
   back:SetPoint("BOTTOMRIGHT",f,"BOTTOMRIGHT",-9,9)
   local heading=label(f,540,"LEFT","GameFontNormalLarge")
   heading:SetPoint("TOPLEFT",f,"TOPLEFT",19,-17)
   heading:SetText(A.L.WALLET_WINDOW_TITLE)
+  f.windowHeading=heading
   f.close=CreateFrame("Button",nil,f,"UIPanelCloseButton")
   f.close:SetPoint("TOPRIGHT",f,"TOPRIGHT",-6,-6)
   f.summary=label(f,610,"LEFT","GameFontHighlightSmall")
@@ -266,6 +268,7 @@ local function createWindow()
   local instruction=label(f,650,"LEFT")
   instruction:SetPoint("TOPLEFT",f,"TOPLEFT",22,-456)
   instruction:SetText(A.L.WALLET_ZOOM_HINT)
+  f.instruction=instruction
   instruction:SetTextColor(.72,.77,.86)
   f:EnableMouseWheel(true)
   f:SetScript("OnMouseWheel",function(_,delta)changeZoom(f,delta)end)
@@ -321,6 +324,7 @@ local function createWindow()
   f:HookScript("OnHide",function()hideCursor(f)end)
   -- Move the window with the title strip, not the chart itself.
   local drag=CreateFrame("Frame",nil,f)
+  f.drag=drag
   drag:SetPoint("TOPLEFT",f,"TOPLEFT",14,-10)
   drag:SetSize(WIDTH-63,35)
   drag:EnableMouse(true);drag:RegisterForDrag("LeftButton")
@@ -436,22 +440,81 @@ function A.RefreshBalanceWindow()
   if f.cursorLine and f.cursorLine:IsShown() then updateCursor(f) end
 end
 
-function A.OpenBalanceWindow()
-  if A.InCombat and A.InCombat() then return end
-  A.Init()
+function A.EmbedBalanceHistory(page)
   local f=createWindow()
-  if UIParent and UIParent.GetWidth and UIParent.GetHeight then
-    local target=math.min(1,(UIParent:GetWidth()-30)/WIDTH,(UIParent:GetHeight()-30)/HEIGHT)
-    f:SetScale(math.max(0.6,target))
+  if f.embeddedIn~=page then
+    f:Hide()
+    f:SetParent(page)
+    f:ClearAllPoints()
+    -- Native 1:1 canvas, matching other tabs; reflow axes, plotting hitbox,
+    -- cursor overlay and controls together instead of enlarging a 694px modal.
+    WIDTH,HEIGHT=946,658
+    LEFT,RIGHT,BOTTOM,TOP=88,916,136,548
+    f:SetScale(1)
+    f:SetSize(WIDTH,HEIGHT)
+    f:SetPoint("TOPLEFT",page,"TOPLEFT",0,-1)
+    f:SetFrameStrata("DIALOG")
+    f:SetFrameLevel(page:GetFrameLevel()+2)
+    if f.SetBackdrop then f:SetBackdrop(nil) end
+    for _,part in ipairs({f.close,f.drag,f.windowHeading,f.background}) do
+      if part then part:Hide() end
+    end
+    local function place(widget,x,y)
+      if not widget then return end
+      widget:ClearAllPoints()
+      widget:SetPoint("TOPLEFT",f,"TOPLEFT",x,y)
+    end
+    place(f.summary,20,-18)
+    f.summary:SetWidth(905)
+    f.hint:ClearAllPoints()
+    f.hint:SetPoint("CENTER",f,"BOTTOMLEFT",(LEFT+RIGHT)/2,(TOP+BOTTOM)/2)
+    for i=1,DIVS+1 do
+      local y=BOTTOM+(i-1)*(TOP-BOTTOM)/DIVS
+      local h=f.hgrid[i]
+      h:ClearAllPoints();h:SetSize(RIGHT-LEFT,1)
+      h:SetPoint("BOTTOMLEFT",f,"BOTTOMLEFT",LEFT,y)
+      local label=f.yticks[i]
+      label:ClearAllPoints();label:SetWidth(LEFT-15)
+      label:SetPoint("RIGHT",f,"BOTTOMLEFT",LEFT-10,y)
+    end
+    for i=1,7 do
+      local x=LEFT+(i-1)*(RIGHT-LEFT)/6
+      local v=f.vgrid[i]
+      v:ClearAllPoints();v:SetSize(1,TOP-BOTTOM)
+      v:SetPoint("BOTTOM",f,"BOTTOMLEFT",x,BOTTOM)
+      local tick=f.xticks[i]
+      tick:ClearAllPoints()
+      tick:SetPoint("TOP",f,"BOTTOMLEFT",x,BOTTOM-7)
+    end
+    f.plotHitbox:ClearAllPoints()
+    f.plotHitbox:SetSize(RIGHT-LEFT,TOP-BOTTOM)
+    f.plotHitbox:SetPoint("BOTTOMLEFT",f,"BOTTOMLEFT",LEFT,BOTTOM)
+    f.cursorLine:SetHeight(TOP-BOTTOM)
+    place(f.presetDay,20,-569)
+    place(f.presetWeek,116,-569)
+    place(f.presetMonth,214,-569)
+    place(f.zoomInfo,339,-574)
+    place(f.zoomIn,620,-569)
+    place(f.zoomOut,669,-569)
+    place(f.zoomReset,725,-569)
+    place(f.enable,20,-569)
+    place(f.instruction,20,-621)
+    f.instruction:SetWidth(900)
+    f:SetMovable(false)
+    f.embeddedIn=page
   end
   f:Show()
-  A.RefreshBalanceWindow()
   return f
+end
+function A.OpenBalanceWindow()
+  if A.InCombat and A.InCombat() then return end
+  if not A.OpenProTool then return end
+  A.OpenProTool("balance")
+  return A.balanceFrame
 end
 function A.ToggleBalanceWindow()
   if A.InCombat and A.InCombat() then return end
-  if A.balanceFrame and A.balanceFrame:IsShown() then A.balanceFrame:Hide()
-  else A.OpenBalanceWindow() end
+  if A.ToggleProTool then A.ToggleProTool("balance") end
 end
 function A.ShowBalance()
   if A.InCombat and A.InCombat() then return end

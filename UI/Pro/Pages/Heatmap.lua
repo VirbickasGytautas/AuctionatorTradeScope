@@ -50,13 +50,13 @@ function B.heatmap(root)
   local weekdaysRU={"Пн","Вт","Ср","Чт","Пт","Сб","Вс"}
   p.identity=makeItemIdentity(p)
   p.cells={}
-  for h=0,23 do fs(p,tostring(h),80+h*25,-168,24) end
+  for h=0,23 do fs(p,tostring(h),80+h*34,-168,31) end
   for day=1,7 do
-    fs(p,A.locale=="ruRU" and weekdaysRU[day] or weekdays[day],20,-205-(day-1)*42,50)
+    fs(p,A.locale=="ruRU" and weekdaysRU[day] or weekdays[day],20,-205-(day-1)*50,50)
     p.cells[day]={}
     for h=0,23 do
       local b=CreateFrame("Button",nil,p)
-      b:SetSize(21,31);b:SetPoint("TOPLEFT",p,"TOPLEFT",79+h*25,-199-(day-1)*42)
+      b:SetSize(30,40);b:SetPoint("TOPLEFT",p,"TOPLEFT",79+h*34,-199-(day-1)*50)
       local bg=b:CreateTexture(nil,"BACKGROUND")
       bg:SetTexture("Interface\\Buttons\\WHITE8X8");bg:SetAllPoints(b)
       b.bg=bg
@@ -74,7 +74,7 @@ function B.heatmap(root)
     end
   end
   p.hint=fs(p,l("Empty cells mean no scans. Color is relative to observed prices only.",
-    "Пустая клетка — не было сканов. Цвет относительно наблюдаемых цен."),24,-515,690)
+    "Пустая клетка — не было сканов. Цвет относительно наблюдаемых цен."),24,-587,900)
   p.update=function()
     local key=selectedKey(p)
     p.identity:showItem(key)

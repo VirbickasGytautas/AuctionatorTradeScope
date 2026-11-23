@@ -42,16 +42,22 @@ local miniLine=C.miniLine
 local attachIndicatorCursor=C.attachIndicatorCursor
 
 function B.candles(root)
+  local PLOT_W,PLOT_H=868,390
   local p=newPage(root)
   heading(p,l("Candlesticks (observed OHLC, no trade volume)","Свечи OHLC по замерам (без объёма сделок)"),-12)
   p.selection=marketInput(p,20,-60,216)
   p.bucket=edit(p,l("Bucket (hours)","Интервал свечи (ч)"),246,-60,100,tostring(A.db.pro.candleBucketHours),true)
   p.hours=edit(p,l("History (hours)","История (часов)"),365,-60,113,tostring(A.db.pro.candleHours),true)
   p.identity=makeItemIdentity(p)
-  p.plot=newPlot(p,56,-174,630,292)
-  p.info=fs(p,"",22,-478,690)
+  -- The common item strip is anchored at y=-117 with height 42. Anchoring the
+  -- plot below its actual bottom avoids drawing price bars on top of the icon
+  -- and label if the strip is ever moved by a future layout change.
+  p.plot=newPlot(p,29,-183,PLOT_W,PLOT_H)
+  p.plot:ClearAllPoints()
+  p.plot:SetPoint("TOPLEFT",p.identity,"BOTTOMLEFT",9,-24)
+  p.info=fs(p,"",22,-590,886)
   p.hint=fs(p,l("Green = rising; red = falling. Empty hours mean no price observations.",
-     "Зелёные — рост, красные — падение. Пустые часы — нет наблюдений."),22,-508,698)
+     "Зелёные — рост, красные — падение. Пустые часы — нет наблюдений."),22,-618,886)
   button(p,l("Update chart","Обновить"),506,-83,152,function()
     A.db.pro.candleBucketHours=math.max(1,math.min(168,math.floor(tonumber(p.bucket:GetText()) or 1)))
     A.db.pro.candleHours=math.max(1,math.min(2160,math.floor(tonumber(p.hours:GetText()) or 24)))
@@ -67,7 +73,7 @@ function B.candles(root)
     local candles=A.ProCandles(samples,hours,bucket)
     local plot=p.plot
     plot:clear()
-    for i=0,4 do plot:rect(0,i*73,630,1,.18,.28,.40,.6) end
+    for i=0,4 do plot:rect(0,i*PLOT_H/4,PLOT_W,1,.18,.28,.40,.6) end
     local lo,hi
     for i=1,#candles do
       lo=math.min(lo or candles[i].low,candles[i].low)
@@ -76,15 +82,15 @@ function B.candles(root)
     if not lo then p.info:SetText(l("No observations in selected period.","За период нет наблюдений."));return end
     local span=math.max(1,hi-lo)
     local start=time()-hours*3600
-    local candW=math.max(2,math.min(13,(bucket/hours)*630*.66))
-    local function y(price) return math.max(3,math.min(289,14+(price-lo)/span*262)) end
+    local candW=math.max(2,math.min(13,(bucket/hours)*PLOT_W*.66))
+    local function y(price) return math.max(3,math.min(PLOT_H-4,16+(price-lo)/span*(PLOT_H-32))) end
     local previousEMA,previousBoll,previousLower
     local indi=A.ProIndicators(samples)
     local lastIndi=indi.latest
     for i=1,#candles do
       local c=candles[i]
-      local x=(c.t-start)/(hours*3600)*630
-      if x>=0 and x<=630 then
+      local x=(c.t-start)/(hours*3600)*PLOT_W
+      if x>=0 and x<=PLOT_W then
         local rising=c.close>=c.open
         local r,g,b=rising and .24 or .95,rising and .88 or .31,rising and .49 or .29
         plot:rect(x,y(c.low),2,math.max(2,y(c.high)-y(c.low)),r,g,b)
@@ -94,8 +100,8 @@ function B.candles(root)
     end
     if A.db.pro.showEMA or A.db.pro.showBollinger then
       for i=1,#indi.values do
-        local v=indi.values[i];local x=(v.t-start)/(hours*3600)*630
-        if x>=0 and x<=630 then
+        local v=indi.values[i];local x=(v.t-start)/(hours*3600)*PLOT_W
+        if x>=0 and x<=PLOT_W then
           if A.db.pro.showEMA and v.ema then
             local yy=y(v.ema)
             if previousEMA and previousEMA.segment==v.segment and

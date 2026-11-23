@@ -48,7 +48,11 @@ function B.quality(root)
   button(p,l("Analyze","Анализировать"),272,-83,132,function()p.update()end)
   p.identity=makeItemIdentity(p)
   p.rows={}
-  for i=1,13 do p.rows[i]=fs(p,"",20,-181-(i-1)*27,694,i==1) end
+  for i=1,13 do
+    local col=(i<=7) and 0 or 1
+    local row=(i<=7) and (i-1) or (i-8)
+    p.rows[i]=fs(p,"",20+col*470,-181-row*61,435,i==1)
+  end
   addMetricTooltips(p,p.rows,{
     {"Overall data reliability score from 0 to 100. Combines distinct observed hours, history span, recency, and time-window coverage. This is not a sale probability.",
      "Общая оценка качества данных от 0 до 100. Учитывает часы с замерами, длительность истории, свежесть и покрытие временных интервалов. Это не вероятность продажи."},
@@ -76,7 +80,7 @@ function B.quality(root)
      "Замеры за разные часы и дни обычно информативнее, чем много сканирований за короткое время."},
     {"The quality score describes coverage and recency of your local data. It cannot tell whether an item will sell, or how quickly.",
      "Оценка качества описывает полноту и свежесть локальной истории. Она не показывает, продастся ли предмет и как быстро."},
-  },694)
+  },427)
   p.update=function()
     local key=selectedKey(p)
     p.identity:showItem(key)
